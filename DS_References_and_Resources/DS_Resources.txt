@@ -1,0 +1,17 @@
+1. Women in Data Science
+https://www.widsworldwide.org/learn/next-gen/
+
+2. Aspirations in Computing (Awards for High School girl students)
+https://www.aspirations.org/award-programs/aic-high-school-award
+
+3. What's Gong On in This Graph?  Graphs, maps and charts from The Times — and an invitation to students to discuss them live.
+https://www.nytimes.com/column/whats-going-on-in-this-graph?page=3
+
+4. Dear Data Post Card
+https://docs.google.com/presentation/d/1WE8Byyv7eJncoS_7Of6xZruaEFa6AZi30lgXKPv7wzc/edit#slide=id.gb98ea110d9_0_0
+
+5. VIZ of the Day (Tableau Public)
+https://public.tableau.com/app/discover/viz-of-the-day
+
+6. What is Viz of the Day?
+https://www.tableau.com/blog/viz-day-heres-what-you-need-know
