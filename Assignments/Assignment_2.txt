@@ -1,0 +1,44 @@
+This is programming exercise 2 from the text book Chapter 9: Dictionaries and Sets
+(page Number: 518; PDF page number: 534) 
+Capital Quiz 
+
+Write a program that creates a dictionary containing the U.S. states as keys, and their capitals as values. 
+(Use the Internet to get a list of the states and their capitals.) The program
+should then randomly quiz the user by displaying the name of a state and asking the user
+to enter that state’s capital. The program should keep a count of the number of correct and
+incorrect responses. (As an alternative to the U.S. states, the program can use the names of
+countries and their capitals.)
+
+
+================  Implementation Strategy =========================================
+
+[1] Maintain a dictionary of all 50 states (state is the KEY) and their capitals (Capital is the VALUE)
+You can get the list from  https://www.britannica.com/topic/list-of-state-capitals-in-the-United-States-2119210
+
+[2] Assume that you are asking 5 random questions to the user.
+
+
+[1] What is the capital of Minnesota?
+St.Paul
+
+[2] What is the capital of Texax?
+Dallas
+
+
+[3] What is the capital of Florida?
+Disneyland
+
+[4] What is the capital of California?
+San Franscisco
+
+
+[5] What is the Massachuets?
+Boston
+
+
+Result: Your score is 3 out of 5.
+
+========= What to submit? ==========================
+1. Submit the completed "python_ds_assignment_2.ipynb"
+2. Capture two runs (run the program two times) and capture the output in a text file.
+Submit the text file also to the assignment folder.
