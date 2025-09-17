@@ -1,3 +1,5 @@
+Please see https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Assignments/US_States_and_Capitals_Quiz.md  (this is the better version)
+
 This is programming exercise 2 from the text book Chapter 9: Dictionaries and Sets
 (page Number: 518; PDF page number: 534) 
 Capital Quiz 
