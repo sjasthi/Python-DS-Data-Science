@@ -155,7 +155,7 @@ Keep studying! You'll improve with practice!
 4. **Code Organization:** Structure your code with clear sections for each part
 5. **Error Handling:** Include basic input validation
 
-### 📓 Jupyter Notebook Structure
+### 📓 Google Colab Notebook Structure
 Organize your notebook with these sections:
 1. **Introduction Cell** (Markdown) - Explain the assignment
 2. **Data Setup** - Dictionary creation and validation
