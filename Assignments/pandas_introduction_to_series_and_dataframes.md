@@ -1,4 +1,4 @@
-# DSCI 2001-51 Data Science I
+# Assignment
 # Introduction to Pandas Series and DataFrames
 
 ---
