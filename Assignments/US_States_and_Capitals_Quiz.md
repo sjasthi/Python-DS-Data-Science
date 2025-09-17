@@ -199,7 +199,7 @@ Organize your notebook with these sections:
 - Incorrect final score calculation
 - Missing input validation for empty responses
 
-### 📓 Jupyter Notebook Tips
+### 📓 Google Colab Notebook Tips
 - Use markdown cells to document your approach
 - Test your code in small chunks before combining
 - Include sample outputs in your notebook
@@ -233,4 +233,4 @@ If you encounter issues:
 
 ---
 
-*Last updated: [Date]*
+*Last updated: [9.17.2025]*
