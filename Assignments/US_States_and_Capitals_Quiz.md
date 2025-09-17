@@ -142,11 +142,11 @@ Keep studying! You'll improve with practice!
 ## 📤 Submission Requirements
 
 ### 📁 File Submissions
-1. **Python Notebook:** Submit the completed `python_ds_assignment_2.ipynb` file
+1. **Python Notebook:** Submit the completed `python_ds_assignment_us_capitals_quiz.ipynb` file
 2. **Output Capture:** Create a text file containing the output from **TWO** complete program runs
    - Run the program twice with different random questions
    - Copy and paste the complete output (including your inputs) into a text file
-   - Name the file: `lastname_firstname_quiz_outputs.txt`
+   - Name the file: `lastname_firstname_us_capitals_quiz_outputs.txt`
 
 ### 💻 Code Requirements
 1. **File Header:** Include your name, course, date, and assignment description
