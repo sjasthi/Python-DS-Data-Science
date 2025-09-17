@@ -321,7 +321,7 @@ np.random.seed(42)  # Use this for reproducible results
 
 ---
 
-## 🎯 Part 4: Challenge Questions (Bonus: +2 points)
+## 🎯 Part 4: Challenge Questions
 
 ### Challenge 1: Data Integration
 Create a summary report that answers:
@@ -376,7 +376,7 @@ Using your sales data:
 | **Part 2: DataFrames** | 10 | Proper DataFrame creation, exploration methods |
 | **Part 3: Modifications** | 7 | Adding columns, aggregations, analysis |
 | **Code Quality** | - | Clean, commented code that runs error-free |
-| **Challenge Questions** | +2 | Creative problem-solving and insights |
+| **Challenge Questions** | - | Creative problem-solving and insights |
 
 ### Detailed Grading:
 - **Excellent (90-100%):** All tasks completed correctly with insightful analysis
