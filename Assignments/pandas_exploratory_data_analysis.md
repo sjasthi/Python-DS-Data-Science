@@ -1,8 +1,5 @@
 # Pandas: Exploratory Data Analysis Assignment
 
-**Platform:** Google Colab  
-**Points:** 25  
-
 ---
 
 ## 🎯 Learning Objectives
@@ -19,11 +16,11 @@ By completing this assignment, you will demonstrate your ability to:
 
 ## 📊 Dataset
 
-You will analyze the **World Happiness Report 2023** dataset, which contains happiness scores and related factors for countries worldwide.
+You will analyze the **Student Performance Dataset**, which contains student achievement data across multiple subjects and various demographic factors.
 
-**Dataset URL:** `https://raw.githubusercontent.com/datasets/happiness/main/data/2023.csv`
+**Dataset URL:** `https://raw.githubusercontent.com/datasciencedojo/datasets/master/StudentsPerformance.csv`
 
-**Dataset Description:** This dataset includes happiness scores and contributing factors such as GDP per capita, social support, healthy life expectancy, freedom, generosity, and corruption perceptions for various countries.
+**Dataset Description:** This dataset contains student performance data including math, reading, and writing scores along with demographic information such as gender, ethnicity, parental education level, lunch type, and test preparation course completion. It provides rich opportunities for exploratory data analysis.
 
 ---
 
@@ -41,7 +38,7 @@ import pandas as pd
 import numpy as np
 
 # Load the dataset
-url = 'https://raw.githubusercontent.com/datasets/happiness/main/data/2023.csv'
+url = 'https://raw.githubusercontent.com/datasciencedojo/datasets/master/StudentsPerformance.csv'
 df = pd.read_csv(url)
 
 print("Dataset loaded successfully!")
@@ -66,8 +63,8 @@ print("Dataset shape:", df.shape)
 5. List all column names and their data types
 
 **Questions to Answer:**
-- How many countries are included in this dataset?
-- How many features (columns) does each country have?
+- How many students are included in this dataset?
+- How many features (columns) does each student record have?
 - What is the total number of data points in the dataset?
 
 ```python
@@ -114,14 +111,14 @@ print("Dataset shape:", df.shape)
 
 **Requirements:**
 1. Use `.describe()` to show statistics for ALL numerical columns
-2. For the happiness score column specifically, calculate and display:
+2. For the math score column specifically, calculate and display:
    - Mean, median, and mode
    - Standard deviation and variance
    - Minimum and maximum values
    - 25th and 75th percentiles
-3. Identify which country has the highest happiness score
-4. Identify which country has the lowest happiness score
-5. Calculate how many countries have happiness scores above the global average
+3. Identify which student has the highest math score
+4. Identify which student has the lowest math score
+5. Calculate how many students have math scores above the overall average
 
 ```python
 # Your code here for Task 2.1
@@ -150,11 +147,11 @@ print("Dataset shape:", df.shape)
 **Your Challenge:** Generate deeper insights from the numerical data.
 
 **Requirements:**
-1. Find correlations between happiness score and other numerical factors
-2. Identify the top 5 happiest countries and display their key metrics
-3. Identify the bottom 5 countries by happiness score and display their key metrics
-4. Calculate the range (max - min) for happiness scores
-5. Determine what percentage of countries score above 7.0 in happiness
+1. Find correlations between math score and other numerical factors (reading, writing scores)
+2. Identify the top 5 performing students (by average of all three scores) and display their key metrics
+3. Identify the bottom 5 performing students and display their key metrics
+4. Calculate the range (max - min) for each subject score
+5. Determine what percentage of students score above 80 in math
 
 ```python
 # Your code here for Task 2.3
@@ -169,9 +166,9 @@ print("Dataset shape:", df.shape)
 
 **Requirements:**
 1. Check for any duplicate rows in the dataset
-2. Verify that happiness scores are within a reasonable range (typically 0-10)
+2. Verify that test scores are within a reasonable range (typically 0-100)
 3. Look for any obvious data entry errors or outliers
-4. Check if country names are consistently formatted
+4. Check if categorical values are consistently formatted (gender, ethnicity, etc.)
 
 ```python
 # Your code here for Task 3.1
@@ -183,10 +180,10 @@ print("Dataset shape:", df.shape)
 **Your Challenge:** Understand how your data is distributed.
 
 **Requirements:**
-1. Calculate quartiles for the happiness score
-2. Identify any countries that might be considered outliers (unusually high or low scores)
-3. Determine the median happiness score and how many countries fall above/below it
-4. Create value counts for any categorical variables
+1. Calculate quartiles for the math scores
+2. Identify any students that might be considered outliers (unusually high or low scores)
+3. Determine the median math score and how many students fall above/below it
+4. Create value counts for categorical variables like gender, ethnicity, parental education
 
 ```python
 # Your code here for Task 3.2
@@ -204,13 +201,13 @@ Create a markdown cell that includes:
 
 1. **Dataset Overview** (1 point):
    - Brief description of the dataset
-   - Number of countries and features analyzed
+   - Number of students and features analyzed
    - Data quality assessment summary
 
 2. **Key Findings** (1 point):
-   - Top 3 happiest countries and their scores
-   - Bottom 3 countries and their scores
-   - Average global happiness score
+   - Top 3 performing students and their average scores
+   - Bottom 3 students and their average scores
+   - Overall class performance patterns
    - Most important insight you discovered
 
 3. **Data Quality Report** (1 point):
@@ -287,10 +284,11 @@ Create a markdown cell that includes:
 ## 🔍 Expected Insights
 
 While working through this assignment, you should discover insights such as:
-- Which regions of the world tend to be happiest
-- The relationship between economic factors and happiness
-- How happiness scores are distributed globally
-- Whether there are any surprising outliers in the data
+- Which demographic groups tend to perform better academically
+- The relationship between parental education level and student performance
+- How test preparation courses affect student scores
+- Whether there are performance differences across different subjects
+- The distribution of scores across gender and ethnicity groups
 
 ---
 
