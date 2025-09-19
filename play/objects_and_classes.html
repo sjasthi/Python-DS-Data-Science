@@ -66,7 +66,11 @@
             font-family: 'Courier New', monospace;
             margin: 15px 0;
             overflow-x: auto;
-            white-space: pre-wrap;
+        }
+        
+        .code-block pre {
+            margin: 0;
+            white-space: pre;
             line-height: 1.5;
         }
         
@@ -253,7 +257,7 @@
                 <p>Here's how we define a class in Python:</p>
                 
                 <div class="code-block">
-class Pet:
+<pre>class Pet:
     def __init__(self, name, animal_type, age):
         self.name = name
         self.animal_type = animal_type
@@ -269,7 +273,7 @@ class Pet:
         return f"{self.name} loves playing! Happiness: {self.happiness}"
     
     def introduce(self):
-        return f"Hi! I'm {self.name}, a {self.age} year old {self.animal_type}!"
+        return f"Hi! I'm {self.name}, a {self.age} year old {self.animal_type}!"</pre>
                 </div>
 
                 <div class="highlight">
@@ -326,13 +330,13 @@ class Pet:
                 <p>Here's how we create and use pet objects:</p>
                 
                 <div class="code-block">
-# Creating objects from our Pet class
+<pre># Creating objects from our Pet class
 my_dog = Pet("Buddy", "Dog", 3)
 my_cat = Pet("Whiskers", "Cat", 2)
 
 # Using the objects
 print(my_dog.introduce())  # Output: Hi! I'm Buddy, a 3 year old Dog!
-print(my_cat.feed())       # Output: Whiskers is happy! Happiness: 60
+print(my_cat.feed())       # Output: Whiskers is happy! Happiness: 60</pre>
                 </div>
 
                 <div class="interactive-demo">
