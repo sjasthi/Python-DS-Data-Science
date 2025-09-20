@@ -115,14 +115,3 @@ if __name__ == "__main__":
 - [ ] Files named correctly
 - [ ] Both files submitted before deadline
 
----
-
-## **Tips for Success**
-
-1. **Choose a Simple but Interesting Class:** Don't overcomplicate - focus on implementing the requirements well
-2. **Test Thoroughly:** Make sure your `__str__` and `__repr__` methods produce different, meaningful outputs
-3. **Comment Your Code:** Explain what each method does
-4. **Follow Python Conventions:** Use proper naming (PascalCase for classes, snake_case for methods)
-5. **Be Creative:** While following requirements, make your class interesting and unique
-
----
