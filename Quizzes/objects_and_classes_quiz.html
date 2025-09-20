@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Classes & Objects Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+            overflow: hidden;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .quiz-header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .quiz-title {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .quiz-subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            background: rgba(255,255,255,0.3);
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: white;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .question-container {
+            padding: 40px;
+        }
+
+        .question-number {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .answers-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .answer-btn {
+            background: #f8f9fa;
+            border: 3px solid #e9ecef;
+            border-radius: 15px;
+            padding: 20px;
+            font-size: 1.1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .answer-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .answer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .answer-btn:hover::before {
+            left: 100%;
+        }
+
+        .answer-btn.selected {
+            background: #4dabf7;
+            color: white;
+            border-color: #339af0;
+        }
+
+        .answer-btn.correct {
+            background: #51cf66;
+            color: white;
+            border-color: #40c057;
+            animation: correctPulse 0.6s ease;
+        }
+
+        .answer-btn.incorrect {
+            background: #ff6b6b;
+            color: white;
+            border-color: #fa5252;
+            animation: shake 0.6s ease;
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .feedback {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 5px solid #4dabf7;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .next-btn {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(116, 185, 255, 0.3);
+        }
+
+        .results {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        .score {
+            font-size: 3em;
+            font-weight: bold;
+            color: #4dabf7;
+            margin-bottom: 20px;
+        }
+
+        .score-message {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .answer-letter {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #4dabf7;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 0.9em;
+        }
+
+        .answer-btn.correct .answer-letter {
+            background: #40c057;
+        }
+
+        .answer-btn.incorrect .answer-letter {
+            background: #fa5252;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1 class="quiz-title">🐍 Python Quiz</h1>
+            <p class="quiz-subtitle">Classes & Objects Mastery</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div class="question-container" id="questionContainer">
+            <!-- Questions will be loaded here -->
+        </div>
+
+        <div class="results" id="results">
+            <!-- Results will be shown here -->
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "What is the correct way to define a class in Python?",
+                answers: ["class MyClass:", "Class MyClass():", "def MyClass:", "create MyClass:"],
+                correct: 0,
+                explanation: "Classes in Python are defined using the 'class' keyword followed by the class name and a colon."
+            },
+            {
+                question: "What is the purpose of the __init__ method?",
+                answers: ["To delete an object", "To initialize object attributes", "To print the object", "To copy an object"],
+                correct: 1,
+                explanation: "The __init__ method is a constructor that initializes object attributes when an instance is created."
+            },
+            {
+                question: "What does 'self' refer to in a class method?",
+                code: "class Car:\n    def __init__(self, model):\n        self.model = model",
+                answers: ["The class itself", "The current instance", "A global variable", "The parent class"],
+                correct: 1,
+                explanation: "'self' refers to the current instance of the class, allowing access to instance attributes and methods."
+            },
+            {
+                question: "Which method is called when you use print(object)?",
+                answers: ["__repr__", "__str__", "__print__", "__display__"],
+                correct: 1,
+                explanation: "The __str__ method is called when using print() or str(). If __str__ isn't defined, __repr__ is used as fallback."
+            },
+            {
+                question: "What's the difference between class and instance attributes?",
+                code: "class Dog:\n    species = 'Canis lupus'  # ?\n    def __init__(self, name):\n        self.name = name     # ?",
+                answers: ["No difference", "Instance: shared, Class: unique", "Class: shared, Instance: unique", "Both are always shared"],
+                correct: 2,
+                explanation: "Class attributes are shared by all instances, while instance attributes are unique to each object."
+            },
+            {
+                question: "How do you create an instance of a class called 'Student'?",
+                answers: ["Student.new()", "create Student()", "Student()", "new Student()"],
+                correct: 2,
+                explanation: "You create an instance by calling the class name followed by parentheses: Student()."
+            },
+            {
+                question: "What will this code output?",
+                code: "class Test:\n    def __repr__(self):\n        return 'Test Object'\n\nobj = Test()\nprint(repr(obj))",
+                answers: ["Test Object", "<Test object at ...>", "repr(obj)", "Error"],
+                correct: 0,
+                explanation: "The __repr__ method returns 'Test Object', which is displayed when using repr() or when the object appears in containers."
+            },
+            {
+                question: "Which is true about private attributes in Python?",
+                code: "class MyClass:\n    def __init__(self):\n        self._protected = 1\n        self.__private = 2",
+                answers: ["__ makes truly private", "_ makes truly private", "__ signals private by convention", "Both are exactly the same"],
+                correct: 2,
+                explanation: "Double underscore (__) triggers name mangling for privacy by convention, but nothing is truly private in Python."
+            },
+            {
+                question: "What happens when you call len(obj) on a custom object?",
+                answers: ["Always returns 1", "Calls obj.__len__()", "Returns object size in memory", "Raises an error always"],
+                correct: 1,
+                explanation: "Python calls the __len__ method when len() is used. If __len__ isn't defined, it raises a TypeError."
+            },
+            {
+                question: "What's the output of this inheritance example?",
+                code: "class Animal:\n    def sound(self):\n        return 'Some sound'\n\nclass Dog(Animal):\n    def sound(self):\n        return 'Woof'\n\ndog = Dog()\nprint(dog.sound())",
+                answers: ["Some sound", "Woof", "Error", "Both sounds"],
+                correct: 1,
+                explanation: "Method overriding allows the child class (Dog) to provide its own implementation, so 'Woof' is returned."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedAnswer = null;
+
+        function loadQuestion() {
+            const question = quizData[currentQuestion];
+            const container = document.getElementById('questionContainer');
+            
+            let codeBlock = question.code ? `<div class="code-block">${question.code}</div>` : '';
+            
+            container.innerHTML = `
+                <div class="question-number">Question ${currentQuestion + 1} of ${quizData.length}</div>
+                <div class="question-text">${question.question}</div>
+                ${codeBlock}
+                <div class="answers-grid">
+                    ${question.answers.map((answer, index) => `
+                        <button class="answer-btn" onclick="selectAnswer(${index})">
+                            <span class="answer-letter">${String.fromCharCode(65 + index)}</span>
+                            ${answer}
+                        </button>
+                    `).join('')}
+                </div>
+                <div class="feedback" id="feedback"></div>
+                <button class="next-btn" id="nextBtn" onclick="nextQuestion()">
+                    ${currentQuestion === quizData.length - 1 ? 'See Results' : 'Next Question'}
+                </button>
+            `;
+
+            updateProgress();
+        }
+
+        function selectAnswer(answerIndex) {
+            if (selectedAnswer !== null) return; // Prevent multiple selections
+            
+            selectedAnswer = answerIndex;
+            const question = quizData[currentQuestion];
+            const buttons = document.querySelectorAll('.answer-btn');
+            const feedback = document.getElementById('feedback');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            buttons.forEach((btn, index) => {
+                btn.style.pointerEvents = 'none';
+                if (index === question.correct) {
+                    btn.classList.add('correct');
+                } else if (index === answerIndex && index !== question.correct) {
+                    btn.classList.add('incorrect');
+                }
+            });
+
+            const isCorrect = answerIndex === question.correct;
+            if (isCorrect) score++;
+
+            feedback.innerHTML = `
+                <strong>${isCorrect ? '🎉 Correct!' : '❌ Incorrect!'}</strong><br>
+                ${question.explanation}
+            `;
+            feedback.classList.add('show');
+            nextBtn.style.display = 'inline-block';
+        }
+
+        function nextQuestion() {
+            selectedAnswer = null;
+            currentQuestion++;
+            
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion) / quizData.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function showResults() {
+            const percentage = Math.round((score / quizData.length) * 100);
+            let message = '';
+            let emoji = '';
+
+            if (percentage >= 90) {
+                message = "Outstanding! You're a Python classes expert! 🏆";
+                emoji = "🌟";
+            } else if (percentage >= 80) {
+                message = "Great job! You have a solid understanding! 👏";
+                emoji = "🎯";
+            } else if (percentage >= 70) {
+                message = "Good work! Keep practicing to improve! 📚";
+                emoji = "👍";
+            } else if (percentage >= 60) {
+                message = "Not bad! Review the concepts and try again! 💪";
+                emoji = "📖";
+            } else {
+                message = "Keep learning! Practice makes perfect! 🌱";
+                emoji = "🔄";
+            }
+
+            document.getElementById('questionContainer').style.display = 'none';
+            document.getElementById('results').innerHTML = `
+                <div class="score">${emoji} ${score}/${quizData.length}</div>
+                <div class="score-message">${message}</div>
+                <p>You scored ${percentage}% on Python Classes & Objects!</p>
+                <button class="restart-btn" onclick="restartQuiz()">Try Again</button>
+            `;
+            document.getElementById('results').classList.add('show');
+            
+            // Update progress to 100%
+            document.getElementById('progressFill').style.width = '100%';
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            selectedAnswer = null;
+            document.getElementById('questionContainer').style.display = 'block';
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('results').style.display = 'none';
+            loadQuestion();
+        }
+
+        // Start the quiz
+        loadQuestion();
+    </script>
+</body>
+</html>
