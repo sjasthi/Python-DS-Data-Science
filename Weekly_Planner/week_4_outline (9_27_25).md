@@ -68,20 +68,8 @@ Visit [Claude.ai](http://www.claude.ai)
 
 ### **Required Prompts:**
 
-#### **Prompt #1:**
-```
-Can you create a python class called "Student [id, name, email, marks]" with some test code?
-```
-
-#### **Prompt #2:**
-```
-Can you explain the difference between str and repr methods?
-```
-
-#### **Prompt #3:**
-```
-Why are there under scores before and after str and repr methods?
-```
+Try out these prompts provided at this LINK
+https://github.com/sjasthi/Python-DS-Data-Science/blob/main/play/exploring_objects_and_classes_advanced.md
 
 ### **Tasks:**
 - [ ] Try each prompt exactly as written
@@ -103,8 +91,7 @@ Test your understanding of objects and classes concepts
 
 ### **Tasks:**
 1. **Take the Quiz:**
-   - Link: [https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Quizzes/objects_and_classes_quiz.html](https://docs.google.com/forms/d/1CWUFP8jJLTvayvIFPAdBI0M38V2ZB7eEnI2_kC1R8o4/edit)
-   - Save the HTML file to your computer
+   - Link: https://docs.google.com/forms/d/1CWUFP8jJLTvayvIFPAdBI0M38V2ZB7eEnI2_kC1R8o4/edit
 
 
 ### **Important Notes:**
@@ -119,14 +106,7 @@ Test your understanding of objects and classes concepts
 
 ---
 
-## **[5] ⏰ Assignment 3**
-
-### **Assignment 3 Deadline Check**
-- **Due Date:** Friday, October 3
-
----
-
-## **[6] 🔮 Looking Ahead!**
+## **[5] 🔮 Looking Ahead!**
 
 ### **Upcoming Deadline**
 - **Assignment 3:** Due Friday, September 26th
