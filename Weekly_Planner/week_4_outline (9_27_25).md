@@ -7,31 +7,8 @@
 
 This week focuses on understanding Python objects and classes through hands-on practice, review, AI-assisted learning, and assessment.
 
----
 
-## **[1] 🎮 Play: Interactive Objects and Classes**
-
-### **Objective:** 
-Explore objects and classes through interactive examples
-
-### **Tasks:**
-1. **Download the HTML file:**
-   - Link: https://github.com/sjasthi/Python-DS-Data-Science/blob/main/play/objects_and_classes.html
-   - Save to your computer
-
-2. **Open and Explore:**
-   - Open the downloaded `objects_and_classes.html` file in your web browser
-   - Play with the interactive objects and classes examples
-   - Experiment with different inputs and observe the outputs
-
-### **Learning Goals:**
-- [ ] Understand how objects are created
-- [ ] See classes in action through interactive examples
-- [ ] Practice with different object behaviors
-
----
-
-## **[2] 📚 Review: Student Examples and Concepts**
+## **[1] 📚 Review: Student Examples and Concepts**
 
 ### **Objective:** 
 Review comprehensive examples of object-oriented programming
@@ -58,7 +35,7 @@ Review comprehensive examples of object-oriented programming
 
 ---
 
-## **[3] 🤖 Claude.ai Prompting Practice**
+## **[2] 🤖 Claude.ai Prompting Practice**
 
 ### **Objective:** 
 Learn to use AI effectively for programming assistance
@@ -84,7 +61,7 @@ https://github.com/sjasthi/Python-DS-Data-Science/blob/main/play/exploring_objec
 
 ---
 
-## **[4] 📝 Quiz 3: Objects and Classes Assessment**
+## **[3] 📝 Quiz 3: Objects and Classes Assessment**
 
 ### **Objective:** 
 Test your understanding of objects and classes concepts
@@ -106,7 +83,7 @@ Test your understanding of objects and classes concepts
 
 ---
 
-## **[5] 🔮 Looking Ahead!**
+## **[4] 🔮 Looking Ahead!**
 
 ### **Upcoming Deadline**
 - **Assignment 3:** Due Friday, September 26th
