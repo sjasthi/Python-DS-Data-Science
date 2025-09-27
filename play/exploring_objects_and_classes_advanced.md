@@ -1,6 +1,6 @@
 # Advanced Exploration of Objects and Classes through AI
 
-This guide provides middle school students with carefully crafted prompts to use with Claude.ai (or other AI assistants) to deepen their understanding of Python objects and classes. These prompts are designed to build knowledge progressively, from basic concepts to more advanced applications.
+This guide provides Python DS students with carefully crafted prompts to use with Claude.ai (or other AI assistants) to deepen their understanding of Python objects and classes. These prompts are designed to build knowledge progressively, from basic concepts to more advanced applications.
 
 ## Starting with the Basics
 
