@@ -405,7 +405,6 @@ for student in students:
 | **Part 1: GroupBy Mastery** | 10 | Understanding split-apply-combine, advanced grouping |
 | **Part 2: Pivot Operations** | 8 | Correct pivot techniques, multiple aggregations |
 | **Part 3: Data Reshaping** | 7 | Melt/stack operations, multi-index handling |
-| **Real-World Applications** | 5 (Bonus) | Creative problem-solving, business insights |
 
 ### Detailed Grading Criteria:
 
