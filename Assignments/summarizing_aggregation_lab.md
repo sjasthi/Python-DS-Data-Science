@@ -66,5 +66,3 @@ Display this as a nicely formatted table using the `agg()` function.
 - Ensure all outputs are clearly labeled
 - Test your code to ensure it runs without errors
 
-## Bonus Challenge (Optional, +1 point)
-Create a pivot table showing total sales with Products as rows and Regions as columns.
