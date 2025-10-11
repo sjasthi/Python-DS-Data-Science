@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Types Explorer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: #764ba2;
+            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.4);
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .concept-box {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border-left: 5px solid #667eea;
+        }
+
+        .concept-title {
+            font-size: 1.5em;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .interactive-area {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border: 2px dashed #667eea;
+        }
+
+        .example-item {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .example-item:hover {
+            transform: translateX(5px);
+        }
+
+        .qualitative { background: #ffeaa7; border-left: 4px solid #fdcb6e; }
+        .quantitative { background: #74b9ff; border-left: 4px solid #0984e3; }
+        .continuous { background: #55efc4; border-left: 4px solid #00b894; }
+        .discrete { background: #fd79a8; border-left: 4px solid #e84393; }
+        .nominal { background: #a29bfe; border-left: 4px solid #6c5ce7; }
+        .ordinal { background: #ffeaa7; border-left: 4px solid #fdcb6e; }
+        .interval { background: #74b9ff; border-left: 4px solid #0984e3; }
+        .ratio { background: #55efc4; border-left: 4px solid #00b894; }
+
+        .drop-zone {
+            min-height: 100px;
+            background: #f8f9fa;
+            border: 3px dashed #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .drop-zone.drag-over {
+            background: #e3f2fd;
+            border-color: #667eea;
+        }
+
+        .feedback {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+            display: block;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+            display: block;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #764ba2;
+        }
+
+        .emoji {
+            font-size: 1.5em;
+        }
+
+        .quiz-option {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .quiz-option:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
+        .quiz-option.selected {
+            background: #667eea;
+            color: white;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔬 Data Types Explorer</h1>
+        <p class="subtitle">Interactive Playbook for Data Science</p>
+
+        <div class="nav-buttons">
+            <button class="nav-btn active" onclick="showSection('intro')">Introduction</button>
+            <button class="nav-btn" onclick="showSection('qual-quant')">Qualitative vs Quantitative</button>
+            <button class="nav-btn" onclick="showSection('cont-disc')">Continuous vs Discrete</button>
+            <button class="nav-btn" onclick="showSection('measurement')">Measurement Scales</button>
+            <button class="nav-btn" onclick="showSection('quiz')">Quiz Time!</button>
+        </div>
+
+        <!-- Introduction Section -->
+        <div id="intro" class="section active">
+            <div class="concept-box">
+                <h2 class="concept-title">Welcome to Data Types! 🎉</h2>
+                <p>Understanding data types is like learning to organize your closet - everything has its place! In data science, we organize information into different categories to better understand and analyze it.</p>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h3>📊 What You'll Learn</h3>
+                    <ul style="margin-left: 20px; line-height: 2;">
+                        <li>Qualitative vs Quantitative Data</li>
+                        <li>Continuous vs Discrete Data</li>
+                        <li>Four Measurement Scales: NOIR</li>
+                        <li>Real-world Examples</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>🎯 Why It Matters</h3>
+                    <p>Knowing your data types helps you:</p>
+                    <ul style="margin-left: 20px; line-height: 2;">
+                        <li>Choose the right graphs</li>
+                        <li>Pick correct statistical tests</li>
+                        <li>Avoid analysis mistakes</li>
+                        <li>Tell better data stories</li>
+                    </ul>
+                </div>
+            </div>
+
+            <button onclick="showSection('qual-quant')" style="width: 100%; font-size: 18px; margin-top: 20px;">Start Learning! 🚀</button>
+        </div>
+
+        <!-- Qualitative vs Quantitative Section -->
+        <div id="qual-quant" class="section">
+            <div class="concept-box">
+                <h2 class="concept-title">Qualitative vs Quantitative 🎨 vs 🔢</h2>
+                <p><strong>Qualitative</strong> = Quality or characteristics (describes with words)</p>
+                <p><strong>Quantitative</strong> = Quantity or numbers (describes with numbers)</p>
+            </div>
+
+            <div class="interactive-area">
+                <h3>🎮 Interactive Challenge: Drag & Sort!</h3>
+                <p>Drag each example into the correct category:</p>
+                
+                <div style="margin: 20px 0;">
+                    <h4>Examples to Sort:</h4>
+                    <div id="examples-container">
+                        <div class="example-item" draggable="true" data-type="qualitative">
+                            <span class="emoji">🎨</span> Favorite color
+                        </div>
+                        <div class="example-item" draggable="true" data-type="quantitative">
+                            <span class="emoji">📏</span> Height in centimeters
+                        </div>
+                        <div class="example-item" draggable="true" data-type="qualitative">
+                            <span class="emoji">🐕</span> Type of pet
+                        </div>
+                        <div class="example-item" draggable="true" data-type="quantitative">
+                            <span class="emoji">⏰</span> Number of hours studied
+                        </div>
+                        <div class="example-item" draggable="true" data-type="qualitative">
+                            <span class="emoji">😊</span> Mood today
+                        </div>
+                        <div class="example-item" draggable="true" data-type="quantitative">
+                            <span class="emoji">🌡️</span> Temperature in degrees
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div>
+                        <h4>Qualitative (Words) 🎨</h4>
+                        <div class="drop-zone" data-category="qualitative"></div>
+                    </div>
+                    <div>
+                        <h4>Quantitative (Numbers) 🔢</h4>
+                        <div class="drop-zone" data-category="quantitative"></div>
+                    </div>
+                </div>
+
+                <button onclick="checkQualQuant()">Check My Answers! ✓</button>
+                <div id="qual-quant-feedback" class="feedback"></div>
+            </div>
+        </div>
+
+        <!-- Continuous vs Discrete Section -->
+        <div id="cont-disc" class="section">
+            <div class="concept-box">
+                <h2 class="concept-title">Continuous vs Discrete 📈 vs 📊</h2>
+                <p><strong>Continuous</strong> = Can take ANY value (including decimals) - like a flowing river 🌊</p>
+                <p><strong>Discrete</strong> = Can only take specific values (usually whole numbers) - like counting steps 👣</p>
+            </div>
+
+            <div class="interactive-area">
+                <h3>🎮 Click to Classify!</h3>
+                <p>Click each example to reveal if it's Continuous or Discrete:</p>
+                
+                <div id="cont-disc-examples">
+                    <div class="example-item" onclick="revealType(this, 'continuous')" style="cursor: pointer; background: #f8f9fa;">
+                        <span class="emoji">⚖️</span> Weight of a backpack → <span class="answer" style="display:none; font-weight: bold; color: #00b894;">Continuous</span>
+                    </div>
+                    <div class="example-item" onclick="revealType(this, 'discrete')" style="cursor: pointer; background: #f8f9fa;">
+                        <span class="emoji">👥</span> Number of students in class → <span class="answer" style="display:none; font-weight: bold; color: #e84393;">Discrete</span>
+                    </div>
+                    <div class="example-item" onclick="revealType(this, 'continuous')" style="cursor: pointer; background: #f8f9fa;">
+                        <span class="emoji">⏱️</span> Time to complete a race → <span class="answer" style="display:none; font-weight: bold; color: #00b894;">Continuous</span>
+                    </div>
+                    <div class="example-item" onclick="revealType(this, 'discrete')" style="cursor: pointer; background: #f8f9fa;">
+                        <span class="emoji">🚗</span> Number of cars in parking lot → <span class="answer" style="display:none; font-weight: bold; color: #e84393;">Discrete</span>
+                    </div>
+                    <div class="example-item" onclick="revealType(this, 'continuous')" style="cursor: pointer; background: #f8f9fa;">
+                        <span class="emoji">🌡️</span> Body temperature → <span class="answer" style="display:none; font-weight: bold; color: #00b894;">Continuous</span>
+                    </div>
+                    <div class="example-item" onclick="revealType(this, 'discrete')" style="cursor: pointer; background: #f8f9fa;">
+                        <span class="emoji">📧</span> Number of emails received → <span class="answer" style="display:none; font-weight: bold; color: #e84393;">Discrete</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 10px;">
+                    <strong>💡 Quick Tip:</strong> If you can have 2.5 or 3.7 of something, it's continuous! If you can only have whole numbers (1, 2, 3...), it's discrete!
+                </div>
+            </div>
+        </div>
+
+        <!-- Measurement Scales Section -->
+        <div id="measurement" class="section">
+            <div class="concept-box">
+                <h2 class="concept-title">Four Measurement Scales: NOIR 🌟</h2>
+                <p>Remember <strong>NOIR</strong> - these go from simplest to most complex!</p>
+            </div>
+
+            <div class="concept-box" style="background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%); color: white;">
+                <h3>1️⃣ Nominal - Names/Labels</h3>
+                <p>Categories with no order or ranking (like names on lockers)</p>
+                <p><strong>Examples:</strong> Hair color, Type of phone, Sports teams</p>
+            </div>
+
+            <div class="concept-box" style="background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);">
+                <h3>2️⃣ Ordinal - Order Matters</h3>
+                <p>Categories with a clear order, but differences aren't equal</p>
+                <p><strong>Examples:</strong> Class rank (1st, 2nd, 3rd), T-shirt size (S, M, L), Movie ratings (⭐⭐⭐)</p>
+            </div>
+
+            <div class="concept-box" style="background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%); color: white;">
+                <h3>3️⃣ Interval - Equal Intervals, No True Zero</h3>
+                <p>Numbers with equal spacing, but zero is arbitrary (doesn't mean "nothing")</p>
+                <p><strong>Examples:</strong> Temperature in °C (0° doesn't mean no temperature!), Years (Year 0 is arbitrary)</p>
+            </div>
+
+            <div class="concept-box" style="background: linear-gradient(135deg, #55efc4 0%, #00b894 100%);">
+                <h3>4️⃣ Ratio - Has a True Zero</h3>
+                <p>Numbers with equal spacing AND a true zero (zero means none/nothing)</p>
+                <p><strong>Examples:</strong> Height (0 = no height), Money ($0 = no money), Age (0 = just born)</p>
+            </div>
+
+            <div class="interactive-area">
+                <h3>🎮 Match the Examples!</h3>
+                <div id="measurement-game">
+                    <div class="example-item" onclick="selectMeasurement(this, 'nominal')">
+                        <span class="emoji">🎨</span> Eye color → <strong>?</strong>
+                    </div>
+                    <div class="example-item" onclick="selectMeasurement(this, 'ordinal')">
+                        <span class="emoji">🏆</span> Education level (HS, Bachelor, Master) → <strong>?</strong>
+                    </div>
+                    <div class="example-item" onclick="selectMeasurement(this, 'interval')">
+                        <span class="emoji">📅</span> Year of birth → <strong>?</strong>
+                    </div>
+                    <div class="example-item" onclick="selectMeasurement(this, 'ratio')">
+                        <span class="emoji">💰</span> Bank account balance → <strong>?</strong>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <button onclick="checkMeasurement('nominal')">Nominal</button>
+                    <button onclick="checkMeasurement('ordinal')">Ordinal</button>
+                    <button onclick="checkMeasurement('interval')">Interval</button>
+                    <button onclick="checkMeasurement('ratio')">Ratio</button>
+                </div>
+                
+                <div id="measurement-feedback" class="feedback"></div>
+            </div>
+        </div>
+
+        <!-- Quiz Section -->
+        <div id="quiz" class="section">
+            <div class="concept-box">
+                <h2 class="concept-title">🎯 Final Challenge Quiz!</h2>
+                <p>Test your knowledge with these questions:</p>
+            </div>
+
+            <div class="progress-bar">
+                <div id="quiz-progress" class="progress-fill" style="width: 0%"></div>
+            </div>
+
+            <div id="quiz-container"></div>
+
+            <button id="submit-quiz" onclick="submitQuiz()" style="width: 100%; margin-top: 20px; display: none;">Submit Quiz 🎉</button>
+            <div id="quiz-results" class="feedback"></div>
+        </div>
+    </div>
+
+    <script>
+        // Navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Drag and Drop for Qual/Quant
+        let draggedElement = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const draggables = document.querySelectorAll('[draggable="true"]');
+            const dropZones = document.querySelectorAll('.drop-zone');
+
+            draggables.forEach(item => {
+                item.addEventListener('dragstart', function(e) {
+                    draggedElement = this;
+                    this.style.opacity = '0.5';
+                });
+
+                item.addEventListener('dragend', function(e) {
+                    this.style.opacity = '1';
+                });
+            });
+
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.classList.add('drag-over');
+                });
+
+                zone.addEventListener('dragleave', function(e) {
+                    this.classList.remove('drag-over');
+                });
+
+                zone.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('drag-over');
+                    if (draggedElement) {
+                        this.appendChild(draggedElement);
+                        draggedElement = null;
+                    }
+                });
+            });
+
+            loadQuiz();
+        });
+
+        function checkQualQuant() {
+            const zones = document.querySelectorAll('.drop-zone');
+            let correct = 0;
+            let total = 0;
+
+            zones.forEach(zone => {
+                const category = zone.dataset.category;
+                const items = zone.querySelectorAll('.example-item');
+                
+                items.forEach(item => {
+                    total++;
+                    if (item.dataset.type === category) {
+                        correct++;
+                        item.style.borderColor = '#28a745';
+                    } else {
+                        item.style.borderColor = '#dc3545';
+                    }
+                });
+            });
+
+            const feedback = document.getElementById('qual-quant-feedback');
+            if (correct === total) {
+                feedback.className = 'feedback correct';
+                feedback.innerHTML = '🎉 Perfect! You got all ' + total + ' correct! You understand the difference between qualitative and quantitative data!';
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.innerHTML = '🤔 You got ' + correct + ' out of ' + total + ' correct. Try moving the items with red borders!';
+            }
+        }
+
+        function revealType(element, type) {
+            const answer = element.querySelector('.answer');
+            answer.style.display = 'inline';
+            
+            if (type === 'continuous') {
+                element.classList.add('continuous');
+            } else {
+                element.classList.add('discrete');
+            }
+        }
+
+        // Measurement Scale Game
+        let selectedExample = null;
+
+        function selectMeasurement(element, correctAnswer) {
+            document.querySelectorAll('#measurement-game .example-item').forEach(item => {
+                item.style.border = '2px solid transparent';
+            });
+            element.style.border = '3px solid #667eea';
+            selectedExample = { element, correctAnswer };
+        }
+
+        function checkMeasurement(guess) {
+            if (!selectedExample) {
+                alert('Please select an example first!');
+                return;
+            }
+
+            const feedback = document.getElementById('measurement-feedback');
+            const isCorrect = guess === selectedExample.correctAnswer;
+
+            if (isCorrect) {
+                feedback.className = 'feedback correct';
+                feedback.innerHTML = '✅ Correct! ' + selectedExample.element.textContent.trim() + ' is ' + guess + ' scale data!';
+                selectedExample.element.style.background = '#d4edda';
+                selectedExample.element.querySelector('strong').textContent = guess.toUpperCase();
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.innerHTML = '❌ Not quite! Try again. Think about whether it has order, equal intervals, or a true zero.';
+            }
+        }
+
+        // Quiz Section
+        const quizQuestions = [
+            {
+                question: "Which of these is qualitative data?",
+                options: ["Number of siblings", "Favorite ice cream flavor", "Age in years", "Test score"],
+                correct: 1
+            },
+            {
+                question: "Temperature in Celsius is which measurement scale?",
+                options: ["Nominal", "Ordinal", "Interval", "Ratio"],
+                correct: 2
+            },
+            {
+                question: "Number of pets is an example of:",
+                options: ["Continuous data", "Discrete data", "Both", "Neither"],
+                correct: 1
+            },
+            {
+                question: "Which has a true zero?",
+                options: ["Temperature in °F", "Year", "Distance traveled", "IQ score"],
+                correct: 2
+            },
+            {
+                question: "Education level (Elementary, High School, College) is:",
+                options: ["Nominal", "Ordinal", "Interval", "Ratio"],
+                correct: 1
+            }
+        ];
+
+        let userAnswers = [];
+
+        function loadQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+
+            quizQuestions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'concept-box';
+                questionDiv.innerHTML = `
+                    <h3>Question ${index + 1}</h3>
+                    <p style="font-size: 1.1em; margin: 15px 0;">${q.question}</p>
+                    ${q.options.map((opt, i) => `
+                        <div class="quiz-option" onclick="selectAnswer(${index}, ${i})">
+                            ${opt}
+                        </div>
+                    `).join('')}
+                `;
+                container.appendChild(questionDiv);
+            });
+
+            document.getElementById('submit-quiz').style.display = 'block';
+        }
+
+        function selectAnswer(questionIndex, optionIndex) {
+            const questionBox = document.querySelectorAll('#quiz-container .concept-box')[questionIndex];
+            const options = questionBox.querySelectorAll('.quiz-option');
+            
+            options.forEach(opt => opt.classList.remove('selected'));
+            options[optionIndex].classList.add('selected');
+            
+            userAnswers[questionIndex] = optionIndex;
+
+            const progress = ((userAnswers.filter(a => a !== undefined).length) / quizQuestions.length) * 100;
+            document.getElementById('quiz-progress').style.width = progress + '%';
+        }
+
+        function submitQuiz() {
+            if (userAnswers.filter(a => a !== undefined).length < quizQuestions.length) {
+                alert('Please answer all questions first!');
+                return;
+            }
+
+            let correct = 0;
+            quizQuestions.forEach((q, i) => {
+                if (userAnswers[i] === q.correct) correct++;
+            });
+
+            const results = document.getElementById('quiz-results');
+            const percentage = (correct / quizQuestions.length * 100).toFixed(0);
+            
+            if (percentage >= 80) {
+                results.className = 'feedback correct';
+                results.innerHTML = `🌟 Outstanding! You scored ${correct}/${quizQuestions.length} (${percentage}%)! You're a data types expert!`;
+            } else if (percentage >= 60) {
+                results.className = 'feedback correct';
+                results.innerHTML = `👍 Good job! You scored ${correct}/${quizQuestions.length} (${percentage}%). Review the sections you missed and try again!`;
+            } else {
+                results.className = 'feedback incorrect';
+                results.innerHTML = `📚 You scored ${correct}/${quizQuestions.length} (${percentage}%). Keep practicing! Review the lessons and try again.`;
+            }
+
+            results.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
