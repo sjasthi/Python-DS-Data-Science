@@ -89,7 +89,7 @@ Welcome to Week 6! This week we dive into the foundation of Data Science - under
 ## 📋 What's Due This Week?
 
 ### 💻 Assignment 5: Exploring the Requests Module
-**Due Date:** Thursday, October 17, 2025
+**Due Date:** Friday, October 17, 2025
 
 🔗 [Assignment Details (Jupyter Notebook)](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Assignments/python_ds_exploring_requests_module_assignment.ipynb)
 
