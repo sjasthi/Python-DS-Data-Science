@@ -3,7 +3,7 @@
 ## Overview
 This assignment will help you develop essential Google Sheets skills for data analysis using the famous Titanic dataset. You will explore data, perform statistical analysis, and use advanced Google Sheets functions.
 
-**Total Points:** 25 (1 point per question)
+**Total Points:** 50 (2 points per question)
 
 ---
 
