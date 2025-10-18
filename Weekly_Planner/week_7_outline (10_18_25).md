@@ -55,7 +55,7 @@ This is an excellent resource because each video focuses on ONE specific skill o
 - **Worth:** 50 points
 - **Due Date:** October 31, 2025 (11:59 PM)
 - **Dataset:** Titanic Dataset
-- **Total Questions:** 25 (1 point each)
+- **Total Questions:** 25 (2 points each)
 
 ### Choose Your Platform
 You can complete this assignment using **either Excel OR Google Sheets**. Both versions ask the same 25 questions.
