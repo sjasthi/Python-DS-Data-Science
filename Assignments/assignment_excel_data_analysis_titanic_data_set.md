@@ -7,6 +7,36 @@ This assignment will help you develop essential Excel skills for data analysis u
 
 ---
 
+## 📥 Getting the Dataset
+
+**Dataset Source:** [Titanic Data CSV](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/datasets/titanic_data.csv)
+
+### Instructions to Download and Convert to Excel:
+
+#### **Option 1: Direct Download (Recommended)**
+1. Go to the dataset URL: https://github.com/sjasthi/Python-DS-Data-Science/blob/main/datasets/titanic_data.csv
+2. Click the **"Raw"** button (top right of the file preview)
+3. Right-click on the page → **"Save As"** → Save as `titanic_data.csv`
+4. Open Excel → **File** → **Open** → Select the CSV file
+5. Excel will automatically load the CSV data
+6. **File** → **Save As** → Choose **"Excel Workbook (*.xlsx)"** format
+7. Save as `titanic_data.xlsx`
+
+#### **Option 2: Import Using Excel**
+1. Open Excel → **Data** tab → **Get Data** → **From File** → **From Text/CSV**
+2. Paste this URL: `https://raw.githubusercontent.com/sjasthi/Python-DS-Data-Science/main/datasets/titanic_data.csv`
+3. Click **Load**
+4. **File** → **Save As** → Choose **"Excel Workbook (*.xlsx)"** format
+
+#### **Option 3: Quick Method**
+1. Copy this raw URL: `https://raw.githubusercontent.com/sjasthi/Python-DS-Data-Science/main/datasets/titanic_data.csv`
+2. Open in browser, press **CTRL+A** (select all), **CTRL+C** (copy)
+3. Open Excel, paste into a new worksheet
+4. **Data** tab → **Text to Columns** → Choose **"Delimited"** → Check **"Comma"** → Finish
+5. Save as Excel workbook
+
+---
+
 ## 📋 Dataset Columns
 Your dataset contains the following columns:
 - **Id**: Passenger ID
@@ -14,11 +44,12 @@ Your dataset contains the following columns:
 - **Pclass**: Passenger Class (1 = 1st, 2 = 2nd, 3 = 3rd)
 - **Name**: Passenger name
 - **Sex**: Male or Female
-- **Age**: Age in years
+- **Age**: Age in years (some values are missing)
 - **SibSp**: Number of siblings/spouses aboard
 - **Parch**: Number of parents/children aboard
 - **Ticket**: Ticket number
 - **Fare**: Ticket fare
+- **Cabin**: Cabin number (many values are missing)
 - **Embarked**: Port of embarkation (C = Cherbourg, Q = Queenstown, S = Southampton)
 
 ---
@@ -36,7 +67,8 @@ Your dataset contains the following columns:
 
 5. **How many passengers are missing age values?**
 
-6. **How many passengers are missing embarkation port information?**
+6. **How many passengers are missing cabin information?**  
+   *Hint: Count blank/empty cells in the Cabin column*
 
 7. **How many passengers embarked from each port (C, Q, and S)?**
 
