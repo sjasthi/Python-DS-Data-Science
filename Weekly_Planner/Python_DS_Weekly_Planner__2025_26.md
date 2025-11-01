@@ -27,6 +27,7 @@ This course introduces middle and high school students to Data Science using Pyt
 
 ### **Thanksgiving Break**
 | - | 11/22/25 | 11/28/25 | **No Class - Thanksgiving Break** |
+
 | - | 11/29/25 | 12/05/25 | **No Class - Thanksgiving Break** |
 
 | Class # | Week Start | Week End (Due Date) | Topic |
@@ -36,7 +37,9 @@ This course introduces middle and high school students to Data Science using Pyt
 
 ### **Winter Break**
 | - | 12/20/25 | 12/26/25 | **No Class - Christmas Break** |
+
 | - | 12/27/25 | 01/02/26 | **No Class - Christmas Break** |
+
 | - | 01/03/26 | 01/09/26 | **No Class - New Year Break** |
 
 | Class # | Week Start | Week End (Due Date) | Topic |
@@ -52,6 +55,7 @@ This course introduces middle and high school students to Data Science using Pyt
 
 ### **Spring Break**
 | - | 03/07/26 | 03/13/26 | **No Class - Spring Break** |
+
 | - | 03/14/26 | 03/20/26 | **No Class - Spring Break** |
 
 | Class # | Week Start | Week End (Due Date) | Topic |
