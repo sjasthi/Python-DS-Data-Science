@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Libraries Matching Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            color: white;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-number {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .score-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .game-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .column-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 8px;
+        }
+
+        .card {
+            padding: 18px;
+            background: #f8f9fa;
+            border: 3px solid #dee2e6;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 1.05em;
+            user-select: none;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .card.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .card.matched {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+            cursor: default;
+            animation: matchAnimation 0.5s ease;
+        }
+
+        .card.wrong {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes matchAnimation {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 15px 35px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .reset-btn {
+            background: #667eea;
+            color: white;
+        }
+
+        .reset-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .message {
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .message.complete {
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffeaa7;
+            display: block;
+        }
+
+        .instructions {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 5px solid #667eea;
+        }
+
+        .instructions p {
+            margin: 5px 0;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .game-area {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐍 Python Libraries Matching Game</h1>
+        <p class="subtitle">Match each library with its purpose!</p>
+
+        <div class="instructions">
+            <p><strong>How to Play:</strong></p>
+            <p>1. Click on a library name on the left</p>
+            <p>2. Then click on its matching purpose on the right</p>
+            <p>3. Get all 10 matches correct to win!</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item">
+                <div class="score-number" id="correct">0</div>
+                <div class="score-label">Correct Matches</div>
+            </div>
+            <div class="score-item">
+                <div class="score-number" id="attempts">0</div>
+                <div class="score-label">Total Attempts</div>
+            </div>
+            <div class="score-item">
+                <div class="score-number" id="accuracy">0%</div>
+                <div class="score-label">Accuracy</div>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="column">
+                <div class="column-title">📚 Libraries</div>
+                <div class="card library" data-id="numpy">NumPy</div>
+                <div class="card library" data-id="pandas">Pandas</div>
+                <div class="card library" data-id="matplotlib">Matplotlib</div>
+                <div class="card library" data-id="sklearn">Scikit-learn</div>
+                <div class="card library" data-id="requests">requests</div>
+                <div class="card library" data-id="beautifulsoup">Beautiful Soup</div>
+                <div class="card library" data-id="plotly">Plotly</div>
+                <div class="card library" data-id="pytorch">PyTorch</div>
+                <div class="card library" data-id="seaborn">Seaborn</div>
+                <div class="card library" data-id="json">json</div>
+            </div>
+
+            <div class="column">
+                <div class="column-title">🎯 Purposes</div>
+                <div class="card purpose" data-id="matplotlib">Creates charts and graphs</div>
+                <div class="card purpose" data-id="pandas">Data manipulation with DataFrames</div>
+                <div class="card purpose" data-id="requests">Gets data from the internet</div>
+                <div class="card purpose" data-id="seaborn">Pretty statistical graphs with less code</div>
+                <div class="card purpose" data-id="numpy">Math and numbers powerhouse</div>
+                <div class="card purpose" data-id="beautifulsoup">Web scraping - extracts data from websites</div>
+                <div class="card purpose" data-id="sklearn">Machine learning made simple</div>
+                <div class="card purpose" data-id="json">Works with JSON data format</div>
+                <div class="card purpose" data-id="plotly">Interactive, web-ready visualizations</div>
+                <div class="card purpose" data-id="pytorch">Deep learning and neural networks</div>
+            </div>
+        </div>
+
+        <div class="message" id="message"></div>
+
+        <div class="buttons">
+            <button class="reset-btn" onclick="resetGame()">🔄 Reset Game</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedLibrary = null;
+        let correctMatches = 0;
+        let totalAttempts = 0;
+
+        const libraries = document.querySelectorAll('.library');
+        const purposes = document.querySelectorAll('.purpose');
+        const messageBox = document.getElementById('message');
+
+        libraries.forEach(lib => {
+            lib.addEventListener('click', () => selectLibrary(lib));
+        });
+
+        purposes.forEach(purpose => {
+            purpose.addEventListener('click', () => selectPurpose(purpose));
+        });
+
+        function selectLibrary(lib) {
+            if (lib.classList.contains('matched')) return;
+
+            libraries.forEach(l => l.classList.remove('selected'));
+            lib.classList.add('selected');
+            selectedLibrary = lib;
+            hideMessage();
+        }
+
+        function selectPurpose(purpose) {
+            if (purpose.classList.contains('matched') || !selectedLibrary) return;
+
+            totalAttempts++;
+            updateScoreboard();
+
+            const libraryId = selectedLibrary.dataset.id;
+            const purposeId = purpose.dataset.id;
+
+            if (libraryId === purposeId) {
+                // Correct match!
+                selectedLibrary.classList.remove('selected');
+                selectedLibrary.classList.add('matched');
+                purpose.classList.add('matched');
+                correctMatches++;
+                
+                showMessage('✓ Perfect match!', 'success');
+                updateScoreboard();
+
+                selectedLibrary = null;
+
+                if (correctMatches === 10) {
+                    setTimeout(() => {
+                        showGameComplete();
+                    }, 500);
+                }
+            } else {
+                // Wrong match
+                selectedLibrary.classList.add('wrong');
+                purpose.classList.add('wrong');
+                
+                showMessage('✗ Not quite! Try again.', 'error');
+
+                setTimeout(() => {
+                    selectedLibrary.classList.remove('wrong', 'selected');
+                    purpose.classList.remove('wrong');
+                    selectedLibrary = null;
+                }, 1000);
+            }
+        }
+
+        function updateScoreboard() {
+            document.getElementById('correct').textContent = correctMatches;
+            document.getElementById('attempts').textContent = totalAttempts;
+            const accuracy = totalAttempts > 0 ? Math.round((correctMatches / totalAttempts) * 100) : 0;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+        }
+
+        function showMessage(text, type) {
+            messageBox.textContent = text;
+            messageBox.className = 'message ' + type;
+            messageBox.style.display = 'block';
+        }
+
+        function hideMessage() {
+            messageBox.style.display = 'none';
+        }
+
+        function showGameComplete() {
+            const accuracy = Math.round((correctMatches / totalAttempts) * 100);
+            let message = `🎉 Congratulations! You completed the game!\n\n`;
+            message += `Matches: ${correctMatches}/10\n`;
+            message += `Attempts: ${totalAttempts}\n`;
+            message += `Accuracy: ${accuracy}%\n\n`;
+            
+            if (accuracy === 100) {
+                message += `Perfect score! You're a Python library expert! 🌟`;
+            } else if (accuracy >= 80) {
+                message += `Great job! You really know your libraries! 🎯`;
+            } else if (accuracy >= 60) {
+                message += `Good work! Keep practicing! 💪`;
+            } else {
+                message += `Nice try! Play again to improve your score! 🚀`;
+            }
+
+            messageBox.textContent = message;
+            messageBox.className = 'message complete';
+            messageBox.style.display = 'block';
+            messageBox.style.whiteSpace = 'pre-line';
+        }
+
+        function resetGame() {
+            correctMatches = 0;
+            totalAttempts = 0;
+            selectedLibrary = null;
+
+            libraries.forEach(lib => {
+                lib.classList.remove('selected', 'matched', 'wrong');
+            });
+
+            purposes.forEach(purpose => {
+                purpose.classList.remove('matched', 'wrong');
+            });
+
+            updateScoreboard();
+            hideMessage();
+
+            // Shuffle the purposes
+            const purposesColumn = document.querySelector('.column:last-child');
+            const purposesArray = Array.from(purposes);
+            purposesArray.sort(() => Math.random() - 0.5);
+            
+            const columnTitle = purposesColumn.querySelector('.column-title');
+            purposesColumn.innerHTML = '';
+            purposesColumn.appendChild(columnTitle);
+            purposesArray.forEach(purpose => purposesColumn.appendChild(purpose));
+        }
+
+        // Shuffle purposes on load
+        window.addEventListener('load', () => {
+            const purposesColumn = document.querySelector('.column:last-child');
+            const purposesArray = Array.from(purposes);
+            purposesArray.sort(() => Math.random() - 0.5);
+            
+            const columnTitle = purposesColumn.querySelector('.column-title');
+            purposesColumn.innerHTML = '';
+            purposesColumn.appendChild(columnTitle);
+            purposesArray.forEach(purpose => purposesColumn.appendChild(purpose));
+        });
+    </script>
+</body>
+</html>
