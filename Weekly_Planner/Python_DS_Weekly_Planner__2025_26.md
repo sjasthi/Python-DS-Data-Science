@@ -63,7 +63,7 @@ This course introduces middle and high school students to Data Science using Pyt
 | 22 | 03/21/26 | 03/27/26 | Pandas Visualizations and matplotlib - 1 |
 | 23 | 03/28/26 | 04/03/26 | matplotlib - 2 |
 | 24 | 04/04/26 | 04/10/26 | matplotlib - 3 |
-| 25 | 04/11/26 | 04/17/26 | seaborn - 1 |
+| 25 | 04/11/26 | 04/17/26 | Introduction to plotly and seaborn |
 | 26 | 04/18/26 | 04/24/26 | Final Project - Working Session 1 |
 | 27 | 04/25/26 | 05/01/26 | Final Project - Working Session 2 |
 | 28 | 05/02/26 | 05/08/26 | Final Project - Working Session 3 |
