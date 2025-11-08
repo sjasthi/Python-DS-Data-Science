@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NumPy Interactive Playground 🚀</title>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .sidebar {
+            background: #f8f9fa;
+            padding: 20px;
+            border-right: 2px solid #dee2e6;
+            overflow-y: auto;
+            max-height: 80vh;
+        }
+
+        .sidebar h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .example-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            color: #667eea;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            font-size: 0.95em;
+        }
+
+        .example-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .challenge-btn {
+            border-color: #f59e0b;
+            color: #f59e0b;
+        }
+
+        .challenge-btn:hover {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .editor-section {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .editor-header h3 {
+            color: #333;
+            font-size: 1.3em;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1em;
+        }
+
+        .btn-run {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-run:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-run:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-clear {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        #codeEditor {
+            width: 100%;
+            min-height: 300px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            resize: vertical;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            line-height: 1.5;
+        }
+
+        .output-section {
+            margin-top: 20px;
+        }
+
+        .output-section h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        #output {
+            background: #1e1e1e;
+            color: #4ade80;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            min-height: 150px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            border: 2px solid #10b981;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 1.2em;
+        }
+
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .section-divider {
+            margin: 20px 0;
+            border-top: 2px solid #dee2e6;
+            padding-top: 15px;
+        }
+
+        .hint {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                border-right: none;
+                border-bottom: 2px solid #dee2e6;
+                max-height: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔢 NumPy Interactive Playground 🚀</h1>
+            <p>Write real Python code and see it run instantly in your browser!</p>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Loading Python environment... This may take a moment on first load.</p>
+        </div>
+
+        <div id="mainContent" class="main-content" style="display: none;">
+            <div class="sidebar">
+                <h2>📚 Lessons</h2>
+                <button class="example-btn" onclick="loadExample('hello')">1. Hello NumPy!</button>
+                <button class="example-btn" onclick="loadExample('create')">2. Creating Arrays</button>
+                <button class="example-btn" onclick="loadExample('math')">3. Array Math</button>
+                <button class="example-btn" onclick="loadExample('stats')">4. Statistics</button>
+                <button class="example-btn" onclick="loadExample('slice')">5. Slicing</button>
+                <button class="example-btn" onclick="loadExample('2d')">6. 2D Arrays</button>
+                <button class="example-btn" onclick="loadExample('boolean')">7. Boolean Filtering</button>
+
+                <div class="section-divider"></div>
+                <h2>🎯 Challenges</h2>
+                <button class="example-btn challenge-btn" onclick="loadExample('challenge1')">Challenge 1: Temperature</button>
+                <button class="example-btn challenge-btn" onclick="loadExample('challenge2')">Challenge 2: Grades</button>
+                <button class="example-btn challenge-btn" onclick="loadExample('challenge3')">Challenge 3: Matrix</button>
+                <button class="example-btn challenge-btn" onclick="loadExample('challenge4')">Challenge 4: Data Cleaning</button>
+            </div>
+
+            <div class="editor-section">
+                <div class="editor-header">
+                    <h3>💻 Code Editor</h3>
+                    <div class="control-buttons">
+                        <button class="btn btn-run" onclick="runCode()" id="runBtn">▶ Run Code</button>
+                        <button class="btn btn-clear" onclick="clearEditor()">🗑️ Clear</button>
+                    </div>
+                </div>
+
+                <textarea id="codeEditor" placeholder="Type your NumPy code here...">import numpy as np
+
+# Try some NumPy code!
+arr = np.array([1, 2, 3, 4, 5])
+print("My first array:", arr)
+print("Sum:", np.sum(arr))
+print("Mean:", np.mean(arr))</textarea>
+
+                <div class="output-section">
+                    <h3>📤 Output</h3>
+                    <div id="output">Run your code to see output here...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let pyodide;
+
+        const examples = {
+            hello: `import numpy as np
+
+# Welcome to NumPy!
+print("🎉 Welcome to NumPy!")
+print("NumPy version:", np.__version__)
+
+# Create your first array
+my_array = np.array([1, 2, 3, 4, 5])
+print("\\nMy first array:", my_array)
+print("Type:", type(my_array))`,
+
+            create: `import numpy as np
+
+# Different ways to create arrays
+print("=== Creating Arrays ===\\n")
+
+# From a list
+arr1 = np.array([10, 20, 30, 40])
+print("From list:", arr1)
+
+# Array of zeros
+zeros = np.zeros(5)
+print("Zeros:", zeros)
+
+# Array of ones
+ones = np.ones(5)
+print("Ones:", ones)
+
+# Range of numbers
+range_arr = np.arange(0, 10, 2)
+print("Range (0 to 10, step 2):", range_arr)
+
+# Evenly spaced numbers
+spaced = np.linspace(0, 1, 6)
+print("6 numbers from 0 to 1:", spaced)
+
+# Random numbers
+random = np.random.rand(5)
+print("Random numbers:", random)`,
+
+            math: `import numpy as np
+
+# Array mathematics
+print("=== Array Math ===\\n")
+
+arr = np.array([1, 2, 3, 4, 5])
+print("Original array:", arr)
+
+print("\\nAdd 10:", arr + 10)
+print("Multiply by 2:", arr * 2)
+print("Square:", arr ** 2)
+print("Square root:", np.sqrt(arr))
+
+# Two arrays
+arr1 = np.array([10, 20, 30])
+arr2 = np.array([1, 2, 3])
+print("\\nArray 1:", arr1)
+print("Array 2:", arr2)
+print("Add arrays:", arr1 + arr2)
+print("Multiply arrays:", arr1 * arr2)`,
+
+            stats: `import numpy as np
+
+# Statistical functions
+print("=== Statistics ===\\n")
+
+scores = np.array([85, 92, 78, 95, 88, 73, 90])
+print("Test scores:", scores)
+
+print("\\nMean (average):", np.mean(scores))
+print("Median:", np.median(scores))
+print("Max:", np.max(scores))
+print("Min:", np.min(scores))
+print("Sum:", np.sum(scores))
+print("Standard deviation:", np.std(scores))
+
+print("\\nPosition of highest score:", np.argmax(scores))
+print("Position of lowest score:", np.argmin(scores))`,
+
+            slice: `import numpy as np
+
+# Slicing and indexing
+print("=== Slicing Arrays ===\\n")
+
+arr = np.array([10, 20, 30, 40, 50, 60, 70])
+print("Array:", arr)
+
+print("\\nFirst element:", arr[0])
+print("Last element:", arr[-1])
+print("Elements 1-4:", arr[1:4])
+print("Every other element:", arr[::2])
+print("Reverse:", arr[::-1])
+
+# Boolean indexing
+print("\\nValues greater than 40:", arr[arr > 40])
+print("Values between 20 and 60:", arr[(arr >= 20) & (arr <= 60)])`,
+
+            '2d': `import numpy as np
+
+# 2D Arrays (Matrices)
+print("=== 2D Arrays ===\\n")
+
+matrix = np.array([[1, 2, 3],
+                   [4, 5, 6],
+                   [7, 8, 9]])
+print("Matrix:")
+print(matrix)
+
+print("\\nShape:", matrix.shape)
+print("Size:", matrix.size)
+
+print("\\nElement at row 1, column 2:", matrix[1, 2])
+print("First row:", matrix[0, :])
+print("Second column:", matrix[:, 1])
+
+print("\\nSum of all elements:", np.sum(matrix))
+print("Sum of each row:", np.sum(matrix, axis=1))
+print("Sum of each column:", np.sum(matrix, axis=0))`,
+
+            boolean: `import numpy as np
+
+# Boolean filtering
+print("=== Boolean Filtering ===\\n")
+
+temperatures = np.array([72, 68, 75, 80, 78, 82, 70])
+print("Temperatures:", temperatures)
+
+# Create boolean mask
+hot_days = temperatures > 75
+print("\\nHot days (>75°F):", hot_days)
+print("Hot temperatures:", temperatures[hot_days])
+
+# Count hot days
+print("Number of hot days:", np.sum(hot_days))
+
+# Multiple conditions
+comfortable = temperatures[(temperatures >= 70) & (temperatures <= 78)]
+print("\\nComfortable days (70-78°F):", comfortable)`,
+
+            challenge1: `import numpy as np
+
+# CHALLENGE 1: Temperature Analysis
+# Given this week's temperatures, calculate:
+# 1. Average temperature
+# 2. Hottest and coldest days
+# 3. How many days were above 75°F?
+
+temps = np.array([72, 68, 75, 80, 78, 82, 70])
+print("Temperatures:", temps)
+
+# YOUR CODE HERE:
+# 1. Calculate average
+
+# 2. Find max and min
+
+# 3. Count days above 75
+`,
+
+            challenge2: `import numpy as np
+
+# CHALLENGE 2: Grade Calculator
+# Create an array of 10 random grades (60-100)
+# Then:
+# 1. Calculate the class average
+# 2. Find how many students passed (>=70)
+# 3. Add a 5-point curve to all grades
+
+# Hint: Use np.random.randint(60, 101, 10)
+
+# YOUR CODE HERE:
+
+`,
+
+            challenge3: `import numpy as np
+
+# CHALLENGE 3: Multiplication Table
+# Create a 5x5 multiplication table (1 through 5)
+# Result should look like:
+# [[ 1  2  3  4  5]
+#  [ 2  4  6  8 10]
+#  [ 3  6  9 12 15]
+#  [ 4  8 12 16 20]
+#  [ 5 10 15 20 25]]
+
+# Hint: Create two arrays and use broadcasting
+# rows = np.arange(1, 6).reshape(5, 1)
+# cols = np.arange(1, 6)
+
+# YOUR CODE HERE:
+
+`,
+
+            challenge4: `import numpy as np
+
+# CHALLENGE 4: Data Cleaning
+# This data has missing values marked as -999
+# Replace them with the average of valid values
+
+data = np.array([25, 30, -999, 28, 32, -999, 35])
+print("Original data:", data)
+
+# HINT: 
+# 1. Find valid data (data != -999)
+# 2. Calculate mean of valid data
+# 3. Replace -999 with the mean
+
+# YOUR CODE HERE:
+
+`
+        };
+
+        async function initPyodide() {
+            try {
+                pyodide = await loadPyodide();
+                await pyodide.loadPackage("numpy");
+                
+                // Redirect stdout to capture print statements
+                pyodide.runPython(`
+                    import sys
+                    from io import StringIO
+                    sys.stdout = StringIO()
+                `);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'grid';
+                document.getElementById('output').textContent = '✅ Python and NumPy loaded! Ready to code!';
+            } catch (error) {
+                document.getElementById('loading').innerHTML = 
+                    '<p style="color: red;">Error loading Python environment. Please refresh the page.</p>';
+                console.error('Error loading Pyodide:', error);
+            }
+        }
+
+        async function runCode() {
+            const code = document.getElementById('codeEditor').value;
+            const outputDiv = document.getElementById('output');
+            const runBtn = document.getElementById('runBtn');
+
+            runBtn.disabled = true;
+            runBtn.textContent = '⏳ Running...';
+            outputDiv.textContent = 'Executing code...';
+
+            try {
+                // Clear previous stdout
+                pyodide.runPython(`
+                    sys.stdout = StringIO()
+                `);
+
+                // Run the user's code
+                await pyodide.runPythonAsync(code);
+
+                // Get the output
+                const stdout = pyodide.runPython(`
+                    sys.stdout.getvalue()
+                `);
+
+                outputDiv.textContent = stdout || '✅ Code executed successfully (no output)';
+            } catch (error) {
+                outputDiv.textContent = `❌ Error:\n${error.message}`;
+                outputDiv.style.borderColor = '#ef4444';
+                outputDiv.style.color = '#fca5a5';
+                
+                setTimeout(() => {
+                    outputDiv.style.borderColor = '#10b981';
+                    outputDiv.style.color = '#4ade80';
+                }, 3000);
+            } finally {
+                runBtn.disabled = false;
+                runBtn.textContent = '▶ Run Code';
+            }
+        }
+
+        function loadExample(exampleName) {
+            const editor = document.getElementById('codeEditor');
+            editor.value = examples[exampleName];
+            document.getElementById('output').textContent = 'Code loaded! Click "Run Code" to see the output.';
+        }
+
+        function clearEditor() {
+            document.getElementById('codeEditor').value = '';
+            document.getElementById('output').textContent = 'Editor cleared. Ready for your code!';
+        }
+
+        // Keyboard shortcut: Ctrl+Enter or Cmd+Enter to run
+        document.getElementById('codeEditor').addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                runCode();
+            }
+        });
+
+        // Initialize when page loads
+        window.addEventListener('load', initPyodide);
+    </script>
+</body>
+</html>
