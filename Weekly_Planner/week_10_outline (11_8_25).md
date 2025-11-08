@@ -59,7 +59,7 @@ By the end of this week, you will be able to:
 ## ✅ What's Due This Week?
 
 ### 📝 Assignment 7: NumPy Assignment
-**Due Date:** Thursday, November 14, 2025  
+**Due Date:** Friday, November 14, 2025  
 **Points:** 25 points
 
 **Assignment Details:**  
