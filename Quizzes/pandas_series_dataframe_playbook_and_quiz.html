@@ -632,19 +632,78 @@ df = pd.DataFrame(data, columns=[<span class="string">'Name'</span>, <span class
                 <h3>🔍 Accessing DataFrame Data</h3>
                 <div class="code-box">
 <code><span class="comment"># Get a column (returns a Series)</span>
-<span class="function">print</span>(df[<span class="string">'Math'</span>])  <span class="comment"># All math scores</span>
+<span class="function">print</span>(df[<span class="string">'Math'</span>])  <span class="comment"># All math scores - this is a Series!</span>
 
-<span class="comment"># Get multiple columns</span>
-<span class="function">print</span>(df[[<span class="string">'Name'</span>, <span class="string">'Math'</span>]])  <span class="comment"># Just names and math scores</span>
+<span class="comment"># Get multiple columns (returns a DataFrame)</span>
+<span class="function">print</span>(df[[<span class="string">'Name'</span>, <span class="string">'Math'</span>]])  <span class="comment"># Returns a smaller DataFrame</span>
 
-<span class="comment"># Get a row by position (iloc)</span>
-<span class="function">print</span>(df.iloc[<span class="number">0</span>])  <span class="comment"># First row</span>
+<span class="comment"># Get a row by position (iloc) - returns a Series!</span>
+<span class="function">print</span>(df.iloc[<span class="number">0</span>])  <span class="comment"># First row as a Series</span>
 
-<span class="comment"># Get a row by index (loc)</span>
-<span class="function">print</span>(df.loc[<span class="number">0</span>])  <span class="comment"># Row at index 0</span>
+<span class="comment"># Get a row by index (loc) - also returns a Series!</span>
+<span class="function">print</span>(df.loc[<span class="number">0</span>])  <span class="comment"># Row at index 0 as a Series</span>
 
-<span class="comment"># Get a specific value</span>
-<span class="function">print</span>(df.loc[<span class="number">0</span>, <span class="string">'Math'</span>])  <span class="comment"># Alice's math score</span></code>
+<span class="comment"># Get a specific value (returns a single value)</span>
+<span class="function">print</span>(df.loc[<span class="number">0</span>, <span class="string">'Math'</span>])  <span class="comment"># Alice's math score: 95</span></code>
+                </div>
+
+                <div class="concept-box" style="margin-top: 30px;">
+                    <h3><span class="emoji">🎯</span>Important: Rows and Columns are Both Series!</h3>
+                    <p style="font-size: 1.15em; line-height: 1.8;">
+                        <strong>Here's a key concept:</strong> Both columns AND rows in a DataFrame are Series, but they work differently:
+                    </p>
+                    
+                    <div class="comparison">
+                        <div class="demo-item" style="background: #e3f2fd;">
+                            <h4>📊 Column = Series (Usually Same Type)</h4>
+                            <p>When you get a <strong>column</strong>, all values are typically the <strong>same data type</strong>:</p>
+                            <div class="code-box" style="margin-top: 10px;">
+<code><span class="comment"># All numbers (integers)</span>
+math_scores = df[<span class="string">'Math'</span>]
+<span class="comment"># [95, 87, 92, 88]</span>
+<span class="comment"># dtype: int64</span></code>
+                            </div>
+                            <p style="margin-top: 10px;"><strong>Index:</strong> Student names or row numbers<br>
+                            <strong>Values:</strong> All same type (numbers)</p>
+                        </div>
+
+                        <div class="demo-item" style="background: #fff3e0;">
+                            <h4>📝 Row = Series (Mixed Types)</h4>
+                            <p>When you get a <strong>row</strong>, values are often <strong>mixed data types</strong>:</p>
+                            <div class="code-box" style="margin-top: 10px;">
+<code><span class="comment"># Mixed: string and numbers</span>
+first_student = df.iloc[<span class="number">0</span>]
+<span class="comment"># Name: 'Alice' (string)</span>
+<span class="comment"># Math: 95 (int)</span>
+<span class="comment"># Science: 88 (int)</span>
+<span class="comment"># dtype: object (mixed)</span></code>
+                            </div>
+                            <p style="margin-top: 10px;"><strong>Index:</strong> Column names<br>
+                            <strong>Values:</strong> Mixed types (text + numbers)</p>
+                        </div>
+                    </div>
+
+                    <div style="background: #fff9c4; padding: 20px; margin-top: 20px; border-radius: 10px; border-left: 5px solid #fbc02d;">
+                        <p style="font-size: 1.1em; margin: 0;">
+                            <strong>💡 Key Insight:</strong> A Series is just a <strong>1-dimensional labeled array</strong>. 
+                            It doesn't care if the data types are all the same or mixed! 
+                            <br><br>
+                            • <strong>Columns</strong> are <em>usually</em> the same type (all numbers, all text, etc.)<br>
+                            • <strong>Rows</strong> are <em>usually</em> mixed types (name + scores + grades)<br>
+                            • Both are <strong>Series objects</strong> in Pandas!
+                        </p>
+                    </div>
+                </div>
+
+                <h3>🔬 Interactive Demo: Explore Series from Rows and Columns</h3>
+                <div class="interactive-box">
+                    <p><strong>Let's see the difference between getting a row vs. a column!</strong></p>
+                    <p>We'll create a sample DataFrame and show you what happens when you extract rows vs. columns.</p>
+                    
+                    <button class="btn" onclick="demonstrateRowColumn()">Show Row vs Column Demo 🔍</button>
+                    <button class="btn" onclick="showSeriesTypes()">Check Data Types 🔬</button>
+                    
+                    <div class="output" id="seriesDemo"></div>
                 </div>
 
                 <h3>🎨 Cool Things You Can Do With DataFrames</h3>
@@ -1047,11 +1106,29 @@ df.sort_values(
                         </div>
                         <div id="answer10" style="margin-top: 15px; font-weight: bold;"></div>
                     </div>
+
+                    <!-- Question 11 (Bonus) -->
+                    <div class="example-box" style="margin: 30px 0; border: 3px solid #ffc107;">
+                        <h3>🌟 Bonus Question 11: When you extract a row from a DataFrame, what data type(s) can the resulting Series contain?</h3>
+                        <div class="quiz-option" onclick="checkAnswer(11, 'a', false)">
+                            A) Only one data type (all numbers or all text)
+                        </div>
+                        <div class="quiz-option" onclick="checkAnswer(11, 'b', true)">
+                            B) Mixed data types (strings, numbers, etc.)
+                        </div>
+                        <div class="quiz-option" onclick="checkAnswer(11, 'c', false)">
+                            C) Only numbers
+                        </div>
+                        <div class="quiz-option" onclick="checkAnswer(11, 'd', false)">
+                            D) Rows cannot be converted to Series
+                        </div>
+                        <div id="answer11" style="margin-top: 15px; font-weight: bold;"></div>
+                    </div>
                 </div>
 
                 <div style="text-align: center; margin: 30px 0;">
                     <div class="progress-bar">
-                        <div class="progress-fill" id="quizProgress" style="width: 0%;">0/10 Correct</div>
+                        <div class="progress-fill" id="quizProgress" style="width: 0%;">0/11 Correct</div>
                     </div>
                     <button class="btn" onclick="resetQuiz()">Reset Quiz 🔄</button>
                     <button class="btn" onclick="showSection(0)">Back to Home 🏠</button>
@@ -1261,6 +1338,142 @@ Lowest Rating: ${minRating} ⭐
             `;
             
             document.getElementById('gamesOutput').innerHTML = html;
+        }
+
+        // Practice Exercise Functions
+        let teamData = null;
+
+        function demonstrateRowColumn() {
+            const output = `
+<strong>📋 Sample DataFrame:</strong>
+<table style="width: 100%; margin: 15px 0;">
+    <tr>
+        <th>Name</th>
+        <th>Math</th>
+        <th>Science</th>
+        <th>Grade</th>
+    </tr>
+    <tr>
+        <td>Alice</td>
+        <td>95</td>
+        <td>88</td>
+        <td>A</td>
+    </tr>
+    <tr>
+        <td>Bob</td>
+        <td>87</td>
+        <td>90</td>
+        <td>B</td>
+    </tr>
+    <tr>
+        <td>Charlie</td>
+        <td>92</td>
+        <td>85</td>
+        <td>B</td>
+    </tr>
+</table>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+    <div style="background: #e3f2fd; padding: 15px; border-radius: 10px;">
+        <strong>📊 Getting a COLUMN (Math):</strong>
+        <div style="background: white; padding: 10px; margin-top: 10px; border-radius: 5px; font-family: monospace;">
+        df['Math']
+        <br><br>
+        Result (Series):
+        <br>0    95
+        <br>1    87
+        <br>2    92
+        <br>dtype: int64
+        <br><br>
+        ✅ All values are <strong>integers</strong>
+        <br>✅ Index: 0, 1, 2 (row numbers)
+        </div>
+    </div>
+    
+    <div style="background: #fff3e0; padding: 15px; border-radius: 10px;">
+        <strong>📝 Getting a ROW (First student):</strong>
+        <div style="background: white; padding: 10px; margin-top: 10px; border-radius: 5px; font-family: monospace;">
+        df.iloc[0]
+        <br><br>
+        Result (Series):
+        <br>Name      Alice
+        <br>Math        95
+        <br>Science     88
+        <br>Grade       A
+        <br>dtype: object
+        <br><br>
+        ⚠️ Mixed types: <strong>string + integers</strong>
+        <br>✅ Index: Name, Math, Science, Grade (column names)
+        </div>
+    </div>
+</div>
+
+<div style="background: #c8e6c9; padding: 15px; margin-top: 20px; border-radius: 10px;">
+    <strong>🎯 Key Takeaway:</strong> Both are Series, but:
+    <br>• Column Series → Same data type (usually)
+    <br>• Row Series → Mixed data types (usually)
+</div>
+            `;
+            document.getElementById('seriesDemo').innerHTML = output;
+        }
+
+        function showSeriesTypes() {
+            const output = `
+<strong>🔬 Data Type Analysis:</strong>
+
+<table style="width: 100%; margin-top: 15px;">
+    <tr>
+        <th>What You Get</th>
+        <th>Python Code</th>
+        <th>Result Type</th>
+        <th>Data Types Inside</th>
+    </tr>
+    <tr style="background: #e8f5e9;">
+        <td><strong>One Column</strong></td>
+        <td>df['Math']</td>
+        <td>Series</td>
+        <td>int64 (all same)</td>
+    </tr>
+    <tr style="background: #fff9c4;">
+        <td><strong>One Row</strong></td>
+        <td>df.iloc[0]</td>
+        <td>Series</td>
+        <td>object (mixed: str + int)</td>
+    </tr>
+    <tr style="background: #e3f2fd;">
+        <td><strong>Multiple Columns</strong></td>
+        <td>df[['Math', 'Science']]</td>
+        <td>DataFrame</td>
+        <td>Each column: int64</td>
+    </tr>
+    <tr style="background: #fce4ec;">
+        <td><strong>Multiple Rows</strong></td>
+        <td>df.iloc[0:2]</td>
+        <td>DataFrame</td>
+        <td>Each row: object (mixed)</td>
+    </tr>
+    <tr style="background: #f3e5f5;">
+        <td><strong>One Value</strong></td>
+        <td>df.loc[0, 'Math']</td>
+        <td>Scalar (int)</td>
+        <td>Just the value: 95</td>
+    </tr>
+</table>
+
+<div style="background: #fff9c4; padding: 15px; margin-top: 20px; border-radius: 10px; border-left: 5px solid #fbc02d;">
+    <strong>💡 Why Rows Have Mixed Types:</strong>
+    <br><br>
+    Think about a student record:
+    <br>• <strong>Name</strong> = "Alice" (text/string)
+    <br>• <strong>Math Score</strong> = 95 (number/integer)
+    <br>• <strong>Science Score</strong> = 88 (number/integer)  
+    <br>• <strong>Grade</strong> = "A" (text/string)
+    <br><br>
+    When you get this as a row, it's still a Series - just with mixed data types!
+    <br>Pandas uses dtype: <strong>object</strong> for Series with mixed types.
+</div>
+            `;
+            document.getElementById('seriesDemo').innerHTML = output;
         }
 
         // Practice Exercise Functions
@@ -1566,13 +1779,13 @@ English: ${bestTest.english}<br>
 
         function updateQuizProgress() {
             const progressBar = document.getElementById('quizProgress');
-            const percentage = (quizScore / 10) * 100;
+            const percentage = (quizScore / 11) * 100;
             progressBar.style.width = percentage + '%';
-            progressBar.textContent = `${quizScore}/10 Correct`;
+            progressBar.textContent = `${quizScore}/11 Correct`;
             
-            if (quizScore === 10) {
+            if (quizScore === 11) {
                 setTimeout(() => {
-                    alert('🎉 Congratulations! You got all answers correct! You\'re a Pandas expert!');
+                    alert('🎉 Congratulations! You got all answers correct including the bonus question! You\'re a Pandas expert!');
                 }, 500);
             }
         }
@@ -1585,7 +1798,7 @@ English: ${bestTest.english}<br>
                 option.classList.remove('correct', 'wrong');
             });
             
-            for (let i = 1; i <= 10; i++) {
+            for (let i = 1; i <= 11; i++) {
                 document.getElementById(`answer${i}`).innerHTML = '';
             }
             
