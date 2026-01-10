@@ -109,7 +109,7 @@ By the end of this week, students will be able to:
 **Assignment:** Pandas Accessing, Filtering and Traversing DataFrames  
 **Due Date:** End of Week 14  
 **Points:** 25  
-**Link:** [pandas_accessing_filtering_traversing.md](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Assignments/pandas_accessing_filtering_traversing.md)
+**Link:** [pandas_ds_assignment_data_accessing_and_filtering.ipynb](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Assignments/python_ds_assignment_pandas_data_accessing_and_filtering.ipynb)
 
 ### Assignment Overview:
 Students will practice various methods of accessing, filtering, and traversing DataFrames using real-world datasets. They will demonstrate proficiency with loc, iloc, boolean filtering, and different iteration techniques.
