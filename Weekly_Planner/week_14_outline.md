@@ -120,7 +120,6 @@ Students will practice various methods of accessing, filtering, and traversing D
 
 ### Required Materials:
 - **Main Notebook:** [4_pandas_accessing_filtering_and_traversing_dataframe.ipynb](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/pandas/4_pandas_accessing_filtering_and_traversing_dataframe.ipynb)
-- **Assignment:** [pandas_accessing_filtering_traversing.md](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Assignments/pandas_accessing_filtering_traversing.md)
 
 ### Additional Resources:
 - Pandas Documentation: [Indexing and Selecting Data](https://pandas.pydata.org/docs/user_guide/indexing.html)
