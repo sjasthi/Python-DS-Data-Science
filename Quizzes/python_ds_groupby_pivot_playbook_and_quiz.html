@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GroupBy & Pivot Tables - Interactive Playbook</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            background: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            padding: 0;
+            border-bottom: 3px solid #667eea;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            flex: 1;
+            min-width: 150px;
+            padding: 20px 30px;
+            background: #e9ecef;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #495057;
+            transition: all 0.3s;
+            border-right: 1px solid #dee2e6;
+        }
+
+        .tab-button:last-child {
+            border-right: none;
+        }
+
+        .tab-button:hover {
+            background: #dee2e6;
+        }
+
+        .tab-button.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            margin-bottom: -3px;
+        }
+
+        .tab-button .emoji {
+            font-size: 1.3em;
+            margin-right: 8px;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            padding: 40px;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-title {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2em;
+            color: #6c757d;
+            margin-bottom: 40px;
+        }
+
+        .concept-box {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            border-left: 5px solid #667eea;
+        }
+
+        .concept-box h3 {
+            color: #764ba2;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .analogy {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #ff6b6b;
+        }
+
+        .analogy strong {
+            color: #c92a2a;
+            font-size: 1.1em;
+        }
+
+        .example-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .example-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .example-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .example-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #68d391;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+        }
+
+        .interactive-demo {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+        }
+
+        .demo-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 10px 5px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .demo-button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .output-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+            min-height: 100px;
+            border: 2px dashed #667eea;
+        }
+
+        .key-point {
+            background: #e3f2fd;
+            padding: 15px;
+            border-left: 4px solid #2196f3;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .visual-demo {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .data-transformation {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .data-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #667eea;
+            margin: 10px;
+            min-width: 200px;
+        }
+
+        .arrow {
+            font-size: 3em;
+            color: #667eea;
+            margin: 0 20px;
+        }
+
+        /* Quiz Styles */
+        .quiz-header {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+
+        .quiz-header h2 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .question-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+        }
+
+        .question-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .options {
+            margin-top: 15px;
+        }
+
+        .option {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .option:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+            border-color: #667eea;
+        }
+
+        .option input[type="radio"] {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .option label {
+            cursor: pointer;
+            display: inline-block;
+            width: calc(100% - 25px);
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 1.2em;
+            cursor: pointer;
+            display: block;
+            margin: 30px auto;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+        }
+
+        .result-box {
+            background: #f8f9fa;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+            border: 3px solid #667eea;
+        }
+
+        .result-box.show {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .score-display {
+            font-size: 4em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .score-excellent {
+            color: #51cf66;
+        }
+
+        .score-good {
+            color: #4dabf7;
+        }
+
+        .score-okay {
+            color: #ff922b;
+        }
+
+        .score-needs-work {
+            color: #ff6b6b;
+        }
+
+        .screenshot-reminder {
+            background: #fff3bf;
+            border: 3px dashed #ff922b;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 1.1em;
+        }
+
+        .emoji-large {
+            font-size: 3em;
+            margin: 10px;
+        }
+
+        .next-tab-btn {
+            background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin: 30px auto;
+            display: block;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+
+        .next-tab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        ul {
+            font-size: 1.1em;
+            line-height: 2;
+            margin-left: 30px;
+        }
+
+        ol {
+            font-size: 1.1em;
+            line-height: 2;
+            margin-left: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 GroupBy, Pivot & Split-Apply-Combine</h1>
+            <p>Master Data Organization Like a Pro!</p>
+            <p style="font-size: 0.9em; margin-top: 10px;">Python Data Science - Middle School Edition</p>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tab-nav">
+            <button class="tab-button active" onclick="openTab('concept')">
+                <span class="emoji">🔄</span> Split-Apply-Combine
+            </button>
+            <button class="tab-button" onclick="openTab('groupby')">
+                <span class="emoji">📦</span> GroupBy
+            </button>
+            <button class="tab-button" onclick="openTab('pivot')">
+                <span class="emoji">📊</span> Pivot Tables
+            </button>
+            <button class="tab-button" onclick="openTab('quiz')">
+                <span class="emoji">🎯</span> Quiz
+            </button>
+        </div>
+
+        <!-- Tab 1: Split-Apply-Combine Concept -->
+        <div id="concept" class="tab-content active">
+            <h2 class="section-title">🔄 Split-Apply-Combine</h2>
+            <p class="section-subtitle">The Core Concept Behind Data Analysis</p>
+
+            <div class="analogy">
+                <strong>🎯 Real-Life Analogy:</strong><br>
+                Imagine grading test papers for multiple classes:<br><br>
+                <strong>SPLIT:</strong> Separate papers by class (6th grade, 7th grade, 8th grade)<br>
+                <strong>APPLY:</strong> Calculate the average score for each class<br>
+                <strong>COMBINE:</strong> Put all the class averages into one report<br><br>
+                That's Split-Apply-Combine - it's the BIG IDEA behind data analysis!
+            </div>
+
+            <div class="concept-box">
+                <h3>🧠 The Universal Pattern</h3>
+                <p style="font-size: 1.1em; margin-bottom: 15px;">
+                    Split-Apply-Combine is not a specific function - it's a <strong>way of thinking</strong> about data analysis!
+                </p>
+                <ol>
+                    <li><strong>SPLIT:</strong> Break data into groups based on a category (like department, grade, or type)</li>
+                    <li><strong>APPLY:</strong> Perform a calculation on each group (sum, average, count, max, min, etc.)</li>
+                    <li><strong>COMBINE:</strong> Put the results back together into a summary</li>
+                </ol>
+            </div>
+
+            <div class="visual-demo">
+                <h3>📈 Visual Example: Game Prices by Console</h3>
+                <div style="background: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="display: inline-block; background: #e3f2fd; padding: 20px; border-radius: 10px;">
+                            <strong>🎮 Original Data (Mixed)</strong><br><br>
+                            Console: PS5, Price: $60<br>
+                            Console: Xbox, Price: $50<br>
+                            Console: PS5, Price: $40<br>
+                            Console: Xbox, Price: $55
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 20px 0; font-size: 2em; color: #667eea;">⬇️ SPLIT by Console</div>
+                    
+                    <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                        <div style="background: #fff3e0; padding: 20px; border-radius: 10px; min-width: 150px;">
+                            <strong>PS5 Group</strong><br>
+                            $60<br>
+                            $40
+                        </div>
+                        <div style="background: #e8f5e9; padding: 20px; border-radius: 10px; min-width: 150px;">
+                            <strong>Xbox Group</strong><br>
+                            $50<br>
+                            $55
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 20px 0; font-size: 2em; color: #667eea;">⬇️ APPLY (Calculate Average)</div>
+                    
+                    <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                        <div style="background: #fff3e0; padding: 20px; border-radius: 10px; min-width: 150px;">
+                            <strong>PS5</strong><br>
+                            ($60 + $40) ÷ 2<br>
+                            = <strong>$50.00</strong>
+                        </div>
+                        <div style="background: #e8f5e9; padding: 20px; border-radius: 10px; min-width: 150px;">
+                            <strong>Xbox</strong><br>
+                            ($50 + $55) ÷ 2<br>
+                            = <strong>$52.50</strong>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 20px 0; font-size: 2em; color: #667eea;">⬇️ COMBINE Results</div>
+                    
+                    <div style="text-align: center;">
+                        <div style="display: inline-block; background: #f3e5f5; padding: 20px; border-radius: 10px;">
+                            <strong>📋 Final Summary</strong><br><br>
+                            PS5: $50.00 average<br>
+                            Xbox: $52.50 average
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="interactive-demo">
+                <h3>🎮 Interactive Demo</h3>
+                <p>Click to see Split-Apply-Combine with student grades:</p>
+                <button class="demo-button" onclick="showSplitApplyCombine()">Show the Process!</button>
+                <div id="sac-output" class="output-box"></div>
+            </div>
+
+            <div class="key-point">
+                <strong>💡 Why This Matters:</strong><br>
+                Split-Apply-Combine is SO useful that Pandas built special tools around it: <strong>GroupBy</strong> and <strong>Pivot Tables</strong>!
+                Both tools use the same Split-Apply-Combine process - they just format the output differently.
+            </div>
+
+            <div class="concept-box">
+                <h3>🎯 Real-World Examples</h3>
+                <ul>
+                    <li><strong>Business:</strong> Split sales by region, calculate total revenue per region, combine into report</li>
+                    <li><strong>School:</strong> Split students by grade, calculate average test score per grade, combine results</li>
+                    <li><strong>Sports:</strong> Split players by position, calculate average points per position, combine stats</li>
+                    <li><strong>Gaming:</strong> Split games by genre, count games per genre, combine into summary</li>
+                </ul>
+            </div>
+
+            <button class="next-tab-btn" onclick="openTab('groupby')">
+                Next: Learn GroupBy →
+            </button>
+        </div>
+
+        <!-- Tab 2: GroupBy -->
+        <div id="groupby" class="tab-content">
+            <h2 class="section-title">📦 GroupBy</h2>
+            <p class="section-subtitle">Split-Apply-Combine in List Format</p>
+
+            <div class="analogy">
+                <strong>🎮 GroupBy is Split-Apply-Combine!</strong><br><br>
+                When you use <code>df.groupby('Console')['Price'].mean()</code>, here's what happens:<br><br>
+                <strong>SPLIT:</strong> Pandas separates games by console type<br>
+                <strong>APPLY:</strong> Calculates the average price for each console<br>
+                <strong>COMBINE:</strong> Returns results as a nice list<br><br>
+                GroupBy does all three steps automatically!
+            </div>
+
+            <div class="concept-box">
+                <h3>📝 How GroupBy Works</h3>
+                <p><strong>Step 1 (SPLIT):</strong> Pick a column to group by (like "Department" or "Grade")</p>
+                <p><strong>Step 2 (APPLY):</strong> Tell it what to calculate (sum, average, count, etc.)</p>
+                <p><strong>Step 3 (COMBINE):</strong> Get back a simple list of results</p>
+                <p style="margin-top: 15px; color: #667eea;"><strong>Result Format:</strong> A list/table (one row per group)</p>
+            </div>
+
+            <div class="code-block">
+# Simple GroupBy Example
+import pandas as pd
+
+# Group by Department and calculate total sales
+df.groupby('Department')['Sales'].sum()
+
+# Output:
+# Department
+# Engineering    595000
+# Marketing      560000
+# Sales          750000
+
+# This automatically does Split-Apply-Combine!
+            </div>
+
+            <div class="interactive-demo">
+                <h3>🎮 Try It Yourself!</h3>
+                <p>Click to see GroupBy in action with student grades:</p>
+                <button class="demo-button" onclick="showGroupByDemo()">Show GroupBy Magic!</button>
+                <div id="groupby-output" class="output-box"></div>
+            </div>
+
+            <div class="concept-box">
+                <h3>🔧 Common GroupBy Aggregations</h3>
+                <table class="example-table">
+                    <tr>
+                        <th>Function</th>
+                        <th>What It Does</th>
+                        <th>Example</th>
+                    </tr>
+                    <tr>
+                        <td><code>.sum()</code></td>
+                        <td>Add all values</td>
+                        <td>Total sales per department</td>
+                    </tr>
+                    <tr>
+                        <td><code>.mean()</code></td>
+                        <td>Calculate average</td>
+                        <td>Average score per grade</td>
+                    </tr>
+                    <tr>
+                        <td><code>.count()</code></td>
+                        <td>Count items</td>
+                        <td>Number of students per class</td>
+                    </tr>
+                    <tr>
+                        <td><code>.max()</code></td>
+                        <td>Find highest value</td>
+                        <td>Best score in each subject</td>
+                    </tr>
+                    <tr>
+                        <td><code>.min()</code></td>
+                        <td>Find lowest value</td>
+                        <td>Lowest price in each category</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="code-block">
+# Multiple Aggregations at Once
+df.groupby('Department').agg({
+    'Sales': 'sum',        # Total sales
+    'Employees': 'mean',   # Average employees
+    'Revenue': 'max'       # Highest revenue
+})
+
+# You can calculate different things for different columns!
+            </div>
+
+            <div class="key-point">
+                <strong>💡 When to Use GroupBy:</strong><br>
+                • You have ONE grouping variable (like Department, Grade, or Category)<br>
+                • You want results as a simple list<br>
+                • You're answering: "What's the total/average/count for each [category]?"
+            </div>
+
+            <button class="next-tab-btn" onclick="openTab('pivot')">
+                Next: Learn Pivot Tables →
+            </button>
+        </div>
+
+        <!-- Tab 3: Pivot Tables -->
+        <div id="pivot" class="tab-content">
+            <h2 class="section-title">📊 Pivot Tables</h2>
+            <p class="section-subtitle">Split-Apply-Combine in Grid Format</p>
+
+            <div class="analogy">
+                <strong>🍕 Pivot = Split-Apply-Combine + Reshaping!</strong><br><br>
+                Pivot tables use the SAME Split-Apply-Combine process as GroupBy, but reshape the output into a grid!<br><br>
+                <strong>SPLIT:</strong> Group by TWO things (like Product AND Month)<br>
+                <strong>APPLY:</strong> Calculate totals for each combination<br>
+                <strong>COMBINE:</strong> Return results arranged as a table with rows and columns<br><br>
+                Think of it like a spreadsheet where you can see everything at once!
+            </div>
+
+            <div class="visual-demo">
+                <h3>📋 Before and After Pivot</h3>
+                <div class="data-transformation">
+                    <div class="data-box">
+                        <strong>❌ Before (Long List)</strong>
+                        <table class="example-table" style="margin-top: 10px;">
+                            <tr><th>Day</th><th>Type</th><th>Count</th></tr>
+                            <tr><td>Mon</td><td>Pepperoni</td><td>15</td></tr>
+                            <tr><td>Mon</td><td>Cheese</td><td>12</td></tr>
+                            <tr><td>Tue</td><td>Pepperoni</td><td>18</td></tr>
+                            <tr><td>Tue</td><td>Cheese</td><td>10</td></tr>
+                        </table>
+                        <p style="margin-top: 10px; font-size: 0.9em;">Hard to compare!</p>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="data-box">
+                        <strong>✅ After (Pivot Table)</strong>
+                        <table class="example-table" style="margin-top: 10px;">
+                            <tr><th></th><th>Mon</th><th>Tue</th></tr>
+                            <tr><td><strong>Pepperoni</strong></td><td>15</td><td>18</td></tr>
+                            <tr><td><strong>Cheese</strong></td><td>12</td><td>10</td></tr>
+                        </table>
+                        <p style="margin-top: 10px; font-size: 0.9em;">Easy to see patterns!</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-block">
+# Create a Pivot Table
+pd.pivot_table(
+    df,
+    values='Sales',      # What to calculate
+    index='Product',     # Rows (vertical)
+    columns='Month',     # Columns (horizontal)
+    aggfunc='sum'       # How to combine (sum, mean, etc.)
+)
+
+# Output is a grid/table format!
+            </div>
+
+            <div class="interactive-demo">
+                <h3>🎮 Try It Yourself!</h3>
+                <p>Click to transform data into a pivot table:</p>
+                <button class="demo-button" onclick="showPivotDemo()">Create Pivot Table!</button>
+                <div id="pivot-output" class="output-box"></div>
+            </div>
+
+            <div class="concept-box">
+                <h3>🎯 Pivot Table Parameters</h3>
+                <table class="example-table">
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Purpose</th>
+                        <th>Example</th>
+                    </tr>
+                    <tr>
+                        <td><code>values</code></td>
+                        <td>What column to calculate</td>
+                        <td>'Sales', 'Revenue', 'Score'</td>
+                    </tr>
+                    <tr>
+                        <td><code>index</code></td>
+                        <td>What goes in rows</td>
+                        <td>'Product', 'Student', 'Department'</td>
+                    </tr>
+                    <tr>
+                        <td><code>columns</code></td>
+                        <td>What goes in columns</td>
+                        <td>'Month', 'Region', 'Subject'</td>
+                    </tr>
+                    <tr>
+                        <td><code>aggfunc</code></td>
+                        <td>How to combine values</td>
+                        <td>'sum', 'mean', 'count', 'max'</td>
+                    </tr>
+                    <tr>
+                        <td><code>margins</code></td>
+                        <td>Add totals row/column</td>
+                        <td>True or False</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="code-block">
+# Pivot Table with Totals
+pd.pivot_table(
+    df,
+    values='Revenue',
+    index='Department',
+    columns='Location',
+    aggfunc='sum',
+    margins=True        # This adds "All" row and column!
+)
+            </div>
+
+            <div class="key-point">
+                <strong>💡 When to Use Pivot Tables:</strong><br>
+                • You have TWO grouping variables (like Product AND Region)<br>
+                • You want to see results as a grid/matrix<br>
+                • You're answering: "Show me [metric] by [category1] AND [category2]"<br>
+                • You want to easily compare across multiple dimensions
+            </div>
+
+            <div class="concept-box">
+                <h3>🔍 GroupBy vs Pivot - The Key Difference</h3>
+                <p style="font-size: 1.1em;">Both use Split-Apply-Combine! The difference is just the output format:</p>
+                <ul style="margin-top: 15px;">
+                    <li><strong>GroupBy:</strong> Returns a list (long format) - best for 1 grouping variable</li>
+                    <li><strong>Pivot:</strong> Returns a grid (wide format) - best for 2+ grouping variables</li>
+                </ul>
+            </div>
+
+            <button class="next-tab-btn" onclick="openTab('quiz')">
+                Ready for the Quiz? →
+            </button>
+        </div>
+
+        <!-- Tab 4: Quiz -->
+        <div id="quiz" class="tab-content">
+            <div class="quiz-header">
+                <h2>🎯 Knowledge Check Quiz</h2>
+                <p style="font-size: 1.2em;">Test your understanding! Answer all 10 questions.</p>
+                <p style="font-size: 1em; margin-top: 10px;">📸 Take a screenshot of your score to submit!</p>
+            </div>
+
+            <form id="quizForm">
+                <!-- Question 1 -->
+                <div class="question-card">
+                    <h3>Question 1: What is Split-Apply-Combine?</h3>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q1" id="q1a" value="a">
+                            <label for="q1a">A specific pandas function</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q1" id="q1b" value="b">
+                            <label for="q1b">A conceptual pattern for organizing and analyzing data</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q1" id="q1c" value="c">
+                            <label for="q1c">A way to delete duplicate rows</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q1" id="q1d" value="d">
+                            <label for="q1d">Only used for creating charts</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="question-card">
+                    <h3>Question 2: In Split-Apply-Combine, what does "APPLY" mean?</h3>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q2" id="q2a" value="a">
+                            <label for="q2a">Dividing data into groups</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q2" id="q2b" value="b">
+                            <label for="q2b">Performing a calculation on each group</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q2" id="q2c" value="c">
+                            <label for="q2c">Merging the results back together</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q2" id="q2d" value="d">
+                            <label for="q2d">Saving the data to a file</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="question-card">
+                    <h3>Question 3: What does GroupBy return?</h3>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q3" id="q3a" value="a">
+                            <label for="q3a">A list/table in long format</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q3" id="q3b" value="b">
+                            <label for="q3b">A grid/matrix in wide format</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q3" id="q3c" value="c">
+                            <label for="q3c">A chart or graph</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q3" id="q3d" value="d">
+                            <label for="q3d">Only numbers, no text</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 4 -->
+                <div class="question-card">
+                    <h3>Question 4: What function calculates the average in GroupBy?</h3>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q4" id="q4a" value="a">
+                            <label for="q4a">.sum()</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q4" id="q4b" value="b">
+                            <label for="q4b">.count()</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q4" id="q4c" value="c">
+                            <label for="q4c">.mean()</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q4" id="q4d" value="d">
+                            <label for="q4d">.max()</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 5 -->
+                <div class="question-card">
+                    <h3>Question 5: In a pivot table, what parameter specifies how to aggregate the data?</h3>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q5" id="q5a" value="a">
+                            <label for="q5a">index</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q5" id="q5b" value="b">
+                            <label for="q5b">columns</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q5" id="q5c" value="c">
+                            <label for="q5c">aggfunc</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q5" id="q5d" value="d">
+                            <label for="q5d">values</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 6 -->
+                <div class="question-card">
+                    <h3>Question 6: You want to find total sales for each product category. Which is simplest?</h3>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q6" id="q6a" value="a">
+                            <label for="q6a">Create a pivot table with two dimensions</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q6" id="q6b" value="b">
+                            <label for="q6b">Use GroupBy with sum()</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q6" id="q6c" value="c">
+                            <label for="q6c">Sort the data first</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q6" id="q6d" value="d">
+                            <label for="q6d">Count all the rows</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 7 -->
+                <div class="question-card">
+                    <h3>Question 7: What does margins=True do in a pivot table?</h3>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q7" id="q7a" value="a">
+                            <label for="q7a">Adds borders around the table</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q7" id="q7b" value="b">
+                            <label for="q7b">Adds row and column totals</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q7" id="q7c" value="c">
+                            <label for="q7c">Removes empty cells</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q7" id="q7d" value="d">
+                            <label for="q7d">Makes the table bigger</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 8 -->
+                <div class="question-card">
+                    <h3>Question 8: Which is NOT a common aggregation function?</h3>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q8" id="q8a" value="a">
+                            <label for="q8a">sum</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q8" id="q8b" value="b">
+                            <label for="q8b">mean</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q8" id="q8c" value="c">
+                            <label for="q8c">delete</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q8" id="q8d" value="d">
+                            <label for="q8d">count</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 9 -->
+                <div class="question-card">
+                    <h3>Question 9: You want to see Product sales across different Regions in a grid. What should you use?</h3>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q9" id="q9a" value="a">
+                            <label for="q9a">Simple GroupBy on Product</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q9" id="q9b" value="b">
+                            <label for="q9b">Pivot table with Product as index and Region as columns</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q9" id="q9c" value="c">
+                            <label for="q9c">Sort the data by Region</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q9" id="q9d" value="d">
+                            <label for="q9d">Count the number of products</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 10 -->
+                <div class="question-card">
+                    <h3>Question 10: What is the relationship between Split-Apply-Combine, GroupBy, and Pivot Tables?</h3>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q10" id="q10a" value="a">
+                            <label for="q10a">They are three completely different and unrelated concepts</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q10" id="q10b" value="b">
+                            <label for="q10b">Split-Apply-Combine is the concept; GroupBy and Pivot are tools that implement it</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q10" id="q10c" value="c">
+                            <label for="q10c">GroupBy is the concept; Split-Apply-Combine is the tool</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q10" id="q10d" value="d">
+                            <label for="q10d">Pivot Tables don't use Split-Apply-Combine</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="submit-btn" onclick="submitQuiz()">📝 Submit Quiz</button>
+            </form>
+
+            <div id="result" class="result-box">
+                <h2>🎉 Quiz Results</h2>
+                <div class="score-display" id="scoreDisplay"></div>
+                <p id="feedback" style="font-size: 1.3em; margin: 20px 0;"></p>
+                <div id="detailedResults" style="text-align: left; margin-top: 20px;"></div>
+                <div class="screenshot-reminder">
+                    <strong>📸 IMPORTANT!</strong><br>
+                    Take a screenshot of this score and submit it to your classroom!<br>
+                    <small>(Windows: Win+Shift+S | Mac: Cmd+Shift+4)</small>
+                </div>
+                <button class="demo-button" onclick="resetQuiz()" style="margin-top: 20px;">🔄 Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab Navigation
+        function openTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+
+            // Remove active class from all buttons
+            const tabButtons = document.getElementsByClassName('tab-button');
+            for (let i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove('active');
+            }
+
+            // Show the selected tab and mark button as active
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        // Interactive Demos
+        function showSplitApplyCombine() {
+            const output = document.getElementById('sac-output');
+            output.innerHTML = `
+                <h4>🎯 Split-Apply-Combine Process:</h4>
+                
+                <div style="background: #fff3e0; padding: 15px; border-radius: 10px; margin: 10px 0;">
+                    <strong>1️⃣ SPLIT:</strong> Divide students by grade level
+                    <div style="margin-left: 20px; margin-top: 10px;">
+                        • 6th Grade: [85, 90, 88]<br>
+                        • 7th Grade: [92, 88, 95]<br>
+                        • 8th Grade: [78, 85, 80]
+                    </div>
+                </div>
+                
+                <div style="background: #e3f2fd; padding: 15px; border-radius: 10px; margin: 10px 0;">
+                    <strong>2️⃣ APPLY:</strong> Calculate average for each grade
+                    <div style="margin-left: 20px; margin-top: 10px;">
+                        • 6th Grade: (85+90+88)/3 = 87.7<br>
+                        • 7th Grade: (92+88+95)/3 = 91.7<br>
+                        • 8th Grade: (78+85+80)/3 = 81.0
+                    </div>
+                </div>
+                
+                <div style="background: #e8f5e9; padding: 15px; border-radius: 10px; margin: 10px 0;">
+                    <strong>3️⃣ COMBINE:</strong> Put results together
+                    <table class="example-table" style="margin-top: 10px;">
+                        <tr><th>Grade</th><th>Average</th></tr>
+                        <tr><td>6th Grade</td><td>87.7</td></tr>
+                        <tr><td>7th Grade</td><td>91.7</td></tr>
+                        <tr><td>8th Grade</td><td>81.0</td></tr>
+                    </table>
+                </div>
+                
+                <p style="margin-top: 15px; color: #2e7d32; font-weight: bold;">
+                    ✅ Complete! We split the data, calculated averages, and combined the results!
+                </p>
+            `;
+        }
+
+        function showGroupByDemo() {
+            const output = document.getElementById('groupby-output');
+            output.innerHTML = `
+                <h4>📊 Sample Student Grades Data:</h4>
+                <table class="example-table" style="margin-bottom: 20px;">
+                    <tr><th>Student</th><th>Subject</th><th>Grade</th></tr>
+                    <tr><td>Alice</td><td>Math</td><td>95</td></tr>
+                    <tr><td>Bob</td><td>Math</td><td>88</td></tr>
+                    <tr><td>Alice</td><td>Science</td><td>92</td></tr>
+                    <tr><td>Bob</td><td>Science</td><td>85</td></tr>
+                </table>
+                
+                <h4>⚡ After GroupBy by Subject:</h4>
+                <div style="background: #e8f5e9; padding: 15px; border-radius: 10px; margin-top: 10px;">
+                    <strong>Math:</strong> Average = 91.5 (from 95 and 88)<br>
+                    <strong>Science:</strong> Average = 88.5 (from 92 and 85)
+                </div>
+                
+                <div style="background: #e3f2fd; padding: 15px; border-radius: 10px; margin-top: 15px;">
+                    <strong>📝 Code Used:</strong><br>
+                    <code>df.groupby('Subject')['Grade'].mean()</code>
+                </div>
+                
+                <p style="margin-top: 15px; color: #2e7d32; font-weight: bold;">
+                    ✅ GroupBy automatically split by Subject, calculated averages, and combined results!
+                </p>
+            `;
+        }
+
+        function showPivotDemo() {
+            const output = document.getElementById('pivot-output');
+            output.innerHTML = `
+                <h4>📋 Original Data (Long Format):</h4>
+                <table class="example-table" style="margin-bottom: 20px;">
+                    <tr><th>Quarter</th><th>Department</th><th>Sales</th></tr>
+                    <tr><td>Q1</td><td>Sales</td><td>50000</td></tr>
+                    <tr><td>Q1</td><td>Marketing</td><td>30000</td></tr>
+                    <tr><td>Q2</td><td>Sales</td><td>55000</td></tr>
+                    <tr><td>Q2</td><td>Marketing</td><td>32000</td></tr>
+                </table>
+                
+                <h4>✨ After Pivot Table (Grid Format):</h4>
+                <table class="example-table" style="margin-top: 10px;">
+                    <tr><th></th><th>Q1</th><th>Q2</th></tr>
+                    <tr><td><strong>Sales</strong></td><td>$50,000</td><td>$55,000</td></tr>
+                    <tr><td><strong>Marketing</strong></td><td>$30,000</td><td>$32,000</td></tr>
+                </table>
+                
+                <div style="background: #e3f2fd; padding: 15px; border-radius: 10px; margin-top: 15px;">
+                    <strong>📝 Code Used:</strong><br>
+                    <code>pd.pivot_table(df, values='Sales', index='Department', columns='Quarter', aggfunc='sum')</code>
+                </div>
+                
+                <p style="margin-top: 15px; color: #1976d2; font-weight: bold;">
+                    ✅ Now it's easy to compare departments across quarters! Pivot uses Split-Apply-Combine too!
+                </p>
+            `;
+        }
+
+        // Quiz Logic
+        const answers = {
+            q1: 'b',
+            q2: 'b',
+            q3: 'a',
+            q4: 'c',
+            q5: 'c',
+            q6: 'b',
+            q7: 'b',
+            q8: 'c',
+            q9: 'b',
+            q10: 'b'
+        };
+
+        const explanations = {
+            q1: 'Split-Apply-Combine is a conceptual pattern/methodology for data analysis - not a specific function.',
+            q2: 'APPLY is the step where you perform calculations (like sum, mean, count) on each group.',
+            q3: 'GroupBy returns results in a list/table format (long format) - one row per group.',
+            q4: '.mean() calculates the average (mean) value.',
+            q5: 'aggfunc (aggregation function) tells the pivot table how to combine values (sum, mean, count, etc.).',
+            q6: 'GroupBy with sum() is the simplest way to get totals for each category.',
+            q7: 'margins=True adds a "Total" row and column showing overall totals.',
+            q8: 'delete is not an aggregation function. The common ones are sum, mean, count, min, max, etc.',
+            q9: 'A pivot table with Product as rows (index) and Region as columns perfectly shows this in a grid format.',
+            q10: 'Split-Apply-Combine is the underlying conceptual framework. Both GroupBy and Pivot Tables implement this concept - they just format the output differently!'
+        };
+
+        function submitQuiz() {
+            let score = 0;
+            let totalQuestions = 10;
+            let detailedResults = '';
+
+            for (let i = 1; i <= totalQuestions; i++) {
+                const question = 'q' + i;
+                const selected = document.querySelector(`input[name="${question}"]:checked`);
+                
+                if (selected) {
+                    if (selected.value === answers[question]) {
+                        score++;
+                        detailedResults += `<div style="background: #d4edda; padding: 10px; margin: 5px 0; border-radius: 5px;">
+                            ✅ <strong>Question ${i}:</strong> Correct! ${explanations[question]}
+                        </div>`;
+                    } else {
+                        detailedResults += `<div style="background: #f8d7da; padding: 10px; margin: 5px 0; border-radius: 5px;">
+                            ❌ <strong>Question ${i}:</strong> Incorrect. ${explanations[question]}
+                        </div>`;
+                    }
+                } else {
+                    detailedResults += `<div style="background: #fff3cd; padding: 10px; margin: 5px 0; border-radius: 5px;">
+                        ⚠️ <strong>Question ${i}:</strong> Not answered. ${explanations[question]}
+                    </div>`;
+                }
+            }
+
+            const percentage = (score / totalQuestions) * 100;
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            const feedback = document.getElementById('feedback');
+            const resultBox = document.getElementById('result');
+            const detailedResultsDiv = document.getElementById('detailedResults');
+
+            scoreDisplay.textContent = `${score}/${totalQuestions}`;
+            
+            if (percentage >= 90) {
+                scoreDisplay.className = 'score-display score-excellent';
+                feedback.innerHTML = `<span class="emoji-large">🌟</span><br>Outstanding! You're a Split-Apply-Combine master!`;
+            } else if (percentage >= 70) {
+                scoreDisplay.className = 'score-display score-good';
+                feedback.innerHTML = `<span class="emoji-large">👏</span><br>Great job! You understand the concepts well!`;
+            } else if (percentage >= 50) {
+                scoreDisplay.className = 'score-display score-okay';
+                feedback.innerHTML = `<span class="emoji-large">📚</span><br>Good start! Review the material and try again!`;
+            } else {
+                scoreDisplay.className = 'score-display score-needs-work';
+                feedback.innerHTML = `<span class="emoji-large">💪</span><br>Keep practicing! Go back and review the concepts!`;
+            }
+
+            detailedResultsDiv.innerHTML = `
+                <h3 style="color: #667eea; margin-bottom: 15px;">📋 Detailed Results:</h3>
+                ${detailedResults}
+            `;
+
+            resultBox.classList.add('show');
+            resultBox.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetQuiz() {
+            document.getElementById('quizForm').reset();
+            document.getElementById('result').classList.remove('show');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Fix for tab navigation when clicking buttons
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const tabName = this.textContent.toLowerCase().includes('split') ? 'concept' :
+                               this.textContent.toLowerCase().includes('groupby') ? 'groupby' :
+                               this.textContent.toLowerCase().includes('pivot') ? 'pivot' : 'quiz';
+                
+                // Hide all tabs
+                document.querySelectorAll('.tab-content').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                
+                // Remove active from all buttons
+                document.querySelectorAll('.tab-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Show selected tab
+                document.getElementById(tabName).classList.add('active');
+                this.classList.add('active');
+                
+                window.scrollTo(0, 0);
+            });
+        });
+    </script>
+</body>
+</html>
