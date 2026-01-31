@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pandas Concat, Merge & Join - Interactive Playbook 🐼</title>
+    
+    <!-- PyScript for Python in browser -->
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 3px solid #667eea;
+            overflow-x: auto;
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -3px;
+        }
+        
+        .tab-button:hover {
+            background: #e9ecef;
+            color: #667eea;
+        }
+        
+        .tab-button.active {
+            color: #667eea;
+            background: white;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 40px;
+            animation: fadeIn 0.5s;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .section h3 {
+            color: #764ba2;
+            font-size: 1.4em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        
+        .explanation {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .explanation p {
+            line-height: 1.8;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .example-box {
+            background: #fff;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .example-title {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .example-title::before {
+            content: "💡";
+            margin-right: 10px;
+            font-size: 1.3em;
+        }
+        
+        .code-editor {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            margin-bottom: 15px;
+            overflow-x: auto;
+        }
+        
+        .run-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: transform 0.2s;
+            margin-bottom: 15px;
+        }
+        
+        .run-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .run-button:active {
+            transform: scale(0.98);
+        }
+        
+        .output-box {
+            background: #f8f9fa;
+            border: 2px solid #28a745;
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            color: #333;
+        }
+        
+        .image-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        /* Quiz Styles */
+        .quiz-question {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .question-number {
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .question-text {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .quiz-option {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .quiz-option:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+        
+        .quiz-option input[type="radio"] {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .quiz-option label {
+            cursor: pointer;
+            flex: 1;
+            font-size: 1em;
+        }
+        
+        .submit-quiz-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-top: 30px;
+            transition: transform 0.2s;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .submit-quiz-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .quiz-result {
+            display: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .quiz-result.show {
+            display: block;
+            animation: slideIn 0.5s;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .score-display {
+            font-size: 4em;
+            font-weight: 700;
+            margin: 20px 0;
+        }
+        
+        .result-message {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        
+        .screenshot-instruction {
+            background: rgba(255,255,255,0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .key-point {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .tip-box {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .code-inline {
+            background: #f8f9fa;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #e83e8c;
+            border: 1px solid #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐼 Pandas Concat, Merge & Join</h1>
+            <p>Interactive Playbook for Python Data Science</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab(event, 'concat')">📚 Concat</button>
+            <button class="tab-button" onclick="openTab(event, 'merge')">🔗 Merge</button>
+            <button class="tab-button" onclick="openTab(event, 'join')">🤝 Join</button>
+            <button class="tab-button" onclick="openTab(event, 'quiz')">🎯 Quiz</button>
+        </div>
+        
+        <!-- CONCAT TAB -->
+        <div id="concat" class="tab-content active">
+            <div class="section">
+                <h2>📚 Understanding Concat (Concatenation)</h2>
+                
+                <div class="explanation">
+                    <p><strong>What is Concat?</strong></p>
+                    <p>Concat is like stacking LEGO blocks! You can either:</p>
+                    <ul>
+                        <li><strong>Stack them vertically</strong> (axis=0) - Add more rows ⬇️</li>
+                        <li><strong>Extend them horizontally</strong> (axis=1) - Add more columns ➡️</li>
+                    </ul>
+                </div>
+                
+                <h3>🔹 Vertical Concat (axis=0) - Stacking Rows</h3>
+                
+                <div class="image-container">
+                    <img src="images_concat_merge_join/concat_vertical.png" alt="Concat Vertical">
+                </div>
+                
+                <div class="explanation">
+                    <p><strong>When to use:</strong> When you have the same columns but different rows of data.</p>
+                    <p><strong>Example:</strong> Combining test scores from Monday and Tuesday!</p>
+                </div>
+                
+                <div class="example-box">
+                    <div class="example-title">Try It Yourself: Stack Student Scores</div>
+                    <div class="code-editor" id="concat-code-1">
+import pandas as pd
+
+# Monday's scores
+monday = pd.DataFrame({
+    'Name': ['Alice', 'Bob'],
+    'Score': [95, 88]
+})
+
+# Tuesday's scores
+tuesday = pd.DataFrame({
+    'Name': ['Charlie', 'Diana'],
+    'Score': [92, 87]
+})
+
+# Stack them together!
+all_scores = pd.concat([monday, tuesday], axis=0, ignore_index=True)
+print("All Scores Combined:")
+print(all_scores)
+                    </div>
+                    <button class="run-button" onclick="runPythonCode('concat-code-1', 'output-1')">▶️ Run Code</button>
+                    <div class="output-box" id="output-1">Click 'Run Code' to see the output!</div>
+                </div>
+                
+                <div class="key-point">
+                    <strong>💡 Pro Tip:</strong> Use <code class="code-inline">ignore_index=True</code> to get clean, continuous index numbers (0, 1, 2, 3...) instead of repeating indices!
+                </div>
+                
+                <h3>🔹 Horizontal Concat (axis=1) - Adding Columns</h3>
+                
+                <div class="image-container">
+                    <img src="images_concat_merge_join/concat_horizontal.png" alt="Concat Horizontal">
+                </div>
+                
+                <div class="explanation">
+                    <p><strong>When to use:</strong> When you have different columns but the rows match up.</p>
+                    <p><strong>Example:</strong> Adding city and grade info to student names and ages!</p>
+                </div>
+                
+                <div class="example-box">
+                    <div class="example-title">Try It Yourself: Add More Information</div>
+                    <div class="code-editor" id="concat-code-2">
+import pandas as pd
+
+# Basic student info
+basic_info = pd.DataFrame({
+    'Name': ['Alice', 'Bob', 'Charlie'],
+    'Age': [12, 13, 12]
+})
+
+# Extra information
+extra_info = pd.DataFrame({
+    'City': ['NYC', 'LA', 'Chicago'],
+    'Grade': [7, 8, 7]
+})
+
+# Extend horizontally!
+complete_info = pd.concat([basic_info, extra_info], axis=1)
+print("Complete Student Information:")
+print(complete_info)
+                    </div>
+                    <button class="run-button" onclick="runPythonCode('concat-code-2', 'output-2')">▶️ Run Code</button>
+                    <div class="output-box" id="output-2">Click 'Run Code' to see the output!</div>
+                </div>
+                
+                <div class="tip-box">
+                    <strong>🎨 Memory Trick:</strong><br>
+                    • <code class="code-inline">axis=0</code> → Think "0 looks like | (vertical)" → Stack vertically<br>
+                    • <code class="code-inline">axis=1</code> → Think "1 looks like — (horizontal)" → Extend horizontally
+                </div>
+            </div>
+        </div>
+        
+        <!-- MERGE TAB -->
+        <div id="merge" class="tab-content">
+            <div class="section">
+                <h2>🔗 Understanding Merge</h2>
+                
+                <div class="explanation">
+                    <p><strong>What is Merge?</strong></p>
+                    <p>Merge is like matching puzzle pieces! You combine DataFrames based on a <strong>common column</strong> (the "key").</p>
+                    <p><strong>Real-Life Example:</strong> You have student names with IDs, and grades with IDs. Merge them to see who got what grade!</p>
+                </div>
+                
+                <h3>🔍 INNER Merge - Keep Only Matches</h3>
+                
+                <div class="image-container">
+                    <img src="images_concat_merge_join/merge_inner.png" alt="Inner Merge">
+                </div>
+                
+                <div class="explanation">
+                    <p><strong>Rule:</strong> Keep ONLY rows that match in BOTH DataFrames.</p>
+                    <p><strong>When to use:</strong> When you only want complete information (no missing data).</p>
+                </div>
+                
+                <div class="example-box">
+                    <div class="example-title">Try It Yourself: Inner Merge</div>
+                    <div class="code-editor" id="merge-code-1">
+import pandas as pd
+
+# Students
+students = pd.DataFrame({
+    'ID': [1, 2, 3, 4],
+    'Name': ['Alice', 'Bob', 'Charlie', 'Diana']
+})
+
+# Scores (not everyone has one!)
+scores = pd.DataFrame({
+    'ID': [1, 2, 5],
+    'Score': [95, 88, 92]
+})
+
+# INNER merge - only keep matches!
+result = pd.merge(students, scores, on='ID', how='inner')
+print("Students with Scores (INNER):")
+print(result)
+print("\n✅ Only Alice and Bob match!")
+print("❌ Charlie, Diana, and ID=5 are dropped!")
+                    </div>
+                    <button class="run-button" onclick="runPythonCode('merge-code-1', 'output-3')">▶️ Run Code</button>
+                    <div class="output-box" id="output-3">Click 'Run Code' to see the output!</div>
+                </div>
+                
+                <h3>⬅️ LEFT Merge - Keep All Left Rows</h3>
+                
+                <div class="image-container">
+                    <img src="images_concat_merge_join/merge_left.png" alt="Left Merge">
+                </div>
+                
+                <div class="explanation">
+                    <p><strong>Rule:</strong> Keep ALL rows from the LEFT DataFrame, match from right where possible.</p>
+                    <p><strong>When to use:</strong> When the left DataFrame is your "main" data.</p>
+                </div>
+                
+                <div class="example-box">
+                    <div class="example-title">Try It Yourself: Left Merge</div>
+                    <div class="code-editor" id="merge-code-2">
+import pandas as pd
+
+# Students (LEFT - keep all!)
+students = pd.DataFrame({
+    'ID': [1, 2, 3, 4],
+    'Name': ['Alice', 'Bob', 'Charlie', 'Diana']
+})
+
+# Scores (RIGHT)
+scores = pd.DataFrame({
+    'ID': [1, 2, 5],
+    'Score': [95, 88, 92]
+})
+
+# LEFT merge - keep all students!
+result = pd.merge(students, scores, on='ID', how='left')
+print("All Students with Available Scores (LEFT):")
+print(result)
+print("\n✅ All students kept!")
+print("⚠️  Charlie and Diana get NaN (missing score)")
+                    </div>
+                    <button class="run-button" onclick="runPythonCode('merge-code-2', 'output-4')">▶️ Run Code</button>
+                    <div class="output-box" id="output-4">Click 'Run Code' to see the output!</div>
+                </div>
+                
+                <h3>🌟 OUTER Merge - Keep Everything</h3>
+                
+                <div class="image-container">
+                    <img src="images_concat_merge_join/merge_outer.png" alt="Outer Merge">
+                </div>
+                
+                <div class="explanation">
+                    <p><strong>Rule:</strong> Keep EVERYTHING from BOTH DataFrames.</p>
+                    <p><strong>When to use:</strong> When you want the complete picture, including gaps.</p>
+                </div>
+                
+                <div class="example-box">
+                    <div class="example-title">Try It Yourself: Outer Merge</div>
+                    <div class="code-editor" id="merge-code-3">
+import pandas as pd
+
+# Students
+students = pd.DataFrame({
+    'ID': [1, 2, 3, 4],
+    'Name': ['Alice', 'Bob', 'Charlie', 'Diana']
+})
+
+# Scores
+scores = pd.DataFrame({
+    'ID': [1, 2, 5],
+    'Score': [95, 88, 92]
+})
+
+# OUTER merge - keep EVERYTHING!
+result = pd.merge(students, scores, on='ID', how='outer')
+print("Everything Combined (OUTER):")
+print(result)
+print("\n✅ ALL rows from both DataFrames!")
+print("⚠️  Lots of NaN where data doesn't match")
+                    </div>
+                    <button class="run-button" onclick="runPythonCode('merge-code-3', 'output-5')">▶️ Run Code</button>
+                    <div class="output-box" id="output-5">Click 'Run Code' to see the output!</div>
+                </div>
+                
+                <div class="image-container">
+                    <img src="images_concat_merge_join/join_types_comparison.png" alt="Join Types Comparison">
+                </div>
+                
+                <div class="key-point">
+                    <strong>📊 Quick Reference:</strong><br>
+                    • <strong>INNER:</strong> Only matches (strictest)<br>
+                    • <strong>LEFT:</strong> All left + matches<br>
+                    • <strong>RIGHT:</strong> All right + matches<br>
+                    • <strong>OUTER:</strong> Everything (most complete)
+                </div>
+            </div>
+        </div>
+        
+        <!-- JOIN TAB -->
+        <div id="join" class="tab-content">
+            <div class="section">
+                <h2>🤝 Understanding Join</h2>
+                
+                <div class="explanation">
+                    <p><strong>What is Join?</strong></p>
+                    <p>Join is a special type of merge that uses the <strong>index</strong> instead of a column to match DataFrames.</p>
+                </div>
+                
+                <div class="tip-box">
+                    <strong>🔍 Key Difference:</strong><br>
+                    • <strong>Merge:</strong> Matches using a column (like 'ID' or 'Name')<br>
+                    • <strong>Join:</strong> Matches using the index (0, 1, 2, 3...)
+                </div>
+                
+                <div class="explanation">
+                    <p><strong>When to Use Join vs Merge:</strong></p>
+                    <ul>
+                        <li><strong>Use Merge:</strong> When you have a specific column to match on</li>
+                        <li><strong>Use Join:</strong> When the index is what you want to match on</li>
+                    </ul>
+                </div>
+                
+                <div class="example-box">
+                    <div class="example-title">Try It Yourself: Join Using Index</div>
+                    <div class="code-editor" id="join-code-1">
+import pandas as pd
+
+# Students with custom index (Student IDs)
+students = pd.DataFrame({
+    'Name': ['Alice', 'Bob', 'Charlie']
+}, index=[101, 102, 103])
+
+print("Students DataFrame:")
+print(students)
+print("\nNotice the index: 101, 102, 103")
+
+# Grades with custom index
+grades = pd.DataFrame({
+    'Math': [95, 88, 92],
+    'Science': [90, 85, 94]
+}, index=[101, 102, 104])
+
+print("\nGrades DataFrame:")
+print(grades)
+print("\nNotice the index: 101, 102, 104")
+
+# Join using index!
+result = students.join(grades, how='left')
+print("\nJoined Result (LEFT):")
+print(result)
+print("\n✅ Charlie (103) gets NaN - no matching grades")
+print("❌ Index 104's grades ignored - no matching student")
+                    </div>
+                    <button class="run-button" onclick="runPythonCode('join-code-1', 'output-6')">▶️ Run Code</button>
+                    <div class="output-box" id="output-6">Click 'Run Code' to see the output!</div>
+                </div>
+                
+                <div class="example-box">
+                    <div class="example-title">Comparison: Merge vs Join</div>
+                    <div class="code-editor" id="join-code-2">
+import pandas as pd
+
+# Method 1: Using MERGE (on a column)
+df1 = pd.DataFrame({
+    'StudentID': [1, 2, 3],
+    'Name': ['Alice', 'Bob', 'Charlie']
+})
+
+df2 = pd.DataFrame({
+    'StudentID': [1, 2, 3],
+    'Score': [95, 88, 92]
+})
+
+merged = pd.merge(df1, df2, on='StudentID')
+print("Using MERGE (on column 'StudentID'):")
+print(merged)
+
+# Method 2: Using JOIN (on index)
+df1_indexed = df1.set_index('StudentID')
+df2_indexed = df2.set_index('StudentID')
+joined = df1_indexed.join(df2_indexed)
+
+print("\n\nUsing JOIN (on index):")
+print(joined)
+
+print("\n✅ Same result, different approach!")
+                    </div>
+                    <button class="run-button" onclick="runPythonCode('join-code-2', 'output-7')">▶️ Run Code</button>
+                    <div class="output-box" id="output-7">Click 'Run Code' to see the output!</div>
+                </div>
+                
+                <div class="key-point">
+                    <strong>💡 Remember:</strong> Join types are the same as merge:<br>
+                    • <code class="code-inline">how='inner'</code> - Only matching indices<br>
+                    • <code class="code-inline">how='left'</code> - All left indices (default!)<br>
+                    • <code class="code-inline">how='right'</code> - All right indices<br>
+                    • <code class="code-inline">how='outer'</code> - All indices from both
+                </div>
+            </div>
+        </div>
+        
+        <!-- QUIZ TAB -->
+        <div id="quiz" class="tab-content">
+            <div class="section">
+                <h2>🎯 Quiz Time! Test Your Knowledge</h2>
+                
+                <div class="explanation">
+                    <p><strong>Instructions:</strong> Answer all 10 questions and click "Submit Quiz" to see your score!</p>
+                    <p><strong>For Google Classroom:</strong> Take a screenshot of your score and submit it! 📸</p>
+                </div>
+                
+                <form id="quiz-form">
+                    <!-- Question 1 -->
+                    <div class="quiz-question">
+                        <span class="question-number">Question 1</span>
+                        <div class="question-text">What does <code class="code-inline">axis=0</code> mean in <code class="code-inline">pd.concat()</code>?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-option">
+                                <input type="radio" name="q1" value="a" id="q1a">
+                                <label for="q1a">Concatenate horizontally (add columns)</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q1" value="b" id="q1b">
+                                <label for="q1b">Concatenate vertically (add rows)</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q1" value="c" id="q1c">
+                                <label for="q1c">Merge on index</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q1" value="d" id="q1d">
+                                <label for="q1d">Delete rows</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Question 2 -->
+                    <div class="quiz-question">
+                        <span class="question-number">Question 2</span>
+                        <div class="question-text">You have two DataFrames with the same columns. What should you use to stack them on top of each other?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-option">
+                                <input type="radio" name="q2" value="a" id="q2a">
+                                <label for="q2a">pd.concat() with axis=1</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q2" value="b" id="q2b">
+                                <label for="q2b">pd.concat() with axis=0</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q2" value="c" id="q2c">
+                                <label for="q2c">pd.merge() with how='inner'</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q2" value="d" id="q2d">
+                                <label for="q2d">df.join()</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Question 3 -->
+                    <div class="quiz-question">
+                        <span class="question-number">Question 3</span>
+                        <div class="question-text">Which merge type keeps ONLY the matching rows from both DataFrames?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-option">
+                                <input type="radio" name="q3" value="a" id="q3a">
+                                <label for="q3a">LEFT merge</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q3" value="b" id="q3b">
+                                <label for="q3b">INNER merge</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q3" value="c" id="q3c">
+                                <label for="q3c">OUTER merge</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q3" value="d" id="q3d">
+                                <label for="q3d">RIGHT merge</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Question 4 -->
+                    <div class="quiz-question">
+                        <span class="question-number">Question 4</span>
+                        <div class="question-text">You want to keep all students in your class list, even if some don't have test scores yet. Which merge should you use?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-option">
+                                <input type="radio" name="q4" value="a" id="q4a">
+                                <label for="q4a">INNER merge</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q4" value="b" id="q4b">
+                                <label for="q4b">LEFT merge (students on left)</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q4" value="c" id="q4c">
+                                <label for="q4c">RIGHT merge (students on right)</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q4" value="d" id="q4d">
+                                <label for="q4d">Both B and C are correct</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Question 5 -->
+                    <div class="quiz-question">
+                        <span class="question-number">Question 5</span>
+                        <div class="question-text">What does NaN mean in a merged DataFrame?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-option">
+                                <input type="radio" name="q5" value="a" id="q5a">
+                                <label for="q5a">Not a Number (missing data)</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q5" value="b" id="q5b">
+                                <label for="q5b">A name column</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q5" value="c" id="q5c">
+                                <label for="q5c">Negative and Null</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q5" value="d" id="q5d">
+                                <label for="q5d">An error in the code</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Question 6 -->
+                    <div class="quiz-question">
+                        <span class="question-number">Question 6</span>
+                        <div class="question-text">What parameter should you use in pd.concat() to reset the index to 0, 1, 2, 3...?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-option">
+                                <input type="radio" name="q6" value="a" id="q6a">
+                                <label for="q6a">reset_index=True</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q6" value="b" id="q6b">
+                                <label for="q6b">ignore_index=True</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q6" value="c" id="q6c">
+                                <label for="q6c">new_index=True</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q6" value="d" id="q6d">
+                                <label for="q6d">index=0</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Question 7 -->
+                    <div class="quiz-question">
+                        <span class="question-number">Question 7</span>
+                        <div class="question-text">What is the main difference between merge() and join()?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-option">
+                                <input type="radio" name="q7" value="a" id="q7a">
+                                <label for="q7a">merge() is faster than join()</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q7" value="b" id="q7b">
+                                <label for="q7b">merge() uses columns, join() uses the index</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q7" value="c" id="q7c">
+                                <label for="q7c">join() can only do inner joins</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q7" value="d" id="q7d">
+                                <label for="q7d">They are exactly the same</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Question 8 -->
+                    <div class="quiz-question">
+                        <span class="question-number">Question 8</span>
+                        <div class="question-text">Which merge type will give you the MOST rows (most complete data)?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-option">
+                                <input type="radio" name="q8" value="a" id="q8a">
+                                <label for="q8a">INNER merge</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q8" value="b" id="q8b">
+                                <label for="q8b">LEFT merge</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q8" value="c" id="q8c">
+                                <label for="q8c">RIGHT merge</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q8" value="d" id="q8d">
+                                <label for="q8d">OUTER merge</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Question 9 -->
+                    <div class="quiz-question">
+                        <span class="question-number">Question 9</span>
+                        <div class="question-text">You have DataFrame A with columns ['Name', 'Age'] and DataFrame B with columns ['City', 'Hobby']. What should you use to combine them side-by-side?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-option">
+                                <input type="radio" name="q9" value="a" id="q9a">
+                                <label for="q9a">pd.concat([A, B], axis=0)</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q9" value="b" id="q9b">
+                                <label for="q9b">pd.concat([A, B], axis=1)</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q9" value="c" id="q9c">
+                                <label for="q9c">pd.merge(A, B, how='inner')</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q9" value="d" id="q9d">
+                                <label for="q9d">You cannot combine them</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Question 10 -->
+                    <div class="quiz-question">
+                        <span class="question-number">Question 10</span>
+                        <div class="question-text">In pd.merge(students, scores, on='ID', how='left'), which DataFrame's rows are ALL kept?</div>
+                        <div class="quiz-options">
+                            <div class="quiz-option">
+                                <input type="radio" name="q10" value="a" id="q10a">
+                                <label for="q10a">students (the left one)</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q10" value="b" id="q10b">
+                                <label for="q10b">scores (the right one)</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q10" value="c" id="q10c">
+                                <label for="q10c">Both are kept</label>
+                            </div>
+                            <div class="quiz-option">
+                                <input type="radio" name="q10" value="d" id="q10d">
+                                <label for="q10d">Only matching rows are kept</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="submit-quiz-btn" onclick="gradeQuiz()">🎯 Submit Quiz</button>
+                </form>
+                
+                <div class="quiz-result" id="quiz-result">
+                    <h2>🎉 Quiz Complete!</h2>
+                    <div class="score-display" id="score-display">0/10</div>
+                    <div class="result-message" id="result-message"></div>
+                    <div class="screenshot-instruction">
+                        <h3>📸 For Google Classroom Submission:</h3>
+                        <p>Take a screenshot of this score and submit it to Google Classroom!</p>
+                        <p style="margin-top: 10px;"><strong>Windows:</strong> Press Windows + Shift + S</p>
+                        <p><strong>Mac:</strong> Press Command + Shift + 4</p>
+                        <p><strong>Chromebook:</strong> Press Ctrl + Show Windows (rectangle with lines)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <py-config>
+        packages = ["pandas"]
+    </py-config>
+    
+    <script>
+        // Tab switching functionality
+        function openTab(evt, tabName) {
+            var i, tabcontent, tabbuttons;
+            
+            // Hide all tab content
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            
+            // Remove active class from all buttons
+            tabbuttons = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tabbuttons.length; i++) {
+                tabbuttons[i].classList.remove("active");
+            }
+            
+            // Show current tab and mark button as active
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+        
+        // Run Python code function
+        async function runPythonCode(codeId, outputId) {
+            const codeElement = document.getElementById(codeId);
+            const outputElement = document.getElementById(outputId);
+            const code = codeElement.textContent.trim();
+            
+            outputElement.textContent = "Running code... ⏳";
+            
+            try {
+                // Use PyScript to run the code
+                const result = await pyscript.interpreter.run(code);
+                // The print statements will be captured by PyScript automatically
+            } catch (error) {
+                outputElement.textContent = "Error: " + error.message;
+            }
+        }
+        
+        // Quiz grading functionality
+        function gradeQuiz() {
+            const answers = {
+                q1: 'b',  // axis=0 = vertical
+                q2: 'b',  // concat axis=0 for stacking
+                q3: 'b',  // INNER = only matches
+                q4: 'd',  // Both B and C correct
+                q5: 'a',  // NaN = Not a Number
+                q6: 'b',  // ignore_index=True
+                q7: 'b',  // merge uses columns, join uses index
+                q8: 'd',  // OUTER = most rows
+                q9: 'b',  // concat axis=1 for side-by-side
+                q10: 'a'  // LEFT keeps left DataFrame
+            };
+            
+            let score = 0;
+            let totalQuestions = 10;
+            
+            // Check each answer
+            for (let i = 1; i <= totalQuestions; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (selected && selected.value === answers[`q${i}`]) {
+                    score++;
+                }
+            }
+            
+            // Display result
+            const resultDiv = document.getElementById('quiz-result');
+            const scoreDisplay = document.getElementById('score-display');
+            const messageDisplay = document.getElementById('result-message');
+            
+            scoreDisplay.textContent = `${score}/${totalQuestions}`;
+            
+            let message = '';
+            let emoji = '';
+            
+            if (score === 10) {
+                emoji = '🏆';
+                message = 'PERFECT SCORE! You\'re a Pandas Master!';
+            } else if (score >= 8) {
+                emoji = '🌟';
+                message = 'Excellent work! You really understand this!';
+            } else if (score >= 6) {
+                emoji = '👍';
+                message = 'Good job! Review the material and try again!';
+            } else if (score >= 4) {
+                emoji = '📚';
+                message = 'Keep studying! You\'re getting there!';
+            } else {
+                emoji = '💪';
+                message = 'Don\'t give up! Review the lessons and try again!';
+            }
+            
+            messageDisplay.innerHTML = `${emoji} ${message}`;
+            resultDiv.classList.add('show');
+            
+            // Scroll to result
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        // PyScript setup for output redirection
+        if (typeof pyscript !== 'undefined') {
+            pyscript.when(pyscript.Event.READY, () => {
+                // Redirect stdout to our output divs
+                let currentOutputId = null;
+                
+                window.runPythonCode = async function(codeId, outputId) {
+                    const codeElement = document.getElementById(codeId);
+                    const outputElement = document.getElementById(outputId);
+                    const code = codeElement.textContent.trim();
+                    
+                    currentOutputId = outputId;
+                    outputElement.textContent = "Running code... ⏳";
+                    
+                    // Create a custom output handler
+                    const oldWrite = pyscript.interpreter.interface.stdout.write;
+                    let output = '';
+                    
+                    pyscript.interpreter.interface.stdout.write = function(text) {
+                        output += text;
+                    };
+                    
+                    try {
+                        await pyscript.interpreter.run(code);
+                        outputElement.textContent = output || "Code executed successfully!";
+                    } catch (error) {
+                        outputElement.textContent = "Error: " + error.message;
+                    } finally {
+                        // Restore original write function
+                        pyscript.interpreter.interface.stdout.write = oldWrite;
+                    }
+                };
+            });
+        }
+    </script>
+</body>
+</html>
