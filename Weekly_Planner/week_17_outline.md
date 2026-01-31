@@ -49,9 +49,8 @@ By the end of this week, students will be able to:
 ---
 
 ## ✅ Assignment
-1. Complete the Colab Notebook tutorial
-2. Complete the Interactive Playbook & Quiz
-3. Submit quiz screenshot to Google Classroom
+1. Complete the Interactive Playbook & Quiz
+2. Submit quiz screenshot to Google Classroom
 
 ---
 
@@ -59,8 +58,3 @@ By the end of this week, students will be able to:
 - **Concat**: Best for stacking similar DataFrames
 - **Merge**: Best when combining DataFrames with common columns
 - **Join**: Best when combining DataFrames using their index
-
----
-
-## 🔗 Next Week
-Week 18: Advanced Pandas - GroupBy and Aggregations
