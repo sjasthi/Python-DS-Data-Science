@@ -46,11 +46,16 @@ By the end of this week, students will be able to:
 ### Assessment
 [Interactive Playbook & Quiz](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Quizzes/pandas_ds_concat_merge_join_interactive_playbook_and_quiz.html)
 
+
+### Assignment
+[Pandas Merge](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Assignments/python_ds_assignment_pandas_merge.ipynb)
+
+
 ---
 
-## ✅ Assignment
-1. Complete the Interactive Playbook & Quiz
-2. Submit quiz screenshot to Google Classroom
+## ✅ Assignments for the week
+1. Complete the Interactive Playbook & Quiz (Submit quiz screenshot to Google Classroom)
+2. Complete the Assignment on Pandas Merge
 
 ---
 
