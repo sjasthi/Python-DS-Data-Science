@@ -790,16 +790,6 @@ Congratulations! You now know:
 
 ---
 
-## 🚀 Next Steps
-
-Ready for more? Try these:
-- Explore `pd.concat()` with more than 2 DataFrames
-- Learn about multi-index merging
-- Study the `suffixes` parameter in merge
-- Practice with real datasets from Kaggle
-
----
-
 ## 💡 Remember
 
 > "Data is like LEGO blocks - the magic happens when you put them together in creative ways!"
@@ -807,64 +797,6 @@ Ready for more? Try these:
 Keep practicing, stay curious, and happy coding! 🎉
 
 ---
-
-**Created for Python Data Science Students**  
-*Version 1.0 - Tailored for Middle School Learners*
-
----
-
-## Additional Resources
-
-### Practice Datasets
-
-Here's a simple dataset to practice with:
-
-```python
-# Create practice data
-import pandas as pd
-
-# Students
-students = pd.DataFrame({
-    'StudentID': [1, 2, 3, 4, 5],
-    'Name': ['Alice', 'Bob', 'Charlie', 'Diana', 'Eve'],
-    'Grade': [7, 8, 7, 8, 7]
-})
-
-# Math scores
-math_scores = pd.DataFrame({
-    'StudentID': [1, 2, 3, 6],
-    'Math': [95, 88, 92, 85]
-})
-
-# Science scores
-science_scores = pd.DataFrame({
-    'StudentID': [1, 2, 4, 5],
-    'Science': [90, 85, 88, 94]
-})
-
-# Practice merging these in different ways!
-```
-
----
-
-### Helpful Functions
-
-```python
-# Check for missing data
-df.isnull().sum()
-
-# See DataFrame info
-df.info()
-
-# Get basic statistics
-df.describe()
-
-# Reset index
-df.reset_index(drop=True)
-
-# Set a column as index
-df.set_index('ColumnName')
-```
 
 ---
 
