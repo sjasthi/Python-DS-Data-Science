@@ -1,8 +1,8 @@
 # 🐼 Pandas Advanced Techniques: Complete Guide
 
-**Instructor:** Siva R Jasthi | Metropolitan State University  
+**Instructor:** Siva R Jasthi | Learn and Help (www.learnandhelp.com) 
 **Course:** Python for Data Science  
-**Level:** Middle School & High School
+
 
 ---
 
