@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pandas Advanced Concepts - Interactive Playbook 📊</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f0f0f0;
+            overflow-x: auto;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            border: none;
+            background: #f0f0f0;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            white-space: nowrap;
+            color: #333;
+        }
+
+        .tab:hover {
+            background: #e0e0e0;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            margin-bottom: -3px;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .concept-section {
+            margin-bottom: 30px;
+        }
+
+        .concept-section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 2em;
+        }
+
+        .concept-section h3 {
+            color: #764ba2;
+            margin: 20px 0 10px 0;
+            font-size: 1.5em;
+        }
+
+        .concept-section p {
+            line-height: 1.8;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .output-block {
+            background: #f5f5f5;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .example-box {
+            background: #e8f4f8;
+            border-left: 5px solid #4CAF50;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .tip-box {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .interactive-demo {
+            background: #f9f9f9;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .demo-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin: 10px 5px;
+        }
+
+        .demo-button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .demo-output {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            min-height: 50px;
+            border: 2px solid #ddd;
+        }
+
+        /* Quiz Styles */
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .question {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 5px solid #667eea;
+        }
+
+        .question h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .options {
+            margin-top: 15px;
+        }
+
+        .option {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid #ddd;
+            transition: all 0.3s;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #f0f0ff;
+        }
+
+        .option input[type="radio"] {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .submit-quiz {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 20px 0;
+            transition: all 0.3s;
+        }
+
+        .submit-quiz:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .quiz-result {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 30px;
+            display: none;
+        }
+
+        .quiz-result h2 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .quiz-result p {
+            font-size: 1.3em;
+        }
+
+        .score-display {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .student-info {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .student-info input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .student-info label {
+            font-weight: 600;
+            color: #333;
+            display: block;
+            margin-top: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .highlight {
+            background: #ffeb3b;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐼 Pandas Advanced Concepts Playbook 📊</h1>
+            <p>Master Data Manipulation Techniques!</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="openTab(event, 'cut')">🔪 Cut</button>
+            <button class="tab" onclick="openTab(event, 'qcut')">📏 Qcut</button>
+            <button class="tab" onclick="openTab(event, 'apply')">⚡ Apply</button>
+            <button class="tab" onclick="openTab(event, 'transform')">🔄 Transform</button>
+            <button class="tab" onclick="openTab(event, 'filter')">🔍 Filter</button>
+            <button class="tab" onclick="openTab(event, 'melt')">🧊 Melt</button>
+            <button class="tab" onclick="openTab(event, 'stack')">📚 Stack</button>
+            <button class="tab" onclick="openTab(event, 'crosstab')">➕ Crosstab</button>
+            <button class="tab" onclick="openTab(event, 'quiz')">🎯 Quiz</button>
+        </div>
+
+        <div class="content">
+            <!-- CUT TAB -->
+            <div id="cut" class="tab-content active">
+                <div class="concept-section">
+                    <h2>🔪 pd.cut() - Slicing Data into Bins</h2>
+                    <p>
+                        Think of <span class="highlight">pd.cut()</span> like sorting your video game scores into categories: Beginner (0-50), Intermediate (51-80), and Expert (81-100). 
+                        It divides continuous data into discrete intervals or bins based on values you specify! 🎮
+                    </p>
+
+                    <h3>📋 What does it do?</h3>
+                    <p>
+                        <strong>pd.cut()</strong> bins values into discrete intervals. You specify the bin edges, and pandas puts each value into the appropriate bin.
+                    </p>
+
+                    <div class="tip-box">
+                        <strong>💡 Key Points:</strong>
+                        <ul>
+                            <li>Creates equal-width bins (same size ranges)</li>
+                            <li>You control where the cuts happen</li>
+                            <li>Great for creating categories from numbers</li>
+                            <li>Can add custom labels to make it readable</li>
+                        </ul>
+                    </div>
+
+                    <h3>💻 Basic Syntax</h3>
+                    <pre class="code-block">pd.cut(x, bins, labels=None, right=True)</pre>
+
+                    <h3>🎯 Example: Student Test Scores</h3>
+                    <div class="example-box">
+                        <p><strong>Scenario:</strong> Your teacher wants to categorize test scores into letter grades!</p>
+                    </div>
+
+                    <pre class="code-block">import pandas as pd
+
+# Test scores for 10 students
+scores = [45, 67, 89, 92, 55, 73, 38, 95, 81, 70]
+
+# Create bins for letter grades
+bins = [0, 60, 70, 80, 90, 100]
+labels = ['F', 'D', 'C', 'B', 'A']
+
+# Cut the scores into grade categories
+grades = pd.cut(scores, bins=bins, labels=labels)
+print(grades)</pre>
+
+                    <div class="output-block">
+<strong>Output:</strong>
+['F', 'D', 'B', 'A', 'F', 'C', 'F', 'A', 'B', 'D']
+Categories (5, object): ['F' < 'D' < 'C' < 'B' < 'A']
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h3>🎮 Interactive Demo: Gaming Levels</h3>
+                        <p>Click the button to categorize player scores into skill levels!</p>
+                        <button class="demo-button" onclick="cutDemo()">Run Cut Demo</button>
+                        <div class="demo-output" id="cutOutput"></div>
+                    </div>
+
+                    <h3>🔑 Important Parameters</h3>
+                    <table>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Description</th>
+                            <th>Example</th>
+                        </tr>
+                        <tr>
+                            <td><strong>bins</strong></td>
+                            <td>Number of bins or bin edges</td>
+                            <td>[0, 50, 100] or 5</td>
+                        </tr>
+                        <tr>
+                            <td><strong>labels</strong></td>
+                            <td>Custom names for bins</td>
+                            <td>['Low', 'Medium', 'High']</td>
+                        </tr>
+                        <tr>
+                            <td><strong>right</strong></td>
+                            <td>Include right edge (default True)</td>
+                            <td>True or False</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- QCUT TAB -->
+            <div id="qcut" class="tab-content">
+                <div class="concept-section">
+                    <h2>📏 pd.qcut() - Quantile-based Binning</h2>
+                    <p>
+                        Imagine dividing your class into equal groups based on height - shortest 25%, middle-short 25%, middle-tall 25%, and tallest 25%. 
+                        <span class="highlight">pd.qcut()</span> creates bins with roughly equal numbers of items in each bin! 📐
+                    </p>
+
+                    <h3>📋 What does it do?</h3>
+                    <p>
+                        <strong>pd.qcut()</strong> bins values based on quantiles (percentiles). Unlike cut() which uses equal-width bins, 
+                        qcut() creates bins with roughly equal numbers of observations in each bin.
+                    </p>
+
+                    <div class="tip-box">
+                        <strong>💡 Key Differences from cut():</strong>
+                        <ul>
+                            <li>Equal NUMBER of items per bin (not equal range size)</li>
+                            <li>Based on data distribution, not fixed values</li>
+                            <li>Perfect for creating balanced groups</li>
+                            <li>Great for percentile analysis</li>
+                        </ul>
+                    </div>
+
+                    <h3>💻 Basic Syntax</h3>
+                    <pre class="code-block">pd.qcut(x, q, labels=None)</pre>
+
+                    <h3>🎯 Example: Social Media Followers</h3>
+                    <div class="example-box">
+                        <p><strong>Scenario:</strong> Categorize students into follower groups: Small, Medium, Large, Mega!</p>
+                    </div>
+
+                    <pre class="code-block">import pandas as pd
+
+# Number of followers for 12 students
+followers = [45, 123, 456, 789, 234, 567, 890, 1234, 345, 678, 901, 2000]
+
+# Create 4 equal-sized groups (quartiles)
+categories = pd.qcut(followers, q=4, labels=['Small', 'Medium', 'Large', 'Mega'])
+print(categories)</pre>
+
+                    <div class="output-block">
+<strong>Output:</strong>
+['Small', 'Small', 'Small', 'Medium', 'Medium', 'Medium', 'Large', 'Large', 'Large', 'Mega', 'Mega', 'Mega']
+Categories (4, object): ['Small' < 'Medium' < 'Large' < 'Mega']
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h3>🎮 Interactive Demo: Screen Time Quartiles</h3>
+                        <p>See how students are divided into equal groups based on daily screen time!</p>
+                        <button class="demo-button" onclick="qcutDemo()">Run Qcut Demo</button>
+                        <div class="demo-output" id="qcutOutput"></div>
+                    </div>
+
+                    <h3>🆚 Cut vs Qcut Comparison</h3>
+                    <table>
+                        <tr>
+                            <th>Feature</th>
+                            <th>pd.cut()</th>
+                            <th>pd.qcut()</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Bin Size</strong></td>
+                            <td>Equal width ranges</td>
+                            <td>Equal number of items</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Use When</strong></td>
+                            <td>You know the ranges</td>
+                            <td>You want balanced groups</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Example</strong></td>
+                            <td>Letter grades (A-F)</td>
+                            <td>Top 25%, Next 25%, etc.</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- APPLY TAB -->
+            <div id="apply" class="tab-content">
+                <div class="concept-section">
+                    <h2>⚡ apply() - Apply Custom Functions</h2>
+                    <p>
+                        Think of <span class="highlight">apply()</span> like a magical assembly line where you can apply ANY custom operation to your data! 
+                        Want to add emojis? Calculate something special? Transform data in a unique way? Apply is your tool! 🪄
+                    </p>
+
+                    <h3>📋 What does it do?</h3>
+                    <p>
+                        <strong>apply()</strong> lets you apply a function along an axis of a DataFrame. You can use built-in functions or create your own custom functions!
+                    </p>
+
+                    <div class="tip-box">
+                        <strong>💡 Key Points:</strong>
+                        <ul>
+                            <li>Works on entire columns or rows</li>
+                            <li>Can use custom functions (lambda or def)</li>
+                            <li>Very flexible and powerful</li>
+                            <li>Can change data types and structure</li>
+                        </ul>
+                    </div>
+
+                    <h3>💻 Basic Syntax</h3>
+                    <pre class="code-block">df.apply(function, axis=0)  # axis=0 for columns, axis=1 for rows</pre>
+
+                    <h3>🎯 Example: Social Media Engagement</h3>
+                    <div class="example-box">
+                        <p><strong>Scenario:</strong> Calculate engagement rate and add status emojis!</p>
+                    </div>
+
+                    <pre class="code-block">import pandas as pd
+
+# Social media data
+data = {
+    'username': ['alice', 'bob', 'charlie', 'diana'],
+    'likes': [100, 250, 75, 420],
+    'comments': [20, 45, 10, 80],
+    'shares': [5, 15, 3, 25]
+}
+df = pd.DataFrame(data)
+
+# Custom function to calculate total engagement
+def calc_engagement(row):
+    return row['likes'] + row['comments'] * 2 + row['shares'] * 3
+
+# Apply the function to each row
+df['engagement'] = df.apply(calc_engagement, axis=1)
+
+# Add status emoji based on engagement
+df['status'] = df['engagement'].apply(lambda x: '🔥' if x > 200 else '⭐' if x > 100 else '👍')
+
+print(df)</pre>
+
+                    <div class="output-block">
+<strong>Output:</strong>
+  username  likes  comments  shares  engagement status
+0    alice    100        20       5         155      ⭐
+1      bob    250        45      15         385      🔥
+2  charlie     75        10       3          98      👍
+3    diana    420        80      25         655      🔥
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h3>🎮 Interactive Demo: Game Score Calculations</h3>
+                        <p>Apply custom scoring functions to player data!</p>
+                        <button class="demo-button" onclick="applyDemo()">Run Apply Demo</button>
+                        <div class="demo-output" id="applyOutput"></div>
+                    </div>
+
+                    <h3>🔥 Common Use Cases</h3>
+                    <div class="example-box">
+                        <strong>Lambda Functions (Quick one-liners):</strong>
+                        <pre class="code-block">df['doubled'] = df['score'].apply(lambda x: x * 2)
+df['category'] = df['age'].apply(lambda x: 'teen' if x < 18 else 'adult')</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TRANSFORM TAB -->
+            <div id="transform" class="tab-content">
+                <div class="concept-section">
+                    <h2>🔄 transform() - Transform and Preserve Shape</h2>
+                    <p>
+                        <span class="highlight">transform()</span> is like apply's organized cousin - it always returns a result with the same shape as the original! 
+                        Perfect for standardizing data or comparing values to group averages! 📊
+                    </p>
+
+                    <h3>📋 What does it do?</h3>
+                    <p>
+                        <strong>transform()</strong> applies a function that returns a result with the same shape as the input. 
+                        It's especially powerful with groupby() operations!
+                    </p>
+
+                    <div class="tip-box">
+                        <strong>💡 Key Differences from apply():</strong>
+                        <ul>
+                            <li>MUST return same shape as input</li>
+                            <li>Perfect for broadcasting group statistics</li>
+                            <li>Great for normalization and standardization</li>
+                            <li>Works seamlessly with groupby()</li>
+                        </ul>
+                    </div>
+
+                    <h3>💻 Basic Syntax</h3>
+                    <pre class="code-block">df.transform(function)
+df.groupby('column').transform(function)</pre>
+
+                    <h3>🎯 Example: Class Performance Comparison</h3>
+                    <div class="example-box">
+                        <p><strong>Scenario:</strong> Compare each student's score to their class average!</p>
+                    </div>
+
+                    <pre class="code-block">import pandas as pd
+
+# Student test scores
+data = {
+    'student': ['Alice', 'Bob', 'Charlie', 'Diana', 'Eve', 'Frank'],
+    'class': ['A', 'A', 'A', 'B', 'B', 'B'],
+    'score': [85, 92, 78, 88, 95, 82]
+}
+df = pd.DataFrame(data)
+
+# Calculate class average for each student
+df['class_avg'] = df.groupby('class')['score'].transform('mean')
+
+# How much above/below class average?
+df['vs_avg'] = df['score'] - df['class_avg']
+
+print(df)</pre>
+
+                    <div class="output-block">
+<strong>Output:</strong>
+   student class  score  class_avg  vs_avg
+0    Alice     A     85      85.00    0.00
+1      Bob     A     92      85.00    7.00
+2  Charlie     A     78      85.00   -7.00
+3    Diana     B     88      88.33   -0.33
+4      Eve     B     95      88.33    6.67
+5    Frank     B     82      88.33   -6.33
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h3>🎮 Interactive Demo: Team Performance</h3>
+                        <p>See how each player compares to their team average!</p>
+                        <button class="demo-button" onclick="transformDemo()">Run Transform Demo</button>
+                        <div class="demo-output" id="transformOutput"></div>
+                    </div>
+
+                    <h3>📊 Common Transform Operations</h3>
+                    <table>
+                        <tr>
+                            <th>Operation</th>
+                            <th>Code</th>
+                            <th>Use Case</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Normalize</strong></td>
+                            <td>transform(lambda x: (x - x.mean()) / x.std())</td>
+                            <td>Standardize scores</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Percentage</strong></td>
+                            <td>transform(lambda x: x / x.sum())</td>
+                            <td>Find contribution %</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Rank</strong></td>
+                            <td>transform('rank')</td>
+                            <td>Ranking within groups</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- FILTER TAB -->
+            <div id="filter" class="tab-content">
+                <div class="concept-section">
+                    <h2>🔍 filter() - Filter Groups by Condition</h2>
+                    <p>
+                        <span class="highlight">filter()</span> is like a bouncer at a club for groups - it only lets groups through if they meet certain criteria! 
+                        Not to be confused with filtering rows - this filters entire GROUPS! 🚪
+                    </p>
+
+                    <h3>📋 What does it do?</h3>
+                    <p>
+                        <strong>filter()</strong> selects ENTIRE GROUPS based on whether they meet a condition. 
+                        If a group passes the test, ALL rows in that group are kept!
+                    </p>
+
+                    <div class="tip-box">
+                        <strong>💡 Key Points:</strong>
+                        <ul>
+                            <li>Filters groups, not individual rows</li>
+                            <li>All-or-nothing: entire group passes or fails</li>
+                            <li>Function must return True or False</li>
+                            <li>Great for removing small or invalid groups</li>
+                        </ul>
+                    </div>
+
+                    <h3>💻 Basic Syntax</h3>
+                    <pre class="code-block">df.groupby('column').filter(function)</pre>
+
+                    <h3>🎯 Example: Active Study Groups</h3>
+                    <div class="example-box">
+                        <p><strong>Scenario:</strong> Only keep study groups with 3+ members!</p>
+                    </div>
+
+                    <pre class="code-block">import pandas as pd
+
+# Study group members
+data = {
+    'group': ['Math', 'Math', 'Math', 'Science', 'Science', 'History', 'History', 'History', 'History'],
+    'student': ['Alice', 'Bob', 'Charlie', 'Diana', 'Eve', 'Frank', 'Grace', 'Henry', 'Iris'],
+    'hours': [5, 6, 4, 7, 5, 3, 4, 5, 6]
+}
+df = pd.DataFrame(data)
+
+# Only keep groups with 3 or more members
+active_groups = df.groupby('group').filter(lambda x: len(x) >= 3)
+
+print(active_groups)</pre>
+
+                    <div class="output-block">
+<strong>Output:</strong>
+     group student  hours
+0     Math   Alice      5
+1     Math     Bob      6
+2     Math Charlie      4
+5  History   Frank      3
+6  History   Grace      4
+7  History   Henry      5
+8  History    Iris      6
+
+# Notice: Science group is completely removed (only 2 members)!
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h3>🎮 Interactive Demo: Gaming Teams</h3>
+                        <p>Filter out teams that don't meet minimum requirements!</p>
+                        <button class="demo-button" onclick="filterDemo()">Run Filter Demo</button>
+                        <div class="demo-output" id="filterOutput"></div>
+                    </div>
+
+                    <h3>🎯 Common Filter Conditions</h3>
+                    <div class="example-box">
+                        <strong>Examples:</strong>
+                        <pre class="code-block"># Keep groups with 5+ members
+df.groupby('team').filter(lambda x: len(x) >= 5)
+
+# Keep groups with average score above 80
+df.groupby('class').filter(lambda x: x['score'].mean() > 80)
+
+# Keep groups with at least one A grade
+df.groupby('section').filter(lambda x: (x['grade'] == 'A').any())</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MELT TAB -->
+            <div id="melt" class="tab-content">
+                <div class="concept-section">
+                    <h2>🧊 melt() - Reshape Wide to Long Format</h2>
+                    <p>
+                        Imagine taking a spreadsheet that's wide and squishing it into a tall, narrow format! 
+                        <span class="highlight">melt()</span> transforms columns into rows, making data easier to analyze and visualize! 📏
+                    </p>
+
+                    <h3>📋 What does it do?</h3>
+                    <p>
+                        <strong>melt()</strong> unpivots a DataFrame from wide format to long format. 
+                        It takes columns and turns them into rows with a variable and value column!
+                    </p>
+
+                    <div class="tip-box">
+                        <strong>💡 Key Points:</strong>
+                        <ul>
+                            <li>Converts wide data to long data</li>
+                            <li>Makes data "tidy" for analysis</li>
+                            <li>Perfect for plotting and groupby operations</li>
+                            <li>Opposite of pivot</li>
+                        </ul>
+                    </div>
+
+                    <h3>💻 Basic Syntax</h3>
+                    <pre class="code-block">pd.melt(df, id_vars=['col1'], value_vars=['col2', 'col3'])</pre>
+
+                    <h3>🎯 Example: Game Scores Across Levels</h3>
+                    <div class="example-box">
+                        <p><strong>Scenario:</strong> Transform score data from wide to long format for easy comparison!</p>
+                    </div>
+
+                    <pre class="code-block">import pandas as pd
+
+# Wide format: Each level is a column
+data = {
+    'player': ['Alice', 'Bob', 'Charlie'],
+    'level_1': [100, 150, 120],
+    'level_2': [200, 180, 210],
+    'level_3': [350, 320, 380]
+}
+df_wide = pd.DataFrame(data)
+print("WIDE FORMAT:")
+print(df_wide)
+
+# Melt to long format
+df_long = pd.melt(df_wide, 
+                  id_vars=['player'],
+                  value_vars=['level_1', 'level_2', 'level_3'],
+                  var_name='level',
+                  value_name='score')
+print("\nLONG FORMAT:")
+print(df_long)</pre>
+
+                    <div class="output-block">
+<strong>WIDE FORMAT:</strong>
+    player  level_1  level_2  level_3
+0    Alice      100      200      350
+1      Bob      150      180      320
+2  Charlie      120      210      380
+
+<strong>LONG FORMAT:</strong>
+    player    level  score
+0    Alice  level_1    100
+1      Bob  level_1    150
+2  Charlie  level_1    120
+3    Alice  level_2    200
+4      Bob  level_2    180
+5  Charlie  level_2    210
+6    Alice  level_3    350
+7      Bob  level_3    320
+8  Charlie  level_3    380
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h3>🎮 Interactive Demo: Monthly Activity</h3>
+                        <p>See how monthly data gets reshaped into long format!</p>
+                        <button class="demo-button" onclick="meltDemo()">Run Melt Demo</button>
+                        <div class="demo-output" id="meltOutput"></div>
+                    </div>
+
+                    <h3>🔑 Important Parameters</h3>
+                    <table>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Description</th>
+                            <th>Example</th>
+                        </tr>
+                        <tr>
+                            <td><strong>id_vars</strong></td>
+                            <td>Columns to keep as identifiers</td>
+                            <td>['student', 'class']</td>
+                        </tr>
+                        <tr>
+                            <td><strong>value_vars</strong></td>
+                            <td>Columns to melt</td>
+                            <td>['test1', 'test2', 'test3']</td>
+                        </tr>
+                        <tr>
+                            <td><strong>var_name</strong></td>
+                            <td>Name for variable column</td>
+                            <td>'test_name'</td>
+                        </tr>
+                        <tr>
+                            <td><strong>value_name</strong></td>
+                            <td>Name for value column</td>
+                            <td>'score'</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- STACK TAB -->
+            <div id="stack" class="tab-content">
+                <div class="concept-section">
+                    <h2>📚 stack() - Pivot Columns to Rows</h2>
+                    <p>
+                        <span class="highlight">stack()</span> is like organizing books on a shelf - it takes columns and stacks them vertically! 
+                        Creates a multi-level index (like nested categories)! 🏗️
+                    </p>
+
+                    <h3>📋 What does it do?</h3>
+                    <p>
+                        <strong>stack()</strong> pivots columns into rows, creating a multi-level index (hierarchical index). 
+                        It "compresses" the DataFrame by moving the column index to the row index!
+                    </p>
+
+                    <div class="tip-box">
+                        <strong>💡 Key Points:</strong>
+                        <ul>
+                            <li>Converts column headers into index levels</li>
+                            <li>Creates hierarchical (multi-level) index</li>
+                            <li>Makes data more compact</li>
+                            <li>Opposite operation is unstack()</li>
+                        </ul>
+                    </div>
+
+                    <h3>💻 Basic Syntax</h3>
+                    <pre class="code-block">df.stack()</pre>
+
+                    <h3>🎯 Example: Student Grades</h3>
+                    <div class="example-box">
+                        <p><strong>Scenario:</strong> Stack subject grades into a hierarchical format!</p>
+                    </div>
+
+                    <pre class="code-block">import pandas as pd
+
+# Grades in different subjects
+data = {
+    'Math': [85, 92, 78],
+    'Science': [88, 95, 82],
+    'English': [90, 87, 93]
+}
+df = pd.DataFrame(data, index=['Alice', 'Bob', 'Charlie'])
+
+print("BEFORE STACKING:")
+print(df)
+
+# Stack the subjects
+stacked = df.stack()
+print("\nAFTER STACKING:")
+print(stacked)</pre>
+
+                    <div class="output-block">
+<strong>BEFORE STACKING:</strong>
+         Math  Science  English
+Alice      85       88       90
+Bob        92       95       87
+Charlie    78       82       93
+
+<strong>AFTER STACKING:</strong>
+Alice    Math       85
+         Science    88
+         English    90
+Bob      Math       92
+         Science    95
+         English    87
+Charlie  Math       78
+         Science    82
+         English    93
+dtype: int64
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h3>🎮 Interactive Demo: Gaming Stats</h3>
+                        <p>See how player stats get stacked into hierarchical format!</p>
+                        <button class="demo-button" onclick="stackDemo()">Run Stack Demo</button>
+                        <div class="demo-output" id="stackOutput"></div>
+                    </div>
+
+                    <h3>🔄 Stack vs Melt</h3>
+                    <table>
+                        <tr>
+                            <th>Feature</th>
+                            <th>stack()</th>
+                            <th>melt()</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Output</strong></td>
+                            <td>Series with multi-index</td>
+                            <td>DataFrame with rows</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Flexibility</strong></td>
+                            <td>Less control</td>
+                            <td>More control (var_name, etc.)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Use Case</strong></td>
+                            <td>Quick reshaping</td>
+                            <td>Data analysis & plotting</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- CROSSTAB TAB -->
+            <div id="crosstab" class="tab-content">
+                <div class="concept-section">
+                    <h2>➕ crosstab() - Create Cross-Tabulation</h2>
+                    <p>
+                        <span class="highlight">pd.crosstab()</span> is like making a multiplication table, but for counting relationships between categories! 
+                        Perfect for finding patterns like "How many students in each class got each grade?" 📊
+                    </p>
+
+                    <h3>📋 What does it do?</h3>
+                    <p>
+                        <strong>pd.crosstab()</strong> computes a cross-tabulation of two (or more) factors. 
+                        It shows the frequency of combinations between categories!
+                    </p>
+
+                    <div class="tip-box">
+                        <strong>💡 Key Points:</strong>
+                        <ul>
+                            <li>Counts occurrences of combinations</li>
+                            <li>Creates a contingency table</li>
+                            <li>Can add margins (totals)</li>
+                            <li>Can normalize to show percentages</li>
+                        </ul>
+                    </div>
+
+                    <h3>💻 Basic Syntax</h3>
+                    <pre class="code-block">pd.crosstab(index, columns, margins=False, normalize=False)</pre>
+
+                    <h3>🎯 Example: Favorite Games by Grade</h3>
+                    <div class="example-box">
+                        <p><strong>Scenario:</strong> See which games are popular in each grade!</p>
+                    </div>
+
+                    <pre class="code-block">import pandas as pd
+
+# Student survey data
+data = {
+    'student': ['Alice', 'Bob', 'Charlie', 'Diana', 'Eve', 'Frank', 'Grace', 'Henry'],
+    'grade': [6, 6, 7, 7, 7, 8, 8, 8],
+    'game': ['Minecraft', 'Roblox', 'Minecraft', 'Fortnite', 'Minecraft', 'Fortnite', 'Roblox', 'Fortnite']
+}
+df = pd.DataFrame(data)
+
+# Create crosstab
+result = pd.crosstab(df['grade'], df['game'], margins=True)
+print(result)</pre>
+
+                    <div class="output-block">
+<strong>Output:</strong>
+game     Fortnite  Minecraft  Roblox  All
+grade                                     
+6               0          1       1    2
+7               1          2       0    3
+8               2          0       1    3
+All             3          3       2    8
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h3>🎮 Interactive Demo: Sports Preferences</h3>
+                        <p>Create a crosstab of gender vs favorite sport!</p>
+                        <button class="demo-button" onclick="crosstabDemo()">Run Crosstab Demo</button>
+                        <div class="demo-output" id="crosstabOutput"></div>
+                    </div>
+
+                    <h3>🎯 Advanced Features</h3>
+                    <div class="example-box">
+                        <strong>With Normalization (Percentages):</strong>
+                        <pre class="code-block"># Show percentages by row
+pd.crosstab(df['grade'], df['game'], normalize='index')
+
+# Show percentages by column
+pd.crosstab(df['grade'], df['game'], normalize='columns')
+
+# Show percentages of total
+pd.crosstab(df['grade'], df['game'], normalize='all')</pre>
+                    </div>
+
+                    <h3>📊 Common Uses</h3>
+                    <table>
+                        <tr>
+                            <th>Use Case</th>
+                            <th>Example</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Survey Analysis</strong></td>
+                            <td>Gender vs Favorite Subject</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Marketing</strong></td>
+                            <td>Age Group vs Product Preference</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Education</strong></td>
+                            <td>Grade Level vs Pass/Fail</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- QUIZ TAB -->
+            <div id="quiz" class="tab-content">
+                <div class="quiz-container">
+                    <h2 style="text-align: center; color: #667eea; margin-bottom: 30px;">🎯 Pandas Concepts Quiz</h2>
+                    
+                    <div class="student-info">
+                        <label for="studentName">Your Name:</label>
+                        <input type="text" id="studentName" placeholder="Enter your full name" required>
+                        
+                        <label for="studentClass">Class Period:</label>
+                        <input type="text" id="studentClass" placeholder="e.g., Period 2" required>
+                    </div>
+
+                    <form id="quizForm">
+                        <!-- Question 1 -->
+                        <div class="question">
+                            <h3>1. What is the main difference between pd.cut() and pd.qcut()?</h3>
+                            <div class="options">
+                                <label class="option">
+                                    <input type="radio" name="q1" value="a">
+                                    cut() creates bins with equal widths, qcut() creates bins with equal numbers of items
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q1" value="b">
+                                    cut() is faster than qcut()
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q1" value="c">
+                                    They are exactly the same function
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q1" value="d">
+                                    qcut() can only create 4 bins
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Question 2 -->
+                        <div class="question">
+                            <h3>2. Which function would you use to calculate a new column based on multiple other columns in each row?</h3>
+                            <div class="options">
+                                <label class="option">
+                                    <input type="radio" name="q2" value="a">
+                                    transform()
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q2" value="b">
+                                    apply() with axis=1
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q2" value="c">
+                                    filter()
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q2" value="d">
+                                    melt()
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Question 3 -->
+                        <div class="question">
+                            <h3>3. What does transform() ALWAYS return?</h3>
+                            <div class="options">
+                                <label class="option">
+                                    <input type="radio" name="q3" value="a">
+                                    A single number
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q3" value="b">
+                                    A result with the same shape as the input
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q3" value="c">
+                                    A dictionary
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q3" value="d">
+                                    A new DataFrame with different dimensions
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Question 4 -->
+                        <div class="question">
+                            <h3>4. When using groupby().filter(), what gets removed if the condition is False?</h3>
+                            <div class="options">
+                                <label class="option">
+                                    <input type="radio" name="q4" value="a">
+                                    Only the rows that failed the condition
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q4" value="b">
+                                    The entire group
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q4" value="c">
+                                    Just the first row of the group
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q4" value="d">
+                                    Nothing, it just adds a warning
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Question 5 -->
+                        <div class="question">
+                            <h3>5. What does melt() do to your DataFrame?</h3>
+                            <div class="options">
+                                <label class="option">
+                                    <input type="radio" name="q5" value="a">
+                                    Deletes columns
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q5" value="b">
+                                    Converts wide format to long format
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q5" value="c">
+                                    Sorts the data
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q5" value="d">
+                                    Creates a pivot table
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Question 6 -->
+                        <div class="question">
+                            <h3>6. What does stack() create?</h3>
+                            <div class="options">
+                                <label class="option">
+                                    <input type="radio" name="q6" value="a">
+                                    A flat list
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q6" value="b">
+                                    A Series with a multi-level index
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q6" value="c">
+                                    A dictionary
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q6" value="d">
+                                    Multiple separate DataFrames
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Question 7 -->
+                        <div class="question">
+                            <h3>7. What is pd.crosstab() primarily used for?</h3>
+                            <div class="options">
+                                <label class="option">
+                                    <input type="radio" name="q7" value="a">
+                                    Calculating averages
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q7" value="b">
+                                    Counting frequency of combinations between categories
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q7" value="c">
+                                    Removing duplicates
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q7" value="d">
+                                    Sorting data
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Question 8 -->
+                        <div class="question">
+                            <h3>8. If you want to categorize test scores (0-100) into letter grades with specific ranges, which function should you use?</h3>
+                            <div class="options">
+                                <label class="option">
+                                    <input type="radio" name="q8" value="a">
+                                    pd.qcut()
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q8" value="b">
+                                    pd.cut()
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q8" value="c">
+                                    melt()
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q8" value="d">
+                                    crosstab()
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Question 9 -->
+                        <div class="question">
+                            <h3>9. Which parameter in melt() specifies the columns you want to keep as identifiers?</h3>
+                            <div class="options">
+                                <label class="option">
+                                    <input type="radio" name="q9" value="a">
+                                    value_vars
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q9" value="b">
+                                    var_name
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q9" value="c">
+                                    id_vars
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q9" value="d">
+                                    value_name
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Question 10 -->
+                        <div class="question">
+                            <h3>10. You want to compare each student's score to their class average. Which function combination works best?</h3>
+                            <div class="options">
+                                <label class="option">
+                                    <input type="radio" name="q10" value="a">
+                                    groupby().apply()
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q10" value="b">
+                                    groupby().transform()
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q10" value="c">
+                                    groupby().filter()
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q10" value="d">
+                                    cut()
+                                </label>
+                            </div>
+                        </div>
+
+                        <div style="text-align: center;">
+                            <button type="button" class="submit-quiz" onclick="submitQuiz()">Submit Quiz 🚀</button>
+                        </div>
+                    </form>
+
+                    <div class="quiz-result" id="quizResult">
+                        <h2>Quiz Results</h2>
+                        <div id="studentInfo"></div>
+                        <div class="score-display" id="scoreDisplay"></div>
+                        <p id="resultMessage"></p>
+                        <p style="margin-top: 20px; font-size: 1.1em;">📸 Take a screenshot of this result and submit it to Google Classroom!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching function
+        function openTab(evt, tabName) {
+            var i, tabContent, tabs;
+            
+            tabContent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabContent.length; i++) {
+                tabContent[i].classList.remove("active");
+            }
+            
+            tabs = document.getElementsByClassName("tab");
+            for (i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove("active");
+            }
+            
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        // Cut Demo
+        function cutDemo() {
+            const output = document.getElementById('cutOutput');
+            output.innerHTML = `
+                <h4>🎮 Player Scores Categorization</h4>
+                <p><strong>Original Scores:</strong> [45, 67, 89, 92, 55, 73, 38, 95, 81, 70]</p>
+                <p><strong>Bins:</strong> [0, 50, 75, 90, 100]</p>
+                <p><strong>Labels:</strong> ['Beginner', 'Intermediate', 'Advanced', 'Expert']</p>
+                <hr>
+                <table>
+                    <tr><th>Score</th><th>Category</th></tr>
+                    <tr><td>45</td><td>Beginner</td></tr>
+                    <tr><td>67</td><td>Intermediate</td></tr>
+                    <tr><td>89</td><td>Advanced</td></tr>
+                    <tr><td>92</td><td>Expert</td></tr>
+                    <tr><td>55</td><td>Intermediate</td></tr>
+                    <tr><td>73</td><td>Intermediate</td></tr>
+                    <tr><td>38</td><td>Beginner</td></tr>
+                    <tr><td>95</td><td>Expert</td></tr>
+                    <tr><td>81</td><td>Advanced</td></tr>
+                    <tr><td>70</td><td>Intermediate</td></tr>
+                </table>
+            `;
+        }
+
+        // Qcut Demo
+        function qcutDemo() {
+            const output = document.getElementById('qcutOutput');
+            output.innerHTML = `
+                <h4>📱 Daily Screen Time (minutes)</h4>
+                <p><strong>Student Screen Times:</strong> [120, 45, 180, 90, 240, 60, 150, 200, 75, 210, 100, 165]</p>
+                <p><strong>Creating 4 equal groups (quartiles)...</strong></p>
+                <hr>
+                <table>
+                    <tr><th>Student</th><th>Minutes</th><th>Quartile</th></tr>
+                    <tr><td>Student 1</td><td>45</td><td>Q1 (Lowest 25%)</td></tr>
+                    <tr><td>Student 2</td><td>60</td><td>Q1 (Lowest 25%)</td></tr>
+                    <tr><td>Student 3</td><td>75</td><td>Q1 (Lowest 25%)</td></tr>
+                    <tr><td>Student 4</td><td>90</td><td>Q2 (25-50%)</td></tr>
+                    <tr><td>Student 5</td><td>100</td><td>Q2 (25-50%)</td></tr>
+                    <tr><td>Student 6</td><td>120</td><td>Q2 (25-50%)</td></tr>
+                    <tr><td>Student 7</td><td>150</td><td>Q3 (50-75%)</td></tr>
+                    <tr><td>Student 8</td><td>165</td><td>Q3 (50-75%)</td></tr>
+                    <tr><td>Student 9</td><td>180</td><td>Q3 (50-75%)</td></tr>
+                    <tr><td>Student 10</td><td>200</td><td>Q4 (Top 25%)</td></tr>
+                    <tr><td>Student 11</td><td>210</td><td>Q4 (Top 25%)</td></tr>
+                    <tr><td>Student 12</td><td>240</td><td>Q4 (Top 25%)</td></tr>
+                </table>
+                <p><strong>Notice:</strong> Each quartile has exactly 3 students! ⚖️</p>
+            `;
+        }
+
+        // Apply Demo
+        function applyDemo() {
+            const output = document.getElementById('applyOutput');
+            output.innerHTML = `
+                <h4>🎮 Game Scoring System</h4>
+                <p><strong>Custom Scoring Formula:</strong> Total = Kills×10 + Assists×5 + (Wins×100)</p>
+                <hr>
+                <table>
+                    <tr><th>Player</th><th>Kills</th><th>Assists</th><th>Wins</th><th>Total Score</th><th>Rank</th></tr>
+                    <tr><td>ProGamer</td><td>25</td><td>15</td><td>1</td><td>425</td><td>⭐⭐⭐</td></tr>
+                    <tr><td>NinjaKid</td><td>18</td><td>12</td><td>2</td><td>440</td><td>⭐⭐⭐</td></tr>
+                    <tr><td>CasualPlayer</td><td>10</td><td>8</td><td>0</td><td>140</td><td>⭐</td></tr>
+                    <tr><td>TeamLeader</td><td>15</td><td>20</td><td>1</td><td>350</td><td>⭐⭐</td></tr>
+                </table>
+                <p><strong>Applied custom function to calculate scores and assign ranks!</strong> 🏆</p>
+            `;
+        }
+
+        // Transform Demo
+        function transformDemo() {
+            const output = document.getElementById('transformOutput');
+            output.innerHTML = `
+                <h4>🏀 Basketball Team Stats</h4>
+                <p><strong>Comparing each player to their team average</strong></p>
+                <hr>
+                <table>
+                    <tr><th>Player</th><th>Team</th><th>Points</th><th>Team Avg</th><th>Difference</th></tr>
+                    <tr><td>Alice</td><td>Red</td><td>18</td><td>16.7</td><td>+1.3</td></tr>
+                    <tr><td>Bob</td><td>Red</td><td>15</td><td>16.7</td><td>-1.7</td></tr>
+                    <tr><td>Charlie</td><td>Red</td><td>17</td><td>16.7</td><td>+0.3</td></tr>
+                    <tr><td>Diana</td><td>Blue</td><td>22</td><td>20.0</td><td>+2.0</td></tr>
+                    <tr><td>Eve</td><td>Blue</td><td>19</td><td>20.0</td><td>-1.0</td></tr>
+                    <tr><td>Frank</td><td>Blue</td><td>19</td><td>20.0</td><td>-1.0</td></tr>
+                </table>
+                <p><strong>Transform kept the same shape while adding team averages!</strong> 📊</p>
+            `;
+        }
+
+        // Filter Demo
+        function filterDemo() {
+            const output = document.getElementById('filterOutput');
+            output.innerHTML = `
+                <h4>🎯 Active Gaming Teams (min 3 players)</h4>
+                <p><strong>Filtering out teams with fewer than 3 members...</strong></p>
+                <hr>
+                <h5>Before Filtering:</h5>
+                <table>
+                    <tr><th>Team</th><th>Player</th><th>Level</th></tr>
+                    <tr><td>Dragons</td><td>Alice</td><td>45</td></tr>
+                    <tr><td>Dragons</td><td>Bob</td><td>52</td></tr>
+                    <tr><td>Dragons</td><td>Charlie</td><td>48</td></tr>
+                    <tr><td>Phoenix</td><td>Diana</td><td>60</td></tr>
+                    <tr><td>Phoenix</td><td>Eve</td><td>58</td></tr>
+                    <tr><td>Wolves</td><td>Frank</td><td>55</td></tr>
+                </table>
+                <h5>After Filtering (only teams with 3+ players):</h5>
+                <table>
+                    <tr><th>Team</th><th>Player</th><th>Level</th></tr>
+                    <tr><td>Dragons</td><td>Alice</td><td>45</td></tr>
+                    <tr><td>Dragons</td><td>Bob</td><td>52</td></tr>
+                    <tr><td>Dragons</td><td>Charlie</td><td>48</td></tr>
+                </table>
+                <p><strong>Phoenix and Wolves teams completely removed! 🚫</strong></p>
+            `;
+        }
+
+        // Melt Demo
+        function meltDemo() {
+            const output = document.getElementById('meltOutput');
+            output.innerHTML = `
+                <h4>📅 Monthly Gaming Hours</h4>
+                <p><strong>Converting from wide to long format...</strong></p>
+                <hr>
+                <h5>WIDE FORMAT (Before):</h5>
+                <table>
+                    <tr><th>Player</th><th>January</th><th>February</th><th>March</th></tr>
+                    <tr><td>Alice</td><td>20</td><td>25</td><td>30</td></tr>
+                    <tr><td>Bob</td><td>15</td><td>20</td><td>18</td></tr>
+                </table>
+                <h5>LONG FORMAT (After Melt):</h5>
+                <table>
+                    <tr><th>Player</th><th>Month</th><th>Hours</th></tr>
+                    <tr><td>Alice</td><td>January</td><td>20</td></tr>
+                    <tr><td>Bob</td><td>January</td><td>15</td></tr>
+                    <tr><td>Alice</td><td>February</td><td>25</td></tr>
+                    <tr><td>Bob</td><td>February</td><td>20</td></tr>
+                    <tr><td>Alice</td><td>March</td><td>30</td></tr>
+                    <tr><td>Bob</td><td>March</td><td>18</td></tr>
+                </table>
+                <p><strong>Now perfect for plotting and analysis! 📈</strong></p>
+            `;
+        }
+
+        // Stack Demo
+        function stackDemo() {
+            const output = document.getElementById('stackOutput');
+            output.innerHTML = `
+                <h4>🎮 Player Statistics</h4>
+                <p><strong>Stacking stats into hierarchical format...</strong></p>
+                <hr>
+                <h5>BEFORE STACKING:</h5>
+                <table>
+                    <tr><th>Player</th><th>Kills</th><th>Deaths</th><th>Assists</th></tr>
+                    <tr><td>Alice</td><td>25</td><td>10</td><td>15</td></tr>
+                    <tr><td>Bob</td><td>30</td><td>12</td><td>20</td></tr>
+                </table>
+                <h5>AFTER STACKING:</h5>
+                <div style="background: white; padding: 15px; border-radius: 8px; font-family: monospace;">
+                    Alice  Kills      25<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Deaths     10<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Assists    15<br>
+                    Bob    Kills      30<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Deaths     12<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Assists    20
+                </div>
+                <p><strong>Created multi-level index! Player → Stat Type 🏗️</strong></p>
+            `;
+        }
+
+        // Crosstab Demo
+        function crosstabDemo() {
+            const output = document.getElementById('crosstabOutput');
+            output.innerHTML = `
+                <h4>⚽ Favorite Sports by Gender</h4>
+                <p><strong>Creating a frequency table...</strong></p>
+                <hr>
+                <table>
+                    <tr><th>Gender / Sport</th><th>Soccer</th><th>Basketball</th><th>Baseball</th><th>Total</th></tr>
+                    <tr><td><strong>Male</strong></td><td>8</td><td>12</td><td>10</td><td>30</td></tr>
+                    <tr><td><strong>Female</strong></td><td>10</td><td>15</td><td>5</td><td>30</td></tr>
+                    <tr><td><strong>Total</strong></td><td>18</td><td>27</td><td>15</td><td>60</td></tr>
+                </table>
+                <p><strong>Key Insights:</strong></p>
+                <ul>
+                    <li>Basketball is most popular overall (27 students)</li>
+                    <li>More females prefer soccer (10 vs 8)</li>
+                    <li>More males prefer baseball (10 vs 5)</li>
+                </ul>
+            `;
+        }
+
+        // Quiz submission
+        function submitQuiz() {
+            const name = document.getElementById('studentName').value.trim();
+            const classInfo = document.getElementById('studentClass').value.trim();
+            
+            if (!name || !classInfo) {
+                alert('Please enter your name and class period!');
+                return;
+            }
+            
+            const answers = {
+                q1: 'a', q2: 'b', q3: 'b', q4: 'b', q5: 'b',
+                q6: 'b', q7: 'b', q8: 'b', q9: 'c', q10: 'b'
+            };
+            
+            let score = 0;
+            let total = 10;
+            
+            for (let i = 1; i <= 10; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (selected && selected.value === answers[`q${i}`]) {
+                    score++;
+                }
+            }
+            
+            const percentage = (score / total * 100).toFixed(0);
+            
+            let emoji = '';
+            let message = '';
+            if (percentage >= 90) {
+                emoji = '🏆';
+                message = 'Outstanding! You\'re a Pandas master!';
+            } else if (percentage >= 80) {
+                emoji = '🌟';
+                message = 'Great job! You really understand these concepts!';
+            } else if (percentage >= 70) {
+                emoji = '👍';
+                message = 'Good work! Review the material to improve further!';
+            } else if (percentage >= 60) {
+                emoji = '📚';
+                message = 'Keep studying! You\'re getting there!';
+            } else {
+                emoji = '💪';
+                message = 'Don\'t give up! Review the playbook and try again!';
+            }
+            
+            document.getElementById('studentInfo').innerHTML = `
+                <p><strong>Name:</strong> ${name}</p>
+                <p><strong>Class:</strong> ${classInfo}</p>
+                <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+            `;
+            
+            document.getElementById('scoreDisplay').innerHTML = `${emoji} ${score}/${total} (${percentage}%)`;
+            document.getElementById('resultMessage').innerHTML = message;
+            
+            document.getElementById('quizResult').style.display = 'block';
+            document.getElementById('quizForm').style.display = 'none';
+            
+            // Scroll to result
+            document.getElementById('quizResult').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
