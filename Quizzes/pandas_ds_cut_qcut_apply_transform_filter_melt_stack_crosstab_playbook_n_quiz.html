@@ -211,6 +211,7 @@
         }
 
         .option {
+            display: block;
             background: white;
             padding: 15px;
             margin: 10px 0;
@@ -1094,14 +1095,6 @@ pd.crosstab(df['grade'], df['game'], normalize='all')</pre>
                 <div class="quiz-container">
                     <h2 style="text-align: center; color: #667eea; margin-bottom: 30px;">🎯 Pandas Concepts Quiz</h2>
                     
-                    <div class="student-info">
-                        <label for="studentName">Your Name:</label>
-                        <input type="text" id="studentName" placeholder="Enter your full name" required>
-                        
-                        <label for="studentClass">Class Period:</label>
-                        <input type="text" id="studentClass" placeholder="e.g., Period 2" required>
-                    </div>
-
                     <form id="quizForm">
                         <!-- Question 1 -->
                         <div class="question">
@@ -1564,14 +1557,6 @@ pd.crosstab(df['grade'], df['game'], normalize='all')</pre>
 
         // Quiz submission
         function submitQuiz() {
-            const name = document.getElementById('studentName').value.trim();
-            const classInfo = document.getElementById('studentClass').value.trim();
-            
-            if (!name || !classInfo) {
-                alert('Please enter your name and class period!');
-                return;
-            }
-            
             const answers = {
                 q1: 'a', q2: 'b', q3: 'b', q4: 'b', q5: 'b',
                 q6: 'b', q7: 'b', q8: 'b', q9: 'c', q10: 'b'
@@ -1607,12 +1592,6 @@ pd.crosstab(df['grade'], df['game'], normalize='all')</pre>
                 emoji = '💪';
                 message = 'Don\'t give up! Review the playbook and try again!';
             }
-            
-            document.getElementById('studentInfo').innerHTML = `
-                <p><strong>Name:</strong> ${name}</p>
-                <p><strong>Class:</strong> ${classInfo}</p>
-                <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-            `;
             
             document.getElementById('scoreDisplay').innerHTML = `${emoji} ${score}/${total} (${percentage}%)`;
             document.getElementById('resultMessage').innerHTML = message;
