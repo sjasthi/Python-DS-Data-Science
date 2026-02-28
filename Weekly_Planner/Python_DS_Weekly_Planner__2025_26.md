@@ -50,8 +50,8 @@ This course introduces middle and high school students to Data Science using Pyt
 | 17 | 01/31/26 | 02/06/26 | pandas - Summarizing and Aggregations |
 | 18 | 02/07/26 | 02/13/26 | pandas - GroupBy and Pivots |
 | 19 | 02/14/26 | 02/20/26 | pandas - Advanced (Merging, Slicing) |
-| 20 | 02/21/26 | 02/27/26 | pandas - Working with Time Series Data |
-| 21 | 02/28/26 | 03/06/26 | Pandas Visualizations and matplotlib - 1 |
+| 20 | 02/21/26 | 02/27/26 | pandas - Time Series Data, pandas Visualizations |
+| 21 | 02/28/26 | 03/06/26 | kaggle and Data Science |
 
 ### **Spring Break**
 | - | 03/07/26 | 03/13/26 | **No Class - Spring Break** |
@@ -60,14 +60,14 @@ This course introduces middle and high school students to Data Science using Pyt
 
 | Class # | Week Start | Week End (Due Date) | Topic |
 |---------|------------|---------------------|-------|
-| 22 | 03/21/26 | 03/27/26 | matplotlib - 2 |
-| 23 | 03/28/26 | 04/03/26 | matplotlib - 3 |
+| 22 | 03/21/26 | 03/27/26 | matplotlib - 1 |
+| 23 | 03/28/26 | 04/03/26 | matplotlib - 2 |
 | 24 | 04/04/26 | 04/10/26 | Introduction to plotly and seaborn |
-| 25 | 04/11/26 | 04/17/26 | HTML and Beautiful Soup |
-| 26 | 04/18/26 | 04/24/26 | Final Project - Working Session 1 |
-| 27 | 04/25/26 | 05/01/26 | Final Project - Working Session 2 |
-| 28 | 05/02/26 | 05/08/26 | Final Project - Working Session 3 |
-| 29 | 05/09/26 | 05/15/26 | Final Project - Working Session 4 |
+| 25 | 04/11/26 | 04/17/26 | HTML for Data Scientists |
+| 26 | 04/18/26 | 04/24/26 | Beautiful Soup |
+| 27 | 04/25/26 | 05/01/26 | Final Project - Working Session 1 |
+| 28 | 05/02/26 | 05/08/26 | Final Project - Working Session 2 |
+| 29 | 05/09/26 | 05/15/26 | Final Project - Working Session 3 |
 | 30 | 05/16/26 | 05/22/26 | **Final Project - Demonstration** |
 
 ---
