@@ -185,17 +185,16 @@ Students will: - Choose one Kaggle dataset\
 
 ------------------------------------------------------------------------
 
-## Assignment (25 pts)
+## Assignment (25 pts) – Guest Speaker Seminar
 
-### Assignment 17 (What would Data Scientists Do?)
+**Speaker:** [Jayanthi Suryanarayana](https://www.linkedin.com/in/jayanthi-suryanarayana-2313841/), Principal AI/ML Solution Engineer at United Health Group
 
-- https://www.linkedin.com/in/jayanthi-suryanarayana-2313841/
+**Topic:** *A Day in the Life of a Data Scientist*
 
-- Jayanthi Suryanarayana, Principal AI/ML Solution Engineer at United Healthgroup, will be talking about "A day in the life of a Data Scientist" on 7th March from 7 to 8 PM CST.
+**Date & Time:** March 7th, 8:00 – 9:00 PM CST
 
-- You are required to attend this seminar and write brief summary of what you learned from this seminar.
-
-- You can prepare a Power Point presentation with 4 slides, outlining your take-aways from this seminar.
+### Deliverable
+Attend the seminar and submit a 4-slide PowerPoint presentation summarizing your key takeaways.
 
 ------------------------------------------------------------------------
 ## Big Idea of the Week
