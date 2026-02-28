@@ -99,14 +99,14 @@ Students will: - Choose one Kaggle dataset\
 
 ## Lab (10 pts)
 
-### Part 1 --- Explore (4 pts)
+### Part 1 --- Explore (3 pts)
 
--   Find a dataset you like
+-   Explore kaggle to find a dataset you like
 -   Describe what the dataset is about
 -   Mention number of rows and columns
 -   List column names
 
-### Part 2 --- Analyze (4 pts)
+### Part 2 --- Analyze (5 pts)
 
 -   Load dataset in Colab
 -   Create at least one visualization
