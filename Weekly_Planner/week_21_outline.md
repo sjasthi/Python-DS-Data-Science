@@ -25,10 +25,10 @@ By the end of this week, students will be able to:
 Kaggle is an online platform for Data Science and Machine Learning where
 students can:
 
--   Explore real-world datasets\
--   Learn from other people's notebooks\
--   Participate in beginner competitions\
--   Join discussions with other learners\
+-   Explore real-world datasets
+-   Learn from other people's notebooks
+-   Participate in beginner competitions
+-   Join discussions with other learners
 -   Be part of a global Data Science community
 
 Think of Kaggle as: "YouTube + GitHub + Science Fair --- for Data
@@ -36,12 +36,12 @@ Science!"
 
 ------------------------------------------------------------------------
 
-## Why Should Middle School Students Use Kaggle?
+## Why Should You Use Kaggle?
 
--   It provides real-world datasets beyond classroom examples\
--   Students can see how professionals solve problems\
--   It builds confidence by exploring real AI projects\
--   It encourages curiosity and independent learning\
+-   It provides real-world datasets beyond classroom examples
+-   Students can see how professionals solve problems
+-   It builds confidence by exploring real AI projects
+-   It encourages curiosity and independent learning
 -   It allows students to showcase projects publicly
 
 ------------------------------------------------------------------------
@@ -50,48 +50,48 @@ Science!"
 
 ### 1. Create a Kaggle Account
 
--   Sign up at: https://www.kaggle.com\
--   Explore the homepage\
+-   Sign up at: https://www.kaggle.com
+-   Explore the homepage
 -   Update profile (add bio and interests)
 
 ### 2. Explore Datasets
 
-Students will: - Visit the Datasets section\
+Students will: - Visit the Datasets section
 - Search for topics they like (sports, video games, movies, climate,
-space, animals)\
-- Preview dataset structure\
+space, animals)
+- Preview dataset structure
 - Download one dataset
 
 ### 3. Explore Notebooks (Kernels)
 
-Students will: - Open a beginner-friendly notebook\
-- Identify how data is loaded\
-- Identify how pandas is used\
-- Identify what visualizations are created\
+Students will: - Open a beginner-friendly notebook
+- Identify how data is loaded
+- Identify how pandas is used
+- Identify what visualizations are created
 - Write a short summary of what they learned
 
 ### 4. Intro to Competitions (Optional & Beginner-Friendly)
 
-Students will: - Explore a "Getting Started" competition\
+Students will: - Explore a "Getting Started" competition
 - Understand prediction, leaderboard, and submission
 
 ### 5. Mini Project (In Class)
 
 Students will: - Choose one Kaggle dataset\
-- Load it into Google Colab\
-- Perform `.head()` and `.info()`\
-- Do basic cleaning\
-- Create one visualization\
+- Load it into Google Colab
+- Perform `.head()` and `.info()`
+- Do basic cleaning
+- Create one visualization
 - Write 3 insights about the data
 
 ------------------------------------------------------------------------
 
 ## Resources
 
--   Kaggle Website: https://www.kaggle.com\
--   Kaggle Learn Micro-Courses: https://www.kaggle.com/learn\
+-   Kaggle Website: https://www.kaggle.com
+-   Kaggle Learn Micro-Courses: https://www.kaggle.com/learn
 -   Titanic Competition (Example):
-    https://www.kaggle.com/competitions/titanic\
+    https://www.kaggle.com/competitions/titanic
 -   Sample Kaggle Notebooks: https://www.kaggle.com/code
 -   Where to get data for DS and ML: https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Where_to_get_data_for_DS_and_ML.pdf
 
@@ -101,21 +101,21 @@ Students will: - Choose one Kaggle dataset\
 
 ### Part 1 --- Explore (4 pts)
 
--   Find a dataset you like\
--   Describe what the dataset is about\
--   Mention number of rows and columns\
+-   Find a dataset you like
+-   Describe what the dataset is about
+-   Mention number of rows and columns
 -   List column names
 
 ### Part 2 --- Analyze (4 pts)
 
--   Load dataset in Colab\
--   Create at least one visualization\
+-   Load dataset in Colab
+-   Create at least one visualization
 -   Write 3 observations
 
 ### Part 3 --- Reflect (2 pts)
 
--   What did you like about Kaggle?\
--   What was confusing?\
+-   What did you like about Kaggle?
+-   What was confusing?
 -   Would you try a competition? Why or why not?
 
 ------------------------------------------------------------------------
