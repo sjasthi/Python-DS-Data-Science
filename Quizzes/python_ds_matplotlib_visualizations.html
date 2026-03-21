@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python DS — Matplotlib Visualizations | Week 22</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --paper: #faf8f5;
+    --accent-quant: #e76f51;
+    --accent-quant-light: #fdf0ec;
+    --accent-qual: #2a9d8f;
+    --accent-qual-light: #eaf7f5;
+    --accent-quiz: #6c63ff;
+    --accent-quiz-light: #eeedff;
+    --gray-100: #f5f3f0;
+    --gray-200: #e8e4df;
+    --gray-300: #c9c4bc;
+    --gray-500: #8a8379;
+    --gray-700: #4a4540;
+    --correct: #2a9d8f;
+    --wrong: #e76f51;
+    --radius: 12px;
+    --radius-lg: 20px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.65;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 40px 0 30px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60%; left: -20%;
+    width: 140%; height: 200%;
+    background: radial-gradient(ellipse at 30% 50%, rgba(231,111,81,0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 50%, rgba(42,157,143,0.15) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .header-inner { position: relative; max-width: 800px; margin: 0 auto; padding: 0 24px; }
+  .header .week-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 4px 16px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(26px, 5vw, 40px);
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .header p { font-size: 15px; color: rgba(255,255,255,0.6); }
+
+  /* ── TAB BAR ── */
+  .tab-bar {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding: 16px 24px 0;
+    max-width: 720px;
+    margin: 0 auto;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--paper);
+    padding-top: 16px;
+    padding-bottom: 12px;
+  }
+  .tab-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 24px;
+    border: 2px solid var(--gray-200);
+    border-radius: 100px;
+    background: white;
+    color: var(--gray-500);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { border-color: var(--gray-300); color: var(--ink); }
+  .tab-btn.active[data-tab="quant"] { background: var(--accent-quant); border-color: var(--accent-quant); color: white; }
+  .tab-btn.active[data-tab="qual"]  { background: var(--accent-qual); border-color: var(--accent-qual); color: white; }
+  .tab-btn.active[data-tab="quiz"]  { background: var(--accent-quiz); border-color: var(--accent-quiz); color: white; }
+
+  /* ── CONTENT AREA ── */
+  .content { max-width: 780px; margin: 0 auto; padding: 20px 24px 60px; }
+  .tab-panel { display: none; animation: fadeUp 0.35s ease; }
+  .tab-panel.active { display: block; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── SECTION CARDS ── */
+  .section-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+  }
+  .section-card h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    font-weight: 400;
+    margin-bottom: 6px;
+  }
+  .section-card .subtitle {
+    font-size: 14px;
+    color: var(--gray-500);
+    margin-bottom: 20px;
+  }
+  .section-card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 24px 0 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-card h3 .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .quant-tab .icon { background: var(--accent-quant-light); }
+  .qual-tab .icon  { background: var(--accent-qual-light); }
+
+  .section-card p { font-size: 15px; color: var(--gray-700); margin-bottom: 10px; }
+
+  /* ── VARIABLE TYPE CALLOUTS ── */
+  .callout {
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .callout-quant { background: var(--accent-quant-light); border-left: 4px solid var(--accent-quant); }
+  .callout-qual  { background: var(--accent-qual-light); border-left: 4px solid var(--accent-qual); }
+  .callout-info  { background: #f0f4ff; border-left: 4px solid #6c63ff; }
+  .callout strong { font-weight: 700; }
+
+  /* ── CODE BLOCKS ── */
+  .code-block {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin: 14px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-x: auto;
+    position: relative;
+  }
+  .code-block .kw  { color: #cba6f7; }
+  .code-block .fn  { color: #89b4fa; }
+  .code-block .str { color: #a6e3a1; }
+  .code-block .com { color: #6c7086; font-style: italic; }
+  .code-block .num { color: #fab387; }
+  .code-block .var { color: #f9e2af; }
+
+  .code-label {
+    display: inline-block;
+    background: rgba(255,255,255,0.08);
+    color: #a6adc8;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* ── VIZ CARDS (mini illustrations) ── */
+  .viz-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .viz-card {
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+    transition: all 0.2s ease;
+    cursor: default;
+  }
+  .viz-card:hover { border-color: var(--gray-300); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .viz-card .viz-icon { font-size: 40px; margin-bottom: 10px; display: block; }
+  .viz-card .viz-name { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .viz-card .viz-fn { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--gray-500); }
+
+  /* ── KEY-VALUE ROWS ── */
+  .kv-row {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--gray-100);
+    font-size: 14px;
+    align-items: flex-start;
+  }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-label { font-weight: 700; min-width: 130px; flex-shrink: 0; color: var(--ink); }
+  .kv-value { color: var(--gray-700); }
+
+  /* ── QUIZ TAB ── */
+  .quiz-header {
+    text-align: center;
+    padding: 10px 0 20px;
+  }
+  .quiz-header h2 { font-family: 'DM Serif Display', serif; font-size: 28px; margin-bottom: 4px; }
+  .quiz-header p { color: var(--gray-500); font-size: 14px; }
+
+  .question-card {
+    background: white;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 28px 28px 24px;
+    margin-bottom: 16px;
+    transition: border-color 0.3s ease;
+  }
+  .question-card.answered-correct { border-color: var(--correct); }
+  .question-card.answered-wrong   { border-color: var(--wrong); }
+
+  .q-number {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+  }
+  .q-number.quant-q { background: var(--accent-quant-light); color: var(--accent-quant); }
+  .q-number.qual-q  { background: var(--accent-qual-light); color: var(--accent-qual); }
+
+  .q-text { font-size: 16px; font-weight: 600; margin-bottom: 16px; line-height: 1.5; }
+
+  .options-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .option-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    text-align: left;
+    padding: 12px 16px;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius);
+    background: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .option-btn:hover:not(.disabled) { border-color: var(--gray-300); background: var(--gray-100); }
+  .option-btn .opt-letter {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: var(--gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+  }
+  .option-btn.selected-correct { border-color: var(--correct); background: #eaf7f5; }
+  .option-btn.selected-correct .opt-letter { background: var(--correct); color: white; }
+  .option-btn.selected-wrong { border-color: var(--wrong); background: #fdf0ec; }
+  .option-btn.selected-wrong .opt-letter { background: var(--wrong); color: white; }
+  .option-btn.reveal-correct { border-color: var(--correct); background: #eaf7f5; }
+  .option-btn.reveal-correct .opt-letter { background: var(--correct); color: white; }
+  .option-btn.disabled { cursor: default; opacity: 0.7; }
+  .option-btn.disabled.selected-correct,
+  .option-btn.disabled.selected-wrong,
+  .option-btn.disabled.reveal-correct { opacity: 1; }
+
+  .explanation {
+    margin-top: 12px;
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    line-height: 1.6;
+    display: none;
+  }
+  .explanation.show { display: block; }
+  .explanation.correct-expl { background: #eaf7f5; color: #1a6b60; }
+  .explanation.wrong-expl   { background: #fdf0ec; color: #b84a30; }
+
+  /* ── SCORE PANEL ── */
+  .score-panel {
+    background: white;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 36px 32px;
+    text-align: center;
+    margin-top: 24px;
+    display: none;
+  }
+  .score-panel.show { display: block; animation: fadeUp 0.4s ease; }
+  .score-big {
+    font-family: 'DM Serif Display', serif;
+    font-size: 64px;
+    line-height: 1;
+    margin: 8px 0;
+  }
+  .score-big.great { color: var(--correct); }
+  .score-big.ok    { color: #e9c46a; }
+  .score-big.low   { color: var(--wrong); }
+  .score-label { font-size: 14px; color: var(--gray-500); margin-bottom: 4px; }
+  .score-msg { font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+  .score-breakdown {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin: 16px 0 20px;
+    font-size: 14px;
+  }
+  .score-breakdown span { display: flex; align-items: center; gap: 6px; }
+  .score-breakdown .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .btn-reset {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 28px;
+    border: 2px solid var(--gray-200);
+    border-radius: 100px;
+    background: white;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .btn-reset:hover { border-color: var(--accent-quiz); color: var(--accent-quiz); }
+
+  .student-info {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .student-info input {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 10px 16px;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius);
+    outline: none;
+    width: 260px;
+    transition: border-color 0.2s;
+  }
+  .student-info input:focus { border-color: var(--accent-quiz); }
+
+  /* ── TABLE-LIKE SUMMARY ── */
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  .summary-table th {
+    text-align: left;
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--gray-500);
+    padding: 8px 12px;
+    border-bottom: 2px solid var(--gray-200);
+  }
+  .summary-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--gray-100);
+    vertical-align: top;
+  }
+  .summary-table code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: var(--gray-100);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .section-card { padding: 20px; }
+    .code-block { padding: 16px; font-size: 12px; }
+    .tab-btn { padding: 8px 16px; font-size: 13px; }
+    .viz-grid { grid-template-columns: 1fr; }
+    .question-card { padding: 20px; }
+    .student-info input { width: 100%; }
+  }
+
+  /* ── PRINT STYLE for screenshot ── */
+  @media print {
+    .tab-bar, .btn-reset { display: none; }
+    .score-panel { border: 2px solid #000; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<div class="header">
+  <div class="header-inner">
+    <div class="week-badge">Week 22 · Python DS</div>
+    <h1>Matplotlib Visualizations</h1>
+    <p>Choosing the right chart for quantitative &amp; qualitative variables</p>
+  </div>
+</div>
+
+<!-- ═══════════════ TAB BAR ═══════════════ -->
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="quant" onclick="switchTab('quant')">📊 Quantitative</button>
+  <button class="tab-btn" data-tab="qual" onclick="switchTab('qual')">📋 Qualitative</button>
+  <button class="tab-btn" data-tab="quiz" onclick="switchTab('quiz')">✏️ Quiz</button>
+</div>
+
+<!-- ═══════════════ CONTENT ═══════════════ -->
+<div class="content">
+
+<!-- ────────── TAB 1: QUANTITATIVE ────────── -->
+<div class="tab-panel active quant-tab" id="panel-quant">
+
+  <div class="section-card">
+    <h2>Quantitative Variables</h2>
+    <p class="subtitle">Variables you can count or measure with numbers</p>
+
+    <div class="callout callout-quant">
+      <strong>What is a quantitative variable?</strong><br>
+      A quantitative (numerical) variable represents quantities that you can count or measure. It makes sense to add, subtract, or average these values. Examples: height, temperature, test scores, age, number of siblings.
+    </div>
+
+    <p>Quantitative variables come in two flavors:</p>
+    <div class="kv-row"><span class="kv-label">Continuous</span><span class="kv-value">Can take any value within a range — height (5.3 ft), temperature (98.6°F), time (2.75 hours)</span></div>
+    <div class="kv-row"><span class="kv-label">Discrete</span><span class="kv-value">Whole number counts — number of pets (3), goals scored (2), apps on your phone (47)</span></div>
+
+    <p style="margin-top:20px;">When we visualize a <strong>single</strong> quantitative variable, we want to understand its <em>distribution</em> — how the values spread out, where they cluster, and whether there are outliers.</p>
+  </div>
+
+  <!-- OVERVIEW GRID -->
+  <div class="section-card">
+    <h2>Best Visualizations</h2>
+    <p class="subtitle">Three matplotlib charts for quantitative data</p>
+    <div class="viz-grid">
+      <div class="viz-card">
+        <span class="viz-icon">📶</span>
+        <div class="viz-name">Histogram</div>
+        <div class="viz-fn">plt.hist()</div>
+      </div>
+      <div class="viz-card">
+        <span class="viz-icon">📦</span>
+        <div class="viz-name">Box Plot</div>
+        <div class="viz-fn">plt.boxplot()</div>
+      </div>
+      <div class="viz-card">
+        <span class="viz-icon">📈</span>
+        <div class="viz-name">Line Chart</div>
+        <div class="viz-fn">plt.plot()</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTOGRAM -->
+  <div class="section-card">
+    <h3><span class="icon">📶</span> Histogram</h3>
+    <p>A histogram divides the range of values into equal-width <strong>bins</strong> and shows how many data points fall into each bin. It reveals the <em>shape</em> of a distribution — is it symmetric? Skewed? Where do most values land?</p>
+
+    <div class="callout callout-quant">
+      <strong>When to use:</strong> You have one list of numbers and want to see how frequently different values appear. Great for test scores, heights, ages, temperatures.
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">Python</div>
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="com"># Test scores for a class</span>
+<span class="var">scores</span> = [<span class="num">72</span>, <span class="num">85</span>, <span class="num">90</span>, <span class="num">67</span>, <span class="num">88</span>, <span class="num">95</span>, <span class="num">78</span>, <span class="num">82</span>, <span class="num">91</span>, <span class="num">74</span>,
+          <span class="num">69</span>, <span class="num">88</span>, <span class="num">93</span>, <span class="num">77</span>, <span class="num">81</span>, <span class="num">86</span>, <span class="num">79</span>, <span class="num">92</span>, <span class="num">84</span>, <span class="num">70</span>]
+
+plt.<span class="fn">hist</span>(<span class="var">scores</span>, bins=<span class="num">5</span>, color=<span class="str">'steelblue'</span>, edgecolor=<span class="str">'white'</span>)
+plt.<span class="fn">title</span>(<span class="str">'Distribution of Test Scores'</span>)
+plt.<span class="fn">xlabel</span>(<span class="str">'Score'</span>)
+plt.<span class="fn">ylabel</span>(<span class="str">'Frequency'</span>)
+plt.<span class="fn">show</span>()
+    </div>
+
+    <h3><span class="icon">🔑</span> Key Parameters</h3>
+    <div class="kv-row"><span class="kv-label"><code>bins</code></span><span class="kv-value">Number of intervals to divide the data into. More bins → more detail. Try different values!</span></div>
+    <div class="kv-row"><span class="kv-label"><code>color</code></span><span class="kv-value">Fill color of the bars (e.g., <code>'steelblue'</code>, <code>'coral'</code>)</span></div>
+    <div class="kv-row"><span class="kv-label"><code>edgecolor</code></span><span class="kv-value">Color of the border around each bar — use <code>'white'</code> to visually separate bars</span></div>
+  </div>
+
+  <!-- BOX PLOT -->
+  <div class="section-card">
+    <h3><span class="icon">📦</span> Box Plot</h3>
+    <p>A box plot (box-and-whisker plot) provides a <strong>5-number summary</strong> at a glance: minimum, Q1 (25th percentile), median (Q2), Q3 (75th percentile), and maximum. Dots beyond the whiskers are <strong>outliers</strong>.</p>
+
+    <div class="callout callout-quant">
+      <strong>When to use:</strong> You want to quickly see the center, spread, and outliers of your data. Also excellent for comparing distributions of different groups side by side.
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">Python</div>
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="com"># Daily step counts for a week</span>
+<span class="var">steps</span> = [<span class="num">4500</span>, <span class="num">7200</span>, <span class="num">6800</span>, <span class="num">8100</span>, <span class="num">3200</span>, <span class="num">9500</span>, <span class="num">7000</span>]
+
+plt.<span class="fn">boxplot</span>(<span class="var">steps</span>, vert=<span class="kw">True</span>, patch_artist=<span class="kw">True</span>,
+           boxprops=<span class="fn">dict</span>(facecolor=<span class="str">'lightcoral'</span>))
+plt.<span class="fn">title</span>(<span class="str">'Daily Step Counts'</span>)
+plt.<span class="fn">ylabel</span>(<span class="str">'Steps'</span>)
+plt.<span class="fn">show</span>()
+    </div>
+
+    <h3><span class="icon">🔑</span> Key Parameters</h3>
+    <div class="kv-row"><span class="kv-label"><code>vert</code></span><span class="kv-value"><code>True</code> for vertical box, <code>False</code> for horizontal</span></div>
+    <div class="kv-row"><span class="kv-label"><code>patch_artist</code></span><span class="kv-value">Set to <code>True</code> to fill the box with color</span></div>
+    <div class="kv-row"><span class="kv-label"><code>boxprops</code></span><span class="kv-value">Dictionary to customize the box appearance, e.g. <code>facecolor</code></span></div>
+  </div>
+
+  <!-- LINE CHART -->
+  <div class="section-card">
+    <h3><span class="icon">📈</span> Line Chart</h3>
+    <p>A line chart connects data points in order, showing how a quantitative variable <strong>changes over time</strong> or across a sequence. The x-axis is usually a time period (days, months, years).</p>
+
+    <div class="callout callout-quant">
+      <strong>When to use:</strong> You have data collected over time (a time series) and want to see trends — is it going up? Down? Staying flat?
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">Python</div>
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="com"># Monthly average temperatures (°F)</span>
+<span class="var">months</span> = [<span class="str">'Jan'</span>, <span class="str">'Feb'</span>, <span class="str">'Mar'</span>, <span class="str">'Apr'</span>, <span class="str">'May'</span>, <span class="str">'Jun'</span>]
+<span class="var">temps</span>  = [<span class="num">30</span>, <span class="num">35</span>, <span class="num">45</span>, <span class="num">55</span>, <span class="num">65</span>, <span class="num">75</span>]
+
+plt.<span class="fn">plot</span>(<span class="var">months</span>, <span class="var">temps</span>, marker=<span class="str">'o'</span>, color=<span class="str">'tomato'</span>, linewidth=<span class="num">2</span>)
+plt.<span class="fn">title</span>(<span class="str">'Average Monthly Temperatures'</span>)
+plt.<span class="fn">xlabel</span>(<span class="str">'Month'</span>)
+plt.<span class="fn">ylabel</span>(<span class="str">'Temperature (°F)'</span>)
+plt.<span class="fn">show</span>()
+    </div>
+
+    <h3><span class="icon">🔑</span> Key Parameters</h3>
+    <div class="kv-row"><span class="kv-label"><code>marker</code></span><span class="kv-value">Shape at each data point — <code>'o'</code> circle, <code>'s'</code> square, <code>'^'</code> triangle</span></div>
+    <div class="kv-row"><span class="kv-label"><code>linewidth</code></span><span class="kv-value">Thickness of the connecting line</span></div>
+    <div class="kv-row"><span class="kv-label"><code>color</code></span><span class="kv-value">Color of the line (e.g., <code>'tomato'</code>, <code>'#3498db'</code>)</span></div>
+  </div>
+
+  <!-- QUICK REFERENCE -->
+  <div class="section-card">
+    <h2>Quick Reference</h2>
+    <table class="summary-table">
+      <thead><tr><th>Chart</th><th>Function</th><th>Best For</th></tr></thead>
+      <tbody>
+        <tr><td>Histogram</td><td><code>plt.hist()</code></td><td>Shape of the distribution, frequency of values</td></tr>
+        <tr><td>Box Plot</td><td><code>plt.boxplot()</code></td><td>5-number summary, spotting outliers</td></tr>
+        <tr><td>Line Chart</td><td><code>plt.plot()</code></td><td>Trends over time (time series)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ────────── TAB 2: QUALITATIVE ────────── -->
+<div class="tab-panel qual-tab" id="panel-qual">
+
+  <div class="section-card">
+    <h2>Qualitative Variables</h2>
+    <p class="subtitle">Also called categorical or nominal variables</p>
+
+    <div class="callout callout-qual">
+      <strong>What is a qualitative variable?</strong><br>
+      A qualitative (categorical / nominal) variable represents categories or groups. You can <em>name</em> them but you cannot meaningfully add or average them. Examples: favorite color, type of pet, city name, grade letter (A/B/C), genre of music.
+    </div>
+
+    <p>Qualitative variables come in two flavors:</p>
+    <div class="kv-row"><span class="kv-label">Nominal</span><span class="kv-value">No natural order — colors, pet types, music genres, sports teams</span></div>
+    <div class="kv-row"><span class="kv-label">Ordinal</span><span class="kv-value">Have a meaningful order — grade letters (A &gt; B &gt; C), satisfaction rating (Happy &gt; Neutral &gt; Sad)</span></div>
+
+    <p style="margin-top:20px;">When we visualize a qualitative variable, we want to <strong>count</strong> how many items fall into each category and <strong>compare</strong> those counts.</p>
+  </div>
+
+  <!-- OVERVIEW GRID -->
+  <div class="section-card">
+    <h2>Best Visualizations</h2>
+    <p class="subtitle">Three matplotlib charts for categorical data</p>
+    <div class="viz-grid">
+      <div class="viz-card">
+        <span class="viz-icon">📊</span>
+        <div class="viz-name">Bar Chart</div>
+        <div class="viz-fn">plt.bar() / plt.barh()</div>
+      </div>
+      <div class="viz-card">
+        <span class="viz-icon">🥧</span>
+        <div class="viz-name">Pie Chart</div>
+        <div class="viz-fn">plt.pie()</div>
+      </div>
+      <div class="viz-card">
+        <span class="viz-icon">📊</span>
+        <div class="viz-name">Horizontal Bar</div>
+        <div class="viz-fn">plt.barh()</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BAR CHART -->
+  <div class="section-card">
+    <h3><span class="icon">📊</span> Bar Chart</h3>
+    <p>A bar chart displays each category as a separate bar, with the height (or length) of the bar representing the count or value for that category. Categories go on one axis, values on the other.</p>
+
+    <div class="callout callout-qual">
+      <strong>When to use:</strong> You want to compare counts or values across different categories. Great for "Which is the most/least popular?" questions.
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">Python — Vertical Bar Chart</div>
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="com"># Favorite sports in class</span>
+<span class="var">sports</span> = [<span class="str">'Soccer'</span>, <span class="str">'Basketball'</span>, <span class="str">'Baseball'</span>, <span class="str">'Tennis'</span>, <span class="str">'Swimming'</span>]
+<span class="var">votes</span>  = [<span class="num">12</span>, <span class="num">9</span>, <span class="num">6</span>, <span class="num">4</span>, <span class="num">7</span>]
+
+plt.<span class="fn">bar</span>(<span class="var">sports</span>, <span class="var">votes</span>, color=<span class="str">'teal'</span>)
+plt.<span class="fn">title</span>(<span class="str">'Favorite Sports in Our Class'</span>)
+plt.<span class="fn">xlabel</span>(<span class="str">'Sport'</span>)
+plt.<span class="fn">ylabel</span>(<span class="str">'Number of Votes'</span>)
+plt.<span class="fn">show</span>()
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">Python — Horizontal Bar Chart</div>
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="var">sports</span> = [<span class="str">'Soccer'</span>, <span class="str">'Basketball'</span>, <span class="str">'Baseball'</span>, <span class="str">'Tennis'</span>, <span class="str">'Swimming'</span>]
+<span class="var">votes</span>  = [<span class="num">12</span>, <span class="num">9</span>, <span class="num">6</span>, <span class="num">4</span>, <span class="num">7</span>]
+
+plt.<span class="fn">barh</span>(<span class="var">sports</span>, <span class="var">votes</span>, color=<span class="str">'darkorange'</span>)
+plt.<span class="fn">title</span>(<span class="str">'Favorite Sports in Our Class'</span>)
+plt.<span class="fn">xlabel</span>(<span class="str">'Number of Votes'</span>)
+plt.<span class="fn">show</span>()
+    </div>
+
+    <h3><span class="icon">🔑</span> Key Parameters</h3>
+    <div class="kv-row"><span class="kv-label"><code>color</code></span><span class="kv-value">Fill color of bars — single color or a list of colors for each bar</span></div>
+    <div class="kv-row"><span class="kv-label"><code>edgecolor</code></span><span class="kv-value">Border color around each bar</span></div>
+    <div class="kv-row"><span class="kv-label"><code>width</code></span><span class="kv-value">Width of each bar (default 0.8). Use <code>height</code> for <code>barh()</code></span></div>
+
+    <div class="callout callout-info" style="margin-top:16px;">
+      <strong>💡 Tip:</strong> Use <code>plt.barh()</code> (horizontal) when category names are long — they are easier to read on the y-axis.
+    </div>
+  </div>
+
+  <!-- PIE CHART -->
+  <div class="section-card">
+    <h3><span class="icon">🥧</span> Pie Chart</h3>
+    <p>A pie chart shows each category as a <strong>slice of a circle</strong>. The size of each slice represents the proportion (percentage) of the whole. The full circle always equals 100%.</p>
+
+    <div class="callout callout-qual">
+      <strong>When to use:</strong> You want to show how a total is divided among categories — "What fraction of the whole does each category represent?" Works best with 2–5 categories.
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">Python</div>
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="com"># Favorite music genres</span>
+<span class="var">genres</span>  = [<span class="str">'Pop'</span>, <span class="str">'Hip Hop'</span>, <span class="str">'Rock'</span>, <span class="str">'Country'</span>, <span class="str">'K-Pop'</span>]
+<span class="var">counts</span>  = [<span class="num">15</span>, <span class="num">10</span>, <span class="num">5</span>, <span class="num">3</span>, <span class="num">7</span>]
+
+plt.<span class="fn">pie</span>(<span class="var">counts</span>, labels=<span class="var">genres</span>, autopct=<span class="str">'%1.1f%%'</span>,
+       colors=[<span class="str">'#ff9999'</span>, <span class="str">'#66b3ff'</span>, <span class="str">'#99ff99'</span>, <span class="str">'#ffcc99'</span>, <span class="str">'#c2c2f0'</span>])
+plt.<span class="fn">title</span>(<span class="str">'Favorite Music Genres'</span>)
+plt.<span class="fn">show</span>()
+    </div>
+
+    <h3><span class="icon">🔑</span> Key Parameters</h3>
+    <div class="kv-row"><span class="kv-label"><code>labels</code></span><span class="kv-value">List of category names shown next to each slice</span></div>
+    <div class="kv-row"><span class="kv-label"><code>autopct</code></span><span class="kv-value">Format string for showing percentages on each slice (e.g., <code>'%1.1f%%'</code>)</span></div>
+    <div class="kv-row"><span class="kv-label"><code>colors</code></span><span class="kv-value">List of colors, one per slice</span></div>
+    <div class="kv-row"><span class="kv-label"><code>explode</code></span><span class="kv-value">Tuple to "pull out" a slice, e.g., <code>(0.1, 0, 0, 0, 0)</code> pulls the first slice</span></div>
+
+    <div class="callout callout-info" style="margin-top:16px;">
+      <strong>⚠️ Caution:</strong> Pie charts become hard to read with more than 5–6 categories. When in doubt, use a bar chart instead!
+    </div>
+  </div>
+
+  <!-- QUICK REFERENCE -->
+  <div class="section-card">
+    <h2>Quick Reference</h2>
+    <table class="summary-table">
+      <thead><tr><th>Chart</th><th>Function</th><th>Best For</th></tr></thead>
+      <tbody>
+        <tr><td>Vertical Bar</td><td><code>plt.bar()</code></td><td>Comparing counts across categories</td></tr>
+        <tr><td>Horizontal Bar</td><td><code>plt.barh()</code></td><td>Same as above, better for long labels</td></tr>
+        <tr><td>Pie Chart</td><td><code>plt.pie()</code></td><td>Part-of-a-whole, proportion of total</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-info" style="margin-top: 16px;">
+      <strong>Coming next week:</strong> Scatter plots and other visualizations that show <em>relationships between two variables</em>.
+    </div>
+  </div>
+</div>
+
+<!-- ────────── TAB 3: QUIZ ────────── -->
+<div class="tab-panel" id="panel-quiz">
+
+  <div class="quiz-header">
+    <h2>📝 Visualization Quiz</h2>
+    <p>5 Quantitative + 5 Qualitative · Pick the best answer</p>
+  </div>
+
+  <div class="student-info">
+    <input type="text" id="studentName" placeholder="Enter your name…">
+  </div>
+
+  <div id="quiz-container"></div>
+
+  <div class="score-panel" id="scorePanel">
+    <div class="score-label">YOUR SCORE</div>
+    <div class="score-big" id="scoreValue"></div>
+    <div class="score-msg" id="scoreMsg"></div>
+    <div class="score-breakdown">
+      <span><span class="dot" style="background:var(--accent-quant)"></span> Quantitative: <strong id="quantScore">0</strong>/5</span>
+      <span><span class="dot" style="background:var(--accent-qual)"></span> Qualitative: <strong id="qualScore">0</strong>/5</span>
+    </div>
+    <div style="font-size:13px; color:var(--gray-500); margin-bottom:16px;" id="studentLabel"></div>
+    <button class="btn-reset" onclick="resetQuiz()">↻ Retake Quiz</button>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<script>
+// ═══════ TAB SWITCHING ═══════
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+  document.getElementById(`panel-${tab}`).classList.add('active');
+}
+
+// ═══════ QUIZ DATA ═══════
+const questions = [
+  // ── QUANTITATIVE (5) ──
+  {
+    id: 1, type: 'quant',
+    text: 'You collected the heights (in cm) of every student in your class and want to see how the heights are spread out. Which chart is the best choice?',
+    options: ['Bar Chart', 'Histogram', 'Pie Chart', 'Line Chart'],
+    answer: 1,
+    explanation: 'A histogram is the best choice because it shows the distribution (spread and shape) of a single quantitative variable like height.'
+  },
+  {
+    id: 2, type: 'quant',
+    text: 'Which matplotlib function creates a box plot?',
+    options: ['plt.box()', 'plt.boxplot()', 'plt.whisker()', 'plt.bplot()'],
+    answer: 1,
+    explanation: 'The correct function is plt.boxplot(). It draws the box-and-whisker diagram showing the 5-number summary.'
+  },
+  {
+    id: 3, type: 'quant',
+    text: 'You want to show how the temperature changed each day for a month. Which chart should you use?',
+    options: ['Pie Chart', 'Box Plot', 'Line Chart', 'Histogram'],
+    answer: 2,
+    explanation: 'A line chart (plt.plot) connects data points across a time sequence, making it perfect for showing trends over time like daily temperature changes.'
+  },
+  {
+    id: 4, type: 'quant',
+    text: 'In a box plot, what does a dot beyond the whiskers represent?',
+    options: ['The average value', 'An outlier', 'The median', 'A missing value'],
+    answer: 1,
+    explanation: 'Points beyond the whiskers in a box plot are outliers — values that are unusually far from the rest of the data.'
+  },
+  {
+    id: 5, type: 'quant',
+    text: 'In a histogram, what does the "bins" parameter control?',
+    options: [
+      'The color of the bars',
+      'The number of intervals the data is divided into',
+      'The height of each bar',
+      'The title of the chart'
+    ],
+    answer: 1,
+    explanation: 'The "bins" parameter sets how many intervals (buckets) the range of data is divided into. More bins show finer detail; fewer bins show a broader picture.'
+  },
+
+  // ── QUALITATIVE (5) ──
+  {
+    id: 6, type: 'qual',
+    text: 'Students voted for their favorite subject: Math, Science, English, and Art. You want to compare how many votes each subject received. Which chart is most appropriate?',
+    options: ['Histogram', 'Line Chart', 'Bar Chart', 'Box Plot'],
+    answer: 2,
+    explanation: 'A bar chart is ideal for comparing counts (votes) across categorical groups like school subjects.'
+  },
+  {
+    id: 7, type: 'qual',
+    text: 'Which matplotlib function creates a horizontal bar chart?',
+    options: ['plt.bar(horizontal=True)', 'plt.hbar()', 'plt.barh()', 'plt.bar_horizontal()'],
+    answer: 2,
+    explanation: 'The correct function is plt.barh() — the "h" stands for horizontal. It draws bars from left to right.'
+  },
+  {
+    id: 8, type: 'qual',
+    text: 'You want to show what percentage of total allowance spending goes to food, games, clothes, and savings. Which chart works best?',
+    options: ['Line Chart', 'Pie Chart', 'Box Plot', 'Histogram'],
+    answer: 1,
+    explanation: 'A pie chart shows parts-of-a-whole as percentages. With 4 categories, it clearly displays what fraction of total spending each category represents.'
+  },
+  {
+    id: 9, type: 'qual',
+    text: 'In a pie chart, what does the "autopct" parameter do?',
+    options: [
+      'Adds a title automatically',
+      'Displays the percentage on each slice',
+      'Rotates the chart automatically',
+      'Picks colors automatically'
+    ],
+    answer: 1,
+    explanation: 'The "autopct" parameter formats and displays the percentage value on each slice. For example, autopct=\'%1.1f%%\' shows one decimal place like "37.5%".'
+  },
+  {
+    id: 10, type: 'qual',
+    text: 'Why is a pie chart generally NOT recommended when you have more than 5 or 6 categories?',
+    options: [
+      'Python does not allow more than 6 slices',
+      'The slices become too small and hard to compare visually',
+      'Pie charts only work with numbers, not categories',
+      'The colors will repeat and look confusing'
+    ],
+    answer: 1,
+    explanation: 'With many categories, pie slices become very thin and nearly the same size, making it hard for the human eye to compare them. A bar chart is a better choice in that case.'
+  }
+];
+
+// ═══════ RENDER QUIZ ═══════
+const container = document.getElementById('quiz-container');
+let answered = 0;
+let correctCount = 0;
+let quantCorrect = 0;
+let qualCorrect = 0;
+
+function renderQuiz() {
+  container.innerHTML = '';
+  answered = 0; correctCount = 0; quantCorrect = 0; qualCorrect = 0;
+  document.getElementById('scorePanel').classList.remove('show');
+
+  questions.forEach((q, qi) => {
+    const letters = ['A', 'B', 'C', 'D'];
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = `qcard-${q.id}`;
+
+    card.innerHTML = `
+      <span class="q-number ${q.type === 'quant' ? 'quant-q' : 'qual-q'}">
+        ${q.type === 'quant' ? 'Quantitative' : 'Qualitative'} · Q${qi + 1}
+      </span>
+      <div class="q-text">${q.text}</div>
+      <ul class="options-list" id="opts-${q.id}">
+        ${q.options.map((opt, oi) => `
+          <li>
+            <button class="option-btn" data-q="${q.id}" data-o="${oi}" onclick="handleAnswer(${q.id}, ${oi})">
+              <span class="opt-letter">${letters[oi]}</span>
+              <span>${opt}</span>
+            </button>
+          </li>
+        `).join('')}
+      </ul>
+      <div class="explanation" id="expl-${q.id}">${q.explanation}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function handleAnswer(qid, chosen) {
+  const q = questions.find(x => x.id === qid);
+  const card = document.getElementById(`qcard-${qid}`);
+  const btns = card.querySelectorAll('.option-btn');
+  const expl = document.getElementById(`expl-${qid}`);
+
+  // Already answered?
+  if (btns[0].classList.contains('disabled')) return;
+
+  const isCorrect = chosen === q.answer;
+  answered++;
+  if (isCorrect) {
+    correctCount++;
+    if (q.type === 'quant') quantCorrect++;
+    else qualCorrect++;
+  }
+
+  btns.forEach((btn, i) => {
+    btn.classList.add('disabled');
+    if (i === chosen && isCorrect)  btn.classList.add('selected-correct');
+    if (i === chosen && !isCorrect) btn.classList.add('selected-wrong');
+    if (i === q.answer && !isCorrect) btn.classList.add('reveal-correct');
+  });
+
+  card.classList.add(isCorrect ? 'answered-correct' : 'answered-wrong');
+  expl.classList.add('show', isCorrect ? 'correct-expl' : 'wrong-expl');
+
+  if (answered === questions.length) showScore();
+}
+
+function showScore() {
+  const panel = document.getElementById('scorePanel');
+  const pct = Math.round((correctCount / questions.length) * 100);
+  const valEl = document.getElementById('scoreValue');
+  valEl.textContent = `${correctCount}/10`;
+  valEl.className = 'score-big ' + (pct >= 80 ? 'great' : pct >= 50 ? 'ok' : 'low');
+
+  const msgs = pct >= 90 ? '🎉 Outstanding work!'
+    : pct >= 70 ? '👏 Great job! Keep it up!'
+    : pct >= 50 ? '👍 Good effort — review the concepts above.'
+    : '📚 Keep practicing — revisit the Quantitative and Qualitative tabs.';
+  document.getElementById('scoreMsg').textContent = msgs;
+  document.getElementById('quantScore').textContent = quantCorrect;
+  document.getElementById('qualScore').textContent = qualCorrect;
+
+  const name = document.getElementById('studentName').value.trim();
+  document.getElementById('studentLabel').textContent = name ? `Student: ${name}` : '';
+
+  panel.classList.add('show');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function resetQuiz() {
+  document.getElementById('studentName').value = '';
+  renderQuiz();
+  window.scrollTo({ top: document.getElementById('panel-quiz').offsetTop - 80, behavior: 'smooth' });
+}
+
+// Init
+renderQuiz();
+</script>
+</body>
+</html>
