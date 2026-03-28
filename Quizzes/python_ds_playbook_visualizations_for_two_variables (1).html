@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python DS — Visualizations for Two Variables | Week 23</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+3:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0f172a;
+  --paper: #f8fafc;
+  --accent-qq: #0ea5e9;
+  --accent-qq-light: #e0f2fe;
+  --accent-qc: #8b5cf6;
+  --accent-qc-light: #ede9fe;
+  --accent-cc: #f59e0b;
+  --accent-cc-light: #fef3c7;
+  --accent-quiz: #10b981;
+  --accent-quiz-light: #d1fae5;
+  --gray-50: #f8fafc;
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --gray-500: #64748b;
+  --gray-700: #334155;
+  --correct: #10b981;
+  --wrong: #ef4444;
+  --radius: 10px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Source Sans 3', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.65;
+}
+
+/* ── HEADER ── */
+.header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: white;
+  padding: 44px 24px 36px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.header::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 60%, rgba(14,165,233,0.12) 0%, transparent 45%),
+    radial-gradient(circle at 80% 40%, rgba(139,92,246,0.12) 0%, transparent 45%),
+    radial-gradient(circle at 50% 90%, rgba(245,158,11,0.08) 0%, transparent 40%);
+  pointer-events: none;
+}
+.header-inner { position: relative; z-index: 1; max-width: 820px; margin: 0 auto; }
+.week-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 4px 16px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  color: rgba(255,255,255,0.7);
+}
+.header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(24px, 4.5vw, 38px);
+  font-weight: 700;
+  line-height: 1.25;
+  margin-bottom: 6px;
+}
+.header h1 em { font-style: italic; color: var(--accent-qq); }
+.header .tagline { font-size: 15px; color: rgba(255,255,255,0.55); }
+
+/* ── PYODIDE STATUS BAR ── */
+.pyodide-status {
+  text-align: center;
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+.pyodide-status.loading { background: #fef3c7; color: #92400e; }
+.pyodide-status.ready   { background: #d1fae5; color: #065f46; }
+.pyodide-status.error   { background: #fee2e2; color: #991b1b; }
+
+/* ── TAB BAR ── */
+.tab-bar {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  max-width: 420px;
+  margin: 0 auto;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--paper);
+  padding: 16px 24px 12px;
+}
+.tab-btn {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 32px;
+  border: 2px solid var(--gray-200);
+  border-radius: 100px;
+  background: white;
+  color: var(--gray-400);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.tab-btn:hover { border-color: var(--gray-300); color: var(--ink); }
+.tab-btn.active[data-tab="concepts"] { background: var(--ink); border-color: var(--ink); color: white; }
+.tab-btn.active[data-tab="quiz"]     { background: var(--accent-quiz); border-color: var(--accent-quiz); color: white; }
+
+/* ── CONTENT ── */
+.content { max-width: 820px; margin: 0 auto; padding: 20px 24px 60px; }
+.tab-panel { display: none; animation: fadeIn 0.35s ease; }
+.tab-panel.active { display: block; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+/* ── CARDS ── */
+.card {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+}
+.card h2 { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 4px; }
+.card .sub { font-size: 14px; color: var(--gray-500); margin-bottom: 18px; }
+.card h3 { font-size: 15px; font-weight: 700; margin: 22px 0 8px; display: flex; align-items: center; gap: 8px; }
+.card h3:first-child { margin-top: 0; }
+.card p { font-size: 15px; color: var(--gray-700); margin-bottom: 10px; }
+
+.section-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 100px; margin-bottom: 14px;
+}
+.badge-qq { background: var(--accent-qq-light); color: var(--accent-qq); }
+.badge-qc { background: var(--accent-qc-light); color: var(--accent-qc); }
+.badge-cc { background: var(--accent-cc-light); color: var(--accent-cc); }
+
+.callout {
+  border-radius: var(--radius); padding: 14px 18px; margin: 14px 0; font-size: 14px; line-height: 1.6;
+}
+.callout-qq   { background: var(--accent-qq-light); border-left: 4px solid var(--accent-qq); }
+.callout-qc   { background: var(--accent-qc-light); border-left: 4px solid var(--accent-qc); }
+.callout-cc   { background: var(--accent-cc-light); border-left: 4px solid var(--accent-cc); }
+.callout-info { background: #f0fdf4; border-left: 4px solid var(--accent-quiz); }
+.callout strong { font-weight: 700; }
+
+/* ── CODE BLOCKS (editable + runnable) ── */
+.code-wrapper { margin: 14px 0; }
+.code-block {
+  background: #0f172a;
+  border-radius: var(--radius) var(--radius) 0 0;
+  overflow: hidden;
+}
+.code-block .code-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,255,255,0.04);
+  color: #64748b;
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 7px 16px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.code-block textarea {
+  display: block;
+  width: 100%;
+  min-height: 180px;
+  padding: 18px 20px;
+  font-family: 'Fira Code', monospace;
+  font-size: 13px;
+  line-height: 1.75;
+  color: #e2e8f0;
+  background: #0f172a;
+  border: none;
+  outline: none;
+  resize: vertical;
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: auto;
+  tab-size: 4;
+}
+.run-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #1e293b;
+  padding: 8px 16px;
+  border-radius: 0 0 var(--radius) var(--radius);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-top: none;
+}
+.btn-run {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 20px;
+  border: none;
+  border-radius: 6px;
+  background: #22c55e;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-run:hover { background: #16a34a; }
+.btn-run:disabled { background: #475569; cursor: wait; }
+.run-status { font-size: 12px; color: #94a3b8; }
+
+/* ── OUTPUT AREA ── */
+.code-output {
+  margin-top: 8px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: white;
+  border: 1px solid var(--gray-200);
+  display: none;
+}
+.code-output.visible { display: block; }
+.code-output img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+.code-output .text-output {
+  padding: 12px 16px;
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--gray-700);
+  white-space: pre-wrap;
+  background: var(--gray-50);
+}
+.code-output .error-output {
+  padding: 12px 16px;
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #dc2626;
+  background: #fef2f2;
+  white-space: pre-wrap;
+}
+
+/* ── KV, VIZ GRID, TABLE ── */
+.kv-row { display: flex; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--gray-100); font-size: 14px; align-items: flex-start; }
+.kv-row:last-child { border-bottom: none; }
+.kv-label { font-weight: 700; min-width: 120px; flex-shrink: 0; }
+.kv-value { color: var(--gray-700); }
+
+.viz-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin: 18px 0; }
+.viz-card { border: 2px solid var(--gray-200); border-radius: var(--radius); padding: 18px; text-align: center; transition: all 0.2s; }
+.viz-card:hover { border-color: var(--gray-300); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.viz-card .viz-icon { font-size: 36px; margin-bottom: 8px; display: block; }
+.viz-card .viz-name { font-weight: 700; font-size: 14px; margin-bottom: 2px; }
+.viz-card .viz-fn { font-family: 'Fira Code', monospace; font-size: 11px; color: var(--gray-400); }
+
+.ref-table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 14px; }
+.ref-table th { text-align: left; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--gray-400); padding: 8px 10px; border-bottom: 2px solid var(--gray-200); }
+.ref-table td { padding: 10px; border-bottom: 1px solid var(--gray-100); vertical-align: top; }
+.ref-table code { font-family: 'Fira Code', monospace; font-size: 12px; background: var(--gray-100); padding: 2px 7px; border-radius: 4px; }
+
+/* ── QUIZ ── */
+.quiz-header { text-align: center; padding: 10px 0 20px; }
+.quiz-header h2 { font-family: 'Playfair Display', serif; font-size: 28px; margin-bottom: 4px; }
+.quiz-header p { color: var(--gray-500); font-size: 14px; }
+.student-info { display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; margin-bottom: 18px; }
+.student-info input {
+  font-family: 'Source Sans 3', sans-serif; font-size: 14px; padding: 10px 16px;
+  border: 2px solid var(--gray-200); border-radius: var(--radius); outline: none;
+  width: 280px; transition: border-color 0.2s;
+}
+.student-info input:focus { border-color: var(--accent-quiz); }
+.question-card {
+  background: white; border: 2px solid var(--gray-200); border-radius: var(--radius-lg);
+  padding: 26px; margin-bottom: 14px; transition: border-color 0.3s;
+}
+.question-card.answered-correct { border-color: var(--correct); }
+.question-card.answered-wrong   { border-color: var(--wrong); }
+.q-badge {
+  display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; padding: 3px 10px; border-radius: 6px; margin-bottom: 10px;
+}
+.q-badge.qq-q { background: var(--accent-qq-light); color: var(--accent-qq); }
+.q-badge.qc-q { background: var(--accent-qc-light); color: var(--accent-qc); }
+.q-badge.cc-q { background: var(--accent-cc-light); color: var(--accent-cc); }
+.q-text { font-size: 15px; font-weight: 600; margin-bottom: 14px; line-height: 1.5; }
+.options-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.opt-btn {
+  display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+  padding: 11px 14px; border: 2px solid var(--gray-200); border-radius: var(--radius);
+  background: white; font-family: 'Source Sans 3', sans-serif; font-size: 14px;
+  color: var(--ink); cursor: pointer; transition: all 0.2s;
+}
+.opt-btn:hover:not(.locked) { border-color: var(--gray-300); background: var(--gray-50); }
+.opt-btn .letter {
+  width: 26px; height: 26px; border-radius: 7px; background: var(--gray-100);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 12px; flex-shrink: 0; transition: all 0.2s;
+}
+.opt-btn.sel-correct { border-color: var(--correct); background: #d1fae5; }
+.opt-btn.sel-correct .letter { background: var(--correct); color: white; }
+.opt-btn.sel-wrong { border-color: var(--wrong); background: #fee2e2; }
+.opt-btn.sel-wrong .letter { background: var(--wrong); color: white; }
+.opt-btn.show-correct { border-color: var(--correct); background: #d1fae5; }
+.opt-btn.show-correct .letter { background: var(--correct); color: white; }
+.opt-btn.locked { cursor: default; opacity: 0.65; }
+.opt-btn.locked.sel-correct, .opt-btn.locked.sel-wrong, .opt-btn.locked.show-correct { opacity: 1; }
+.explanation { margin-top: 10px; padding: 10px 14px; border-radius: var(--radius); font-size: 13px; line-height: 1.6; display: none; }
+.explanation.visible { display: block; }
+.explanation.ok  { background: #d1fae5; color: #065f46; }
+.explanation.bad { background: #fee2e2; color: #991b1b; }
+.submit-row { text-align: center; margin: 24px 0 8px; }
+.btn-submit {
+  font-family: 'Source Sans 3', sans-serif; font-size: 15px; font-weight: 700;
+  padding: 12px 40px; border: none; border-radius: 100px;
+  background: var(--accent-quiz); color: white; cursor: pointer;
+  transition: all 0.2s; box-shadow: 0 2px 8px rgba(16,185,129,0.25);
+}
+.btn-submit:hover { background: #059669; transform: translateY(-1px); }
+.btn-submit:disabled { background: var(--gray-300); color: var(--gray-500); cursor: default; box-shadow: none; transform: none; }
+.score-panel {
+  background: white; border: 2px solid var(--gray-200); border-radius: var(--radius-lg);
+  padding: 36px 32px; text-align: center; margin-top: 20px; display: none;
+}
+.score-panel.show { display: block; animation: fadeIn 0.4s ease; }
+.score-big { font-family: 'Playfair Display', serif; font-size: 60px; line-height: 1; margin: 8px 0; }
+.score-big.great { color: var(--correct); }
+.score-big.ok    { color: #f59e0b; }
+.score-big.low   { color: var(--wrong); }
+.score-label { font-size: 13px; color: var(--gray-400); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
+.score-msg { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+.score-breakdown { display: flex; justify-content: center; gap: 28px; margin: 14px 0 18px; font-size: 13px; flex-wrap: wrap; }
+.score-breakdown span { display: flex; align-items: center; gap: 5px; }
+.score-breakdown .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.student-display { font-size: 13px; color: var(--gray-500); margin-bottom: 14px; }
+.btn-reset {
+  font-family: 'Source Sans 3', sans-serif; font-size: 14px; font-weight: 600;
+  padding: 9px 26px; border: 2px solid var(--gray-200); border-radius: 100px;
+  background: white; color: var(--ink); cursor: pointer; transition: all 0.2s;
+}
+.btn-reset:hover { border-color: var(--accent-quiz); color: var(--accent-quiz); }
+
+@media (max-width: 600px) {
+  .card { padding: 20px; }
+  .code-block textarea { padding: 14px 16px; font-size: 12px; min-height: 140px; }
+  .tab-btn { padding: 9px 22px; font-size: 13px; }
+  .viz-grid { grid-template-columns: 1fr; }
+  .question-card { padding: 18px; }
+  .student-info input { width: 100%; }
+}
+@media print {
+  .tab-bar, .btn-reset, .btn-submit, .run-bar, .pyodide-status { display: none; }
+  .score-panel { border: 2px solid #000; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════ HEADER ═══════ -->
+<div class="header">
+  <div class="header-inner">
+    <div class="week-badge">Week 23 · Python DS</div>
+    <h1>Visualizing <em>Relationships</em> Between Two Variables</h1>
+    <p class="tagline">Scatter plots, grouped bars, side-by-side box plots &amp; more</p>
+  </div>
+</div>
+
+<!-- Pyodide loading status -->
+<div class="pyodide-status loading" id="pyStatus">⏳ Loading Python environment (one-time setup)…</div>
+
+<!-- ═══════ TABS ═══════ -->
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="concepts" onclick="switchTab('concepts')">📖 Concepts</button>
+  <button class="tab-btn" data-tab="quiz" onclick="switchTab('quiz')">✏️ Quiz</button>
+</div>
+
+<div class="content">
+
+<!-- ═══════════════════════════════════════ -->
+<!--           TAB 1: CONCEPTS              -->
+<!-- ═══════════════════════════════════════ -->
+<div class="tab-panel active" id="panel-concepts">
+
+  <!-- INTRO -->
+  <div class="card">
+    <h2>Why Two Variables?</h2>
+    <p class="sub">Moving beyond single-variable charts</p>
+    <p>Last week you learned how to visualize <strong>one variable at a time</strong> — histograms for quantitative data, bar charts for qualitative data. This week we ask a bigger question: <strong>how are two variables related to each other?</strong></p>
+    <p>The right chart depends on what <em>types</em> of variables you are comparing:</p>
+    <div class="kv-row"><span class="kv-label" style="color:var(--accent-qq);">Quant vs Quant</span><span class="kv-value">Two numerical variables — e.g., height vs weight, hours studied vs test score</span></div>
+    <div class="kv-row"><span class="kv-label" style="color:var(--accent-qc);">Quant vs Qual</span><span class="kv-value">A numerical variable split by a category — e.g., test scores by grade level</span></div>
+    <div class="kv-row"><span class="kv-label" style="color:var(--accent-cc);">Qual vs Qual</span><span class="kv-value">Two categorical variables — e.g., favorite sport vs gender</span></div>
+    <div class="callout callout-info"><strong>💡 Tip:</strong> Click the <strong>▶ Run</strong> button below any code block to execute the Python code and see the chart!</div>
+  </div>
+
+  <!-- ═══════ SECTION 1: QUANT vs QUANT ═══════ -->
+  <div class="card">
+    <div class="section-badge badge-qq">📐 Quantitative vs Quantitative</div>
+    <h2>Scatter Plot &amp; Line Chart</h2>
+    <p class="sub">Best charts when both variables are numbers</p>
+    <div class="viz-grid">
+      <div class="viz-card"><span class="viz-icon">⬡</span><div class="viz-name">Scatter Plot</div><div class="viz-fn">plt.scatter()</div></div>
+      <div class="viz-card"><span class="viz-icon">📈</span><div class="viz-name">Line Chart</div><div class="viz-fn">plt.plot()</div></div>
+    </div>
+  </div>
+
+  <!-- Scatter Plot -->
+  <div class="card">
+    <h3>⬡ Scatter Plot</h3>
+    <p>A scatter plot places one variable on the x-axis and another on the y-axis. Each data point becomes a <strong>dot</strong>. The pattern of dots reveals whether the variables are positively correlated, negatively correlated, or have no clear relationship.</p>
+    <div class="callout callout-qq"><strong>When to use:</strong> Both variables are quantitative and you want to see if a relationship (correlation) exists — e.g., "Do taller students weigh more?"</div>
+
+    <div class="code-wrapper">
+      <div class="code-block"><div class="code-label"><span>Python — Scatter Plot</span></div>
+<textarea id="code-1" spellcheck="false">import matplotlib.pyplot as plt
+
+# Hours studied vs Test score
+hours  = [1, 2, 3, 4, 5, 6, 7, 8]
+scores = [52, 58, 65, 70, 74, 80, 85, 92]
+
+plt.scatter(hours, scores, color='dodgerblue', s=80)
+plt.title('Hours Studied vs Test Score')
+plt.xlabel('Hours Studied')
+plt.ylabel('Test Score')
+plt.show()</textarea></div>
+      <div class="run-bar">
+        <button class="btn-run" onclick="runCode('code-1')">▶ Run</button>
+        <span class="run-status" id="status-code-1"></span>
+      </div>
+      <div class="code-output" id="output-code-1"></div>
+    </div>
+
+    <h3>🔑 Key Parameters</h3>
+    <div class="kv-row"><span class="kv-label"><code>s</code></span><span class="kv-value">Size of the dots (default ~36). Larger values make dots bigger.</span></div>
+    <div class="kv-row"><span class="kv-label"><code>color</code></span><span class="kv-value">Color of the dots (e.g., <code>'dodgerblue'</code>, <code>'#e74c3c'</code>)</span></div>
+    <div class="kv-row"><span class="kv-label"><code>alpha</code></span><span class="kv-value">Transparency from 0 (invisible) to 1 (solid). Useful when dots overlap.</span></div>
+    <div class="kv-row"><span class="kv-label"><code>marker</code></span><span class="kv-value">Dot shape — <code>'o'</code> circle, <code>'s'</code> square, <code>'^'</code> triangle, <code>'x'</code> cross</span></div>
+  </div>
+
+  <!-- Line Chart for two series -->
+  <div class="card">
+    <h3>📈 Line Chart (Quant vs Quant over time)</h3>
+    <p>When the x-axis variable is <strong>time</strong> (or any ordered sequence), a line chart connects the dots to highlight <strong>trends</strong>. You can overlay multiple lines to compare two quantitative series.</p>
+    <div class="callout callout-qq"><strong>When to use:</strong> One quantitative variable changes over time and you want to show the trend — e.g., "How did temperature and rainfall change each month?"</div>
+
+    <div class="code-wrapper">
+      <div class="code-block"><div class="code-label"><span>Python — Two Lines on One Chart</span></div>
+<textarea id="code-2" spellcheck="false">import matplotlib.pyplot as plt
+
+months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
+city_a = [30, 35, 45, 55, 65, 75]
+city_b = [50, 52, 58, 63, 70, 78]
+
+plt.plot(months, city_a, marker='o', label='City A')
+plt.plot(months, city_b, marker='s', label='City B')
+plt.title('Monthly Temperatures: City A vs City B')
+plt.xlabel('Month')
+plt.ylabel('Temperature (°F)')
+plt.legend()
+plt.show()</textarea></div>
+      <div class="run-bar">
+        <button class="btn-run" onclick="runCode('code-2')">▶ Run</button>
+        <span class="run-status" id="status-code-2"></span>
+      </div>
+      <div class="code-output" id="output-code-2"></div>
+    </div>
+  </div>
+
+  <!-- ═══════ SECTION 2: QUANT vs QUAL ═══════ -->
+  <div class="card">
+    <div class="section-badge badge-qc">🔀 Quantitative vs Qualitative</div>
+    <h2>Grouped Bar Chart &amp; Side-by-Side Box Plot</h2>
+    <p class="sub">Comparing a numerical variable across categories</p>
+    <div class="viz-grid">
+      <div class="viz-card"><span class="viz-icon">📊</span><div class="viz-name">Grouped Bar Chart</div><div class="viz-fn">plt.bar()</div></div>
+      <div class="viz-card"><span class="viz-icon">📦</span><div class="viz-name">Side-by-Side Box Plot</div><div class="viz-fn">plt.boxplot()</div></div>
+    </div>
+  </div>
+
+  <!-- Grouped Bar Chart -->
+  <div class="card">
+    <h3>📊 Grouped Bar Chart</h3>
+    <p>A grouped bar chart places bars for different categories <strong>side by side</strong>, making it easy to compare a quantitative measure across groups. You control bar positions using numerical x-values and offsets.</p>
+    <div class="callout callout-qc"><strong>When to use:</strong> You want to compare average values (or totals) of a quantitative variable across different categories — e.g., "Average test score by grade level."</div>
+
+    <div class="code-wrapper">
+      <div class="code-block"><div class="code-label"><span>Python — Grouped Bar Chart</span></div>
+<textarea id="code-3" spellcheck="false">import matplotlib.pyplot as plt
+import numpy as np
+
+subjects  = ['Math', 'Science', 'English']
+boys_avg  = [78, 85, 72]
+girls_avg = [82, 80, 88]
+
+x = np.arange(len(subjects))
+width = 0.35
+
+plt.bar(x - width/2, boys_avg,  width, label='Boys',  color='steelblue')
+plt.bar(x + width/2, girls_avg, width, label='Girls', color='coral')
+
+plt.xticks(x, subjects)
+plt.title('Average Scores by Subject and Gender')
+plt.ylabel('Average Score')
+plt.legend()
+plt.show()</textarea></div>
+      <div class="run-bar">
+        <button class="btn-run" onclick="runCode('code-3')">▶ Run</button>
+        <span class="run-status" id="status-code-3"></span>
+      </div>
+      <div class="code-output" id="output-code-3"></div>
+    </div>
+
+    <h3>🔑 Key Technique</h3>
+    <p>Use <code>np.arange()</code> to create numerical x-positions, then offset each group by <code>±width/2</code>. Call <code>plt.xticks()</code> to replace the numbers with category labels.</p>
+  </div>
+
+  <!-- Side-by-Side Box Plot -->
+  <div class="card">
+    <h3>📦 Side-by-Side Box Plot</h3>
+    <p>Placing multiple box plots next to each other lets you compare the <strong>distribution</strong> of a quantitative variable across different categories — including median, spread, and outliers for each group.</p>
+    <div class="callout callout-qc"><strong>When to use:</strong> You want to compare the full distribution (not just averages) of a quantitative variable across categories — e.g., "How do test score distributions differ by class period?"</div>
+
+    <div class="code-wrapper">
+      <div class="code-block"><div class="code-label"><span>Python — Side-by-Side Box Plot</span></div>
+<textarea id="code-4" spellcheck="false">import matplotlib.pyplot as plt
+
+# Test scores by class period
+period_1 = [72, 85, 90, 67, 88, 78, 82, 91]
+period_2 = [65, 70, 75, 80, 60, 72, 68, 74]
+period_3 = [90, 88, 95, 92, 85, 87, 91, 93]
+
+plt.boxplot([period_1, period_2, period_3],
+            labels=['Period 1', 'Period 2', 'Period 3'],
+            patch_artist=True,
+            boxprops=dict(facecolor='lightskyblue'))
+plt.title('Test Scores by Class Period')
+plt.ylabel('Score')
+plt.show()</textarea></div>
+      <div class="run-bar">
+        <button class="btn-run" onclick="runCode('code-4')">▶ Run</button>
+        <span class="run-status" id="status-code-4"></span>
+      </div>
+      <div class="code-output" id="output-code-4"></div>
+    </div>
+
+    <h3>🔑 Key Technique</h3>
+    <p>Pass a <strong>list of lists</strong> to <code>plt.boxplot()</code> — each inner list becomes its own box. Use the <code>labels</code> parameter to name the categories.</p>
+  </div>
+
+  <!-- ═══════ SECTION 3: QUAL vs QUAL ═══════ -->
+  <div class="card">
+    <div class="section-badge badge-cc">🏷️ Qualitative vs Qualitative</div>
+    <h2>Grouped Bar Chart &amp; Stacked Bar Chart</h2>
+    <p class="sub">Comparing counts when both variables are categories</p>
+    <div class="viz-grid">
+      <div class="viz-card"><span class="viz-icon">📊</span><div class="viz-name">Grouped Bar Chart</div><div class="viz-fn">plt.bar()</div></div>
+      <div class="viz-card"><span class="viz-icon">📊</span><div class="viz-name">Stacked Bar Chart</div><div class="viz-fn">plt.bar(bottom=…)</div></div>
+    </div>
+  </div>
+
+  <!-- Grouped Bar (Qual vs Qual) -->
+  <div class="card">
+    <h3>📊 Grouped Bar Chart (two categorical variables)</h3>
+    <p>When both variables are categorical, a grouped bar chart shows counts for each <strong>combination</strong> of categories side by side. One category goes on the x-axis; the other is represented by different colored bars.</p>
+    <div class="callout callout-cc"><strong>When to use:</strong> You want to compare counts across every combination of two categorical variables — e.g., "How many boys vs girls chose each favorite sport?"</div>
+
+    <div class="code-wrapper">
+      <div class="code-block"><div class="code-label"><span>Python — Grouped Bar (Qual vs Qual)</span></div>
+<textarea id="code-5" spellcheck="false">import matplotlib.pyplot as plt
+import numpy as np
+
+sports = ['Soccer', 'Basketball', 'Tennis']
+boys   = [10, 8, 3]
+girls  = [7, 4, 9]
+
+x = np.arange(len(sports))
+width = 0.35
+
+plt.bar(x - width/2, boys,  width, label='Boys',  color='#3b82f6')
+plt.bar(x + width/2, girls, width, label='Girls', color='#f472b6')
+
+plt.xticks(x, sports)
+plt.title('Favorite Sport by Gender')
+plt.ylabel('Number of Students')
+plt.legend()
+plt.show()</textarea></div>
+      <div class="run-bar">
+        <button class="btn-run" onclick="runCode('code-5')">▶ Run</button>
+        <span class="run-status" id="status-code-5"></span>
+      </div>
+      <div class="code-output" id="output-code-5"></div>
+    </div>
+  </div>
+
+  <!-- Stacked Bar Chart -->
+  <div class="card">
+    <h3>📊 Stacked Bar Chart</h3>
+    <p>A stacked bar chart places one group's bars <strong>on top of</strong> the other, so each bar shows the <strong>total</strong> and you can see each group's contribution. Use the <code>bottom</code> parameter to stack.</p>
+    <div class="callout callout-cc"><strong>When to use:</strong> You want to show totals AND the breakdown within each category — e.g., "Total votes per sport, split by gender."</div>
+
+    <div class="code-wrapper">
+      <div class="code-block"><div class="code-label"><span>Python — Stacked Bar Chart</span></div>
+<textarea id="code-6" spellcheck="false">import matplotlib.pyplot as plt
+
+sports = ['Soccer', 'Basketball', 'Tennis']
+boys   = [10, 8, 3]
+girls  = [7, 4, 9]
+
+plt.bar(sports, boys,  label='Boys',  color='#3b82f6')
+plt.bar(sports, girls, label='Girls', color='#f472b6',
+        bottom=boys)
+
+plt.title('Favorite Sport by Gender (Stacked)')
+plt.ylabel('Number of Students')
+plt.legend()
+plt.show()</textarea></div>
+      <div class="run-bar">
+        <button class="btn-run" onclick="runCode('code-6')">▶ Run</button>
+        <span class="run-status" id="status-code-6"></span>
+      </div>
+      <div class="code-output" id="output-code-6"></div>
+    </div>
+
+    <h3>🔑 Key Parameter</h3>
+    <div class="kv-row"><span class="kv-label"><code>bottom</code></span><span class="kv-value">A list of values that defines where each bar starts. Set it to the first group's data to stack the second group on top.</span></div>
+  </div>
+
+  <!-- QUICK REFERENCE -->
+  <div class="card">
+    <h2>Quick Reference Table</h2>
+    <table class="ref-table">
+      <thead><tr><th>Variable Combo</th><th>Best Chart(s)</th><th>Function</th></tr></thead>
+      <tbody>
+        <tr><td style="color:var(--accent-qq);font-weight:700;">Quant vs Quant</td><td>Scatter Plot</td><td><code>plt.scatter()</code></td></tr>
+        <tr><td style="color:var(--accent-qq);font-weight:700;">Quant vs Quant (time)</td><td>Line Chart</td><td><code>plt.plot()</code></td></tr>
+        <tr><td style="color:var(--accent-qc);font-weight:700;">Quant vs Qual</td><td>Grouped Bar Chart</td><td><code>plt.bar()</code> with offsets</td></tr>
+        <tr><td style="color:var(--accent-qc);font-weight:700;">Quant vs Qual</td><td>Side-by-Side Box Plot</td><td><code>plt.boxplot()</code></td></tr>
+        <tr><td style="color:var(--accent-cc);font-weight:700;">Qual vs Qual</td><td>Grouped Bar Chart</td><td><code>plt.bar()</code> with offsets</td></tr>
+        <tr><td style="color:var(--accent-cc);font-weight:700;">Qual vs Qual</td><td>Stacked Bar Chart</td><td><code>plt.bar(bottom=…)</code></td></tr>
+      </tbody>
+    </table>
+    <div class="callout callout-info"><strong>Remember:</strong> Always add a <code>plt.title()</code>, <code>plt.xlabel()</code>, <code>plt.ylabel()</code>, and <code>plt.legend()</code> to make your charts informative!</div>
+  </div>
+
+</div><!-- /panel-concepts -->
+
+<!-- ═══════════════════════════════════════ -->
+<!--            TAB 2: QUIZ                 -->
+<!-- ═══════════════════════════════════════ -->
+<div class="tab-panel" id="panel-quiz">
+
+  <div class="quiz-header">
+    <h2>📝 Two-Variable Visualization Quiz</h2>
+    <p>Answer all 10 questions, then click <strong>Submit</strong> to see your score.</p>
+  </div>
+
+  <div class="student-info">
+    <input type="text" id="studentName" placeholder="Enter your name…">
+  </div>
+
+  <div id="quiz-container"></div>
+
+  <div class="submit-row">
+    <button class="btn-submit" id="btnSubmit" onclick="submitQuiz()">Submit Quiz</button>
+  </div>
+
+  <div class="score-panel" id="scorePanel">
+    <div class="score-label">Your Score</div>
+    <div class="score-big" id="scoreValue"></div>
+    <div class="score-msg" id="scoreMsg"></div>
+    <div class="score-breakdown">
+      <span><span class="dot" style="background:var(--accent-qq)"></span> Quant vs Quant: <strong id="qqScore">0</strong>/4</span>
+      <span><span class="dot" style="background:var(--accent-qc)"></span> Quant vs Qual: <strong id="qcScore">0</strong>/3</span>
+      <span><span class="dot" style="background:var(--accent-cc)"></span> Qual vs Qual: <strong id="ccScore">0</strong>/3</span>
+    </div>
+    <div class="student-display" id="studentDisplay"></div>
+    <button class="btn-reset" onclick="resetQuiz()">↻ Retake Quiz</button>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<!-- ═══════ PYODIDE ═══════ -->
+<script src="https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js"></script>
+
+<script>
+/* ═══════ PYODIDE SETUP ═══════ */
+let pyodideReady = false;
+let pyodideInstance = null;
+
+async function initPyodide() {
+  const statusEl = document.getElementById('pyStatus');
+  try {
+    pyodideInstance = await loadPyodide();
+    await pyodideInstance.loadPackage(['matplotlib', 'numpy']);
+
+    // Configure matplotlib for headless PNG output
+    await pyodideInstance.runPythonAsync(`
+import matplotlib
+matplotlib.use('AGG')
+import matplotlib.pyplot as plt
+import io, base64
+
+def _capture_plot():
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', dpi=100, bbox_inches='tight',
+                facecolor='white', edgecolor='none')
+    plt.close('all')
+    buf.seek(0)
+    return base64.b64encode(buf.read()).decode('utf-8')
+`);
+    pyodideReady = true;
+    statusEl.className = 'pyodide-status ready';
+    statusEl.textContent = '✅ Python environment ready — click ▶ Run on any code block!';
+    setTimeout(() => { statusEl.style.display = 'none'; }, 4000);
+  } catch(e) {
+    statusEl.className = 'pyodide-status error';
+    statusEl.textContent = '❌ Failed to load Python. Try refreshing the page.';
+    console.error(e);
+  }
+}
+
+initPyodide();
+
+/* ═══════ RUN CODE ═══════ */
+async function runCode(id) {
+  if (!pyodideReady) {
+    alert('Python is still loading. Please wait a moment and try again.');
+    return;
+  }
+
+  const textarea = document.getElementById(id);
+  const outputEl = document.getElementById('output-' + id);
+  const statusEl = document.getElementById('status-' + id);
+  const btn = textarea.closest('.code-wrapper').querySelector('.btn-run');
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Running…';
+  statusEl.textContent = '';
+  outputEl.innerHTML = '';
+  outputEl.classList.remove('visible');
+
+  const code = textarea.value;
+
+  try {
+    // Capture stdout
+    await pyodideInstance.runPythonAsync(`
+import sys, io as _io
+_stdout_capture = _io.StringIO()
+sys.stdout = _stdout_capture
+`);
+
+    // Run user code
+    await pyodideInstance.runPythonAsync(code);
+
+    // Check if a figure was created
+    const hasPlot = await pyodideInstance.runPythonAsync(`
+len(plt.get_fignums()) > 0
+`);
+
+    let html = '';
+
+    if (hasPlot) {
+      const imgData = await pyodideInstance.runPythonAsync(`_capture_plot()`);
+      html += `<img src="data:image/png;base64,${imgData}" alt="matplotlib output">`;
+    }
+
+    // Get stdout
+    const stdout = await pyodideInstance.runPythonAsync(`
+sys.stdout = sys.__stdout__
+_stdout_capture.getvalue()
+`);
+
+    if (stdout && stdout.trim()) {
+      html += `<div class="text-output">${escapeHtml(stdout)}</div>`;
+    }
+
+    if (html) {
+      outputEl.innerHTML = html;
+      outputEl.classList.add('visible');
+    }
+
+    statusEl.textContent = '✓ Done';
+    statusEl.style.color = '#22c55e';
+
+  } catch(err) {
+    // Reset stdout on error
+    await pyodideInstance.runPythonAsync(`
+import sys
+sys.stdout = sys.__stdout__
+plt.close('all')
+`);
+    outputEl.innerHTML = `<div class="error-output">${escapeHtml(err.message)}</div>`;
+    outputEl.classList.add('visible');
+    statusEl.textContent = '✗ Error';
+    statusEl.style.color = '#ef4444';
+  }
+
+  btn.disabled = false;
+  btn.textContent = '▶ Run';
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+/* ═══════ TAB SWITCHING ═══════ */
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+  document.getElementById(`panel-${tab}`).classList.add('active');
+}
+
+/* ═══════ QUIZ ═══════ */
+const questions = [
+  { id:1, type:'qq', badge:'Quant vs Quant',
+    text:'You want to see if there is a relationship between the number of hours students sleep and their test scores. Which chart should you use?',
+    options:['Pie Chart','Scatter Plot','Stacked Bar Chart','Histogram'], answer:1,
+    explanation:'A scatter plot is the best choice for showing the relationship between two quantitative variables (hours of sleep and test scores).' },
+  { id:2, type:'qq', badge:'Quant vs Quant',
+    text:'Which matplotlib function creates a scatter plot?',
+    options:['plt.dot()','plt.scatter()','plt.points()','plt.plot_scatter()'], answer:1,
+    explanation:'The correct function is plt.scatter(). It takes x and y values and plots individual dots to reveal relationships.' },
+  { id:3, type:'qq', badge:'Quant vs Quant',
+    text:'In a scatter plot, the dots trend upward from left to right. What kind of relationship does this show?',
+    options:['Negative correlation','No correlation','Positive correlation','Inverse correlation'], answer:2,
+    explanation:'When dots trend upward from left to right, it shows a positive correlation — as one variable increases, the other also tends to increase.' },
+  { id:4, type:'qq', badge:'Quant vs Quant',
+    text:'You have monthly temperatures for two cities and want to compare their trends over time. Which approach works best?',
+    options:['Two pie charts','Two separate histograms','Two lines on the same line chart','A single box plot'], answer:2,
+    explanation:"Plotting two lines on the same chart with plt.plot() and plt.legend() lets you directly compare how both cities' temperatures change over the same months." },
+  { id:5, type:'qc', badge:'Quant vs Qual',
+    text:'You want to compare the average height of students in Grade 6, Grade 7, and Grade 8. Which chart is best?',
+    options:['Scatter Plot','Grouped Bar Chart','Pie Chart','Line Chart'], answer:1,
+    explanation:'A grouped bar chart is ideal here because you are comparing a quantitative variable (average height) across qualitative categories (grade levels).' },
+  { id:6, type:'qc', badge:'Quant vs Qual',
+    text:'To compare the full distribution of test scores (median, quartiles, outliers) for three different class periods, which chart should you use?',
+    options:['Three Pie Charts','A Stacked Bar Chart','Side-by-Side Box Plots','A Scatter Plot'], answer:2,
+    explanation:'Side-by-side box plots show the full distribution for each group — including the median, quartiles, and outliers — making them perfect for comparing distributions across categories.' },
+  { id:7, type:'qc', badge:'Quant vs Qual',
+    text:'In a side-by-side box plot, you pass the data as a list of lists to plt.boxplot(). What does each inner list represent?',
+    options:['A single data point','The data for one category/group','The colors for the boxes','The x-axis labels'], answer:1,
+    explanation:'Each inner list contains the data values for one category. For example, [period_1, period_2, period_3] creates three boxes, one for each period.' },
+  { id:8, type:'cc', badge:'Qual vs Qual',
+    text:'You surveyed students about their favorite subject (Math, Science, English) and their favorite sport (Soccer, Basketball). Which chart best shows the relationship between these two categorical variables?',
+    options:['Scatter Plot','Histogram','Grouped Bar Chart','Line Chart'], answer:2,
+    explanation:'A grouped bar chart is best for showing the count (or frequency) of each combination of two categorical variables side by side.' },
+  { id:9, type:'cc', badge:'Qual vs Qual',
+    text:'In a stacked bar chart, what does the "bottom" parameter do?',
+    options:['Sets the color of the bottom bar','Tells the second set of bars where to start (stacking on top of the first)','Moves the chart to the bottom of the page','Adds labels below the x-axis'], answer:1,
+    explanation:"The bottom parameter tells matplotlib where each bar should start vertically. Setting bottom to the first group's values makes the second group stack directly on top." },
+  { id:10, type:'cc', badge:'Qual vs Qual',
+    text:'A grouped bar chart shows Boys and Girls side by side for each sport. A stacked bar chart stacks Boys on top of Girls for each sport. What extra information does the stacked version show that the grouped version does not?',
+    options:['The individual count for each group','The total count for each sport','The percentage for each sport','The average count across all sports'], answer:1,
+    explanation:'In a stacked bar chart, the total height of each bar represents the combined total for that sport, which is not as easy to see in a grouped bar chart.' }
+];
+
+const container = document.getElementById('quiz-container');
+let selections = {};
+let submitted = false;
+
+function renderQuiz() {
+  container.innerHTML = '';
+  selections = {};
+  submitted = false;
+  document.getElementById('scorePanel').classList.remove('show');
+  document.getElementById('btnSubmit').disabled = false;
+  document.getElementById('btnSubmit').textContent = 'Submit Quiz';
+
+  questions.forEach((q, qi) => {
+    const letters = ['A','B','C','D'];
+    const badgeClass = q.type === 'qq' ? 'qq-q' : q.type === 'qc' ? 'qc-q' : 'cc-q';
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = `qcard-${q.id}`;
+    card.innerHTML = `
+      <span class="q-badge ${badgeClass}">${q.badge} · Q${qi+1}</span>
+      <div class="q-text">${q.text}</div>
+      <ul class="options-list">
+        ${q.options.map((opt, oi) => `
+          <li><button class="opt-btn" id="opt-${q.id}-${oi}" onclick="pick(${q.id},${oi})">
+            <span class="letter">${letters[oi]}</span><span>${opt}</span>
+          </button></li>
+        `).join('')}
+      </ul>
+      <div class="explanation" id="expl-${q.id}">${q.explanation}</div>`;
+    container.appendChild(card);
+  });
+}
+
+function pick(qid, chosen) {
+  if (submitted) return;
+  selections[qid] = chosen;
+  const q = questions.find(x => x.id === qid);
+  q.options.forEach((_, i) => {
+    const btn = document.getElementById(`opt-${qid}-${i}`);
+    if (i === chosen) {
+      btn.style.borderColor = 'var(--accent-quiz)';
+      btn.style.background = 'var(--accent-quiz-light)';
+      btn.querySelector('.letter').style.background = 'var(--accent-quiz)';
+      btn.querySelector('.letter').style.color = 'white';
+    } else {
+      btn.style.borderColor = '';
+      btn.style.background = '';
+      btn.querySelector('.letter').style.background = '';
+      btn.querySelector('.letter').style.color = '';
+    }
+  });
+}
+
+function submitQuiz() {
+  if (submitted) return;
+  const unanswered = questions.filter(q => selections[q.id] === undefined);
+  if (unanswered.length > 0) {
+    alert(`Please answer all questions before submitting. You have ${unanswered.length} unanswered question(s).`);
+    return;
+  }
+  submitted = true;
+  let total = 0, qqC = 0, qcC = 0, ccC = 0;
+
+  questions.forEach(q => {
+    const chosen = selections[q.id];
+    const isCorrect = chosen === q.answer;
+    const card = document.getElementById(`qcard-${q.id}`);
+    const expl = document.getElementById(`expl-${q.id}`);
+    if (isCorrect) { total++; if (q.type==='qq') qqC++; else if (q.type==='qc') qcC++; else ccC++; }
+    q.options.forEach((_, i) => {
+      const btn = document.getElementById(`opt-${q.id}-${i}`);
+      btn.classList.add('locked');
+      btn.style.borderColor = '';
+      btn.style.background = '';
+      btn.querySelector('.letter').style.background = '';
+      btn.querySelector('.letter').style.color = '';
+      if (i === chosen && isCorrect)  btn.classList.add('sel-correct');
+      if (i === chosen && !isCorrect) btn.classList.add('sel-wrong');
+      if (i === q.answer && !isCorrect) btn.classList.add('show-correct');
+    });
+    card.classList.add(isCorrect ? 'answered-correct' : 'answered-wrong');
+    expl.classList.add('visible', isCorrect ? 'ok' : 'bad');
+  });
+
+  const pct = Math.round((total / questions.length) * 100);
+  const valEl = document.getElementById('scoreValue');
+  valEl.textContent = `${total} / 10`;
+  valEl.className = 'score-big ' + (pct >= 80 ? 'great' : pct >= 50 ? 'ok' : 'low');
+  document.getElementById('scoreMsg').textContent =
+    pct >= 90 ? '🎉 Outstanding work!' :
+    pct >= 70 ? '👏 Great job! Keep it up!' :
+    pct >= 50 ? '👍 Good effort — review the Concepts tab.' :
+    '📚 Keep practicing — re-read the Concepts tab and try again.';
+  document.getElementById('qqScore').textContent = qqC;
+  document.getElementById('qcScore').textContent = qcC;
+  document.getElementById('ccScore').textContent = ccC;
+  const name = document.getElementById('studentName').value.trim();
+  document.getElementById('studentDisplay').textContent = name ? `Student: ${name}` : '';
+  document.getElementById('scorePanel').classList.add('show');
+  document.getElementById('btnSubmit').disabled = true;
+  document.getElementById('btnSubmit').textContent = 'Submitted ✓';
+  document.getElementById('scorePanel').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function resetQuiz() {
+  document.getElementById('studentName').value = '';
+  renderQuiz();
+  window.scrollTo({ top: document.getElementById('panel-quiz').offsetTop - 80, behavior: 'smooth' });
+}
+
+renderQuiz();
+</script>
+</body>
+</html>
