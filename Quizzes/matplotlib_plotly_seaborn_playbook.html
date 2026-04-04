@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python DS — Matplotlib, Seaborn &amp; Plotly Playbook</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Fraunces:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #181a24;
+  --surface2: #21242f;
+  --border: #2d3040;
+  --text: #e2e4ed;
+  --text-dim: #8b8fa3;
+  --accent-mpl: #e8913a;
+  --accent-sns: #5ba5e6;
+  --accent-plotly: #ab6bdb;
+  --accent-compare: #4ecb8d;
+  --accent-quiz: #e05c7a;
+  --correct: #4ecb8d;
+  --wrong: #e05c7a;
+  --code-bg: #13151e;
+  --hover-glow: rgba(255,255,255,0.04);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+.header {
+  text-align: center;
+  padding: 40px 20px 10px;
+}
+.header .org {
+  font-family: 'Fraunces', serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent-compare);
+  margin-bottom: 4px;
+}
+.header .org a { color: var(--accent-compare); text-decoration: none; }
+.header .course-line {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+}
+.header h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(24px, 5vw, 38px);
+  font-weight: 800;
+  line-height: 1.2;
+  background: linear-gradient(135deg, var(--accent-mpl), var(--accent-sns), var(--accent-plotly));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.header .subtitle {
+  font-size: 15px;
+  color: var(--text-dim);
+  margin-top: 8px;
+}
+
+/* ── Tabs ── */
+.tab-bar {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  padding: 20px 16px 0;
+  flex-wrap: wrap;
+}
+.tab-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 20px;
+  border: 2px solid var(--border);
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+  background: var(--surface);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.25s;
+  position: relative;
+}
+.tab-btn:hover { background: var(--surface2); color: var(--text); }
+.tab-btn.active {
+  color: #fff;
+  border-color: var(--tab-color);
+  background: var(--surface2);
+}
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 0; right: 0;
+  height: 3px;
+  background: var(--tab-color);
+  border-radius: 2px 2px 0 0;
+}
+.tab-btn[data-tab="matplotlib"] { --tab-color: var(--accent-mpl); }
+.tab-btn[data-tab="seaborn"]    { --tab-color: var(--accent-sns); }
+.tab-btn[data-tab="plotly"]     { --tab-color: var(--accent-plotly); }
+.tab-btn[data-tab="comparison"] { --tab-color: var(--accent-compare); }
+.tab-btn[data-tab="quiz"]       { --tab-color: var(--accent-quiz); }
+
+/* ── Tab Content ── */
+.tab-content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 16px 60px;
+}
+.tab-panel {
+  display: none;
+  border: 2px solid var(--border);
+  border-radius: 0 0 14px 14px;
+  background: var(--surface);
+  padding: 32px 28px;
+  animation: fadeIn 0.3s;
+}
+.tab-panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.tab-panel h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.tab-panel h3 {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 28px 0 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+.tab-panel p, .tab-panel li {
+  font-size: 15px;
+  color: var(--text);
+}
+.tab-panel ul { padding-left: 22px; margin: 8px 0 16px; }
+.tab-panel li { margin-bottom: 5px; }
+
+.accent-mpl    { color: var(--accent-mpl); }
+.accent-sns    { color: var(--accent-sns); }
+.accent-plotly { color: var(--accent-plotly); }
+.accent-compare{ color: var(--accent-compare); }
+
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.badge-mpl    { background: rgba(232,145,58,0.15); color: var(--accent-mpl); }
+.badge-sns    { background: rgba(91,165,230,0.15); color: var(--accent-sns); }
+.badge-plotly { background: rgba(171,107,219,0.15); color: var(--accent-plotly); }
+.badge-compare{ background: rgba(78,203,141,0.15); color: var(--accent-compare); }
+
+.callout {
+  background: var(--surface2);
+  border-left: 4px solid var(--accent-compare);
+  border-radius: 0 8px 8px 0;
+  padding: 14px 18px;
+  margin: 16px 0;
+  font-size: 14px;
+}
+.callout strong { color: var(--accent-compare); }
+
+/* ── Code Blocks ── */
+.code-block {
+  position: relative;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin: 14px 0 18px;
+  overflow: hidden;
+}
+.code-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+.code-block pre {
+  margin: 0;
+  padding: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  overflow-x: auto;
+  color: var(--text);
+  white-space: pre;
+}
+.code-block textarea {
+  display: block;
+  width: 100%;
+  min-height: 140px;
+  padding: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  background: var(--code-bg);
+  color: var(--text);
+  border: none;
+  outline: none;
+  resize: vertical;
+  tab-size: 4;
+}
+.run-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 18px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #fff;
+}
+.run-btn.mpl { background: var(--accent-mpl); }
+.run-btn.mpl:hover { background: #d17e2a; }
+.run-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.output-area {
+  border-top: 1px solid var(--border);
+  padding: 12px 14px;
+  min-height: 40px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--text-dim);
+  background: rgba(0,0,0,0.2);
+}
+.output-area img {
+  max-width: 100%;
+  border-radius: 6px;
+  margin-top: 6px;
+}
+
+.colab-note {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-style: italic;
+  margin: 6px 0 14px;
+}
+
+/* ── Comparison Table ── */
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 14px;
+}
+.cmp-table th, .cmp-table td {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  text-align: left;
+}
+.cmp-table th {
+  background: var(--surface2);
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.cmp-table th:nth-child(2) { color: var(--accent-mpl); }
+.cmp-table th:nth-child(3) { color: var(--accent-sns); }
+.cmp-table th:nth-child(4) { color: var(--accent-plotly); }
+.cmp-table td:first-child { font-weight: 600; color: var(--text-dim); }
+.cmp-table tr:hover { background: var(--hover-glow); }
+
+.decision-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 14px;
+}
+.decision-table th, .decision-table td {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+}
+.decision-table th {
+  background: var(--surface2);
+  font-weight: 700;
+  text-align: left;
+}
+.decision-table td:last-child { font-weight: 700; }
+
+/* ── Diagram ── */
+.diagram-box {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 18px 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre;
+  overflow-x: auto;
+  text-align: center;
+}
+
+/* ── Quiz ── */
+.quiz-intro {
+  text-align: center;
+  margin-bottom: 24px;
+}
+.quiz-intro p { color: var(--text-dim); font-size: 14px; }
+.name-field {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  margin: 16px 0 28px;
+  flex-wrap: wrap;
+}
+.name-field label {
+  font-weight: 600;
+  font-size: 15px;
+}
+.name-field input {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  padding: 10px 16px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--code-bg);
+  color: var(--text);
+  width: 280px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.name-field input:focus { border-color: var(--accent-quiz); }
+
+.question-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px 24px;
+  margin-bottom: 18px;
+  transition: border-color 0.3s;
+}
+.question-card.answered-correct { border-color: var(--correct); }
+.question-card.answered-wrong   { border-color: var(--wrong); }
+.q-number {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+.q-cat {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.q-cat-mpl    { background: rgba(232,145,58,0.15); color: var(--accent-mpl); }
+.q-cat-sns    { background: rgba(91,165,230,0.15); color: var(--accent-sns); }
+.q-cat-plotly { background: rgba(171,107,219,0.15); color: var(--accent-plotly); }
+.q-cat-compare{ background: rgba(78,203,141,0.15); color: var(--accent-compare); }
+
+.q-text {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+.option-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  padding: 11px 16px;
+  margin-bottom: 8px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.option-btn:hover:not(.locked) {
+  border-color: var(--accent-quiz);
+  background: rgba(224,92,122,0.06);
+}
+.option-btn.selected {
+  border-color: var(--accent-quiz);
+  background: rgba(224,92,122,0.1);
+  font-weight: 600;
+}
+.option-btn.locked { cursor: default; }
+.option-btn.show-correct {
+  border-color: var(--correct) !important;
+  background: rgba(78,203,141,0.12) !important;
+}
+.option-btn.show-wrong {
+  border-color: var(--wrong) !important;
+  background: rgba(224,92,122,0.1) !important;
+}
+.q-feedback {
+  display: none;
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.q-feedback.correct { display: block; background: rgba(78,203,141,0.1); color: var(--correct); }
+.q-feedback.wrong   { display: block; background: rgba(224,92,122,0.1); color: var(--wrong); }
+
+.submit-area {
+  text-align: center;
+  margin-top: 30px;
+}
+.submit-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 14px 40px;
+  border: none;
+  border-radius: 10px;
+  background: var(--accent-quiz);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.submit-btn:hover { background: #c94a66; transform: translateY(-1px); }
+.submit-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+/* ── Score Panel ── */
+.score-panel {
+  display: none;
+  background: var(--surface2);
+  border: 2px solid var(--accent-quiz);
+  border-radius: 14px;
+  padding: 28px;
+  margin-top: 24px;
+  text-align: center;
+}
+.score-panel.visible { display: block; animation: fadeIn 0.4s; }
+.score-panel h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+.score-big {
+  font-family: 'Fraunces', serif;
+  font-size: 56px;
+  font-weight: 800;
+  margin: 10px 0;
+}
+.score-big.great { color: var(--correct); }
+.score-big.ok    { color: var(--accent-mpl); }
+.score-big.low   { color: var(--wrong); }
+.score-msg {
+  font-size: 15px;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+}
+.breakdown {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+  text-align: left;
+}
+.breakdown-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.breakdown-item .cat-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+.breakdown-item .cat-score {
+  font-size: 20px;
+  font-weight: 700;
+}
+.screenshot-hint {
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--text-dim);
+  font-style: italic;
+}
+.student-name-display {
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 6px;
+  color: var(--accent-quiz);
+}
+
+/* ── Footer ── */
+.footer {
+  text-align: center;
+  padding: 30px 20px;
+  font-size: 13px;
+  color: var(--text-dim);
+  border-top: 1px solid var(--border);
+  max-width: 900px;
+  margin: 0 auto;
+}
+.footer a { color: var(--accent-compare); text-decoration: none; }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .tab-btn { font-size: 12px; padding: 8px 12px; }
+  .tab-panel { padding: 22px 16px; }
+  .cmp-table { font-size: 12px; }
+  .cmp-table th, .cmp-table td { padding: 7px 6px; }
+}
+
+/* ── Pyodide Status ── */
+.pyodide-status {
+  text-align: center;
+  padding: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-mpl);
+}
+.pyodide-status.ready { color: var(--correct); }
+.pyodide-status.error { color: var(--wrong); }
+</style>
+</head>
+<body>
+
+<!-- ════════ HEADER ════════ -->
+<div class="header">
+  <div class="org"><a href="http://www.learnandhelp.com" target="_blank">Learn and Help</a></div>
+  <div class="course-line">Python for Data Science</div>
+  <h1>Matplotlib, Seaborn &amp; Plotly</h1>
+  <p class="subtitle">An interactive overview &amp; comparison of Python's top visualization libraries</p>
+</div>
+
+<!-- ════════ TAB BAR ════════ -->
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="matplotlib" onclick="switchTab('matplotlib')">📊 Matplotlib</button>
+  <button class="tab-btn" data-tab="seaborn" onclick="switchTab('seaborn')">🎨 Seaborn</button>
+  <button class="tab-btn" data-tab="plotly" onclick="switchTab('plotly')">✨ Plotly</button>
+  <button class="tab-btn" data-tab="comparison" onclick="switchTab('comparison')">⚖️ Comparison</button>
+  <button class="tab-btn" data-tab="quiz" onclick="switchTab('quiz')">🧠 Quiz</button>
+</div>
+
+<!-- ════════ TAB PANELS ════════ -->
+<div class="tab-content">
+
+<!-- ──────── MATPLOTLIB TAB ──────── -->
+<div class="tab-panel active" id="tab-matplotlib">
+  <span class="badge badge-mpl">Review</span>
+  <h2 class="accent-mpl">Matplotlib — The Foundation</h2>
+  <p>Matplotlib is Python's original plotting library, created in <strong>2003</strong>. It gives you <strong>complete control</strong> over every element of your chart. Think of it as the "building blocks" that other libraries are built on.</p>
+
+  <h3>Key Things to Remember</h3>
+  <ul>
+    <li><strong>Static plots</strong> — creates images (PNG, PDF, SVG), not interactive web pages</li>
+    <li><strong>Fine-grained control</strong> — you decide every color, label, tick mark, and line width</li>
+    <li><strong>The foundation</strong> — Seaborn is built directly on top of Matplotlib</li>
+    <li><strong>Great for reports</strong> — publication-quality figures for papers and homework</li>
+  </ul>
+
+  <h3>Try It — Simple Bar Chart</h3>
+  <div id="pyodide-status" class="pyodide-status">⏳ Loading Python engine (Pyodide)…</div>
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>Python — Matplotlib</span>
+      <button class="run-btn mpl" id="run1" onclick="runCode('editor1','output1')" disabled>▶ Run</button>
+    </div>
+<textarea id="editor1" spellcheck="false">
+import matplotlib
+matplotlib.use('AGG')
+import matplotlib.pyplot as plt
+
+fruits = ['Apples', 'Bananas', 'Cherries', 'Dates']
+sales = [45, 30, 55, 20]
+
+plt.figure(figsize=(7, 4))
+plt.bar(fruits, sales, color=['#e8913a','#f5c542','#e05c7a','#ab6bdb'])
+plt.title('Fruit Sales This Week', fontsize=16, fontweight='bold')
+plt.xlabel('Fruit')
+plt.ylabel('Units Sold')
+plt.tight_layout()
+plt.savefig('chart.png', dpi=100)
+plt.close()
+print('CHART:chart.png')
+</textarea>
+    <div class="output-area" id="output1">Click <strong>▶ Run</strong> to see the chart</div>
+  </div>
+
+  <div class="callout">
+    <strong>💡 Recall:</strong> We use <code>plt.figure()</code> to create, <code>plt.bar()</code> / <code>plt.plot()</code> / <code>plt.scatter()</code> to draw, and <code>plt.show()</code> to display. Every element is set manually.
+  </div>
+</div>
+
+<!-- ──────── SEABORN TAB ──────── -->
+<div class="tab-panel" id="tab-seaborn">
+  <span class="badge badge-sns">New</span>
+  <h2 class="accent-sns">Seaborn — Beautiful Stats Made Easy</h2>
+  <p>Seaborn is built <strong>on top of Matplotlib</strong> and was created by Michael Waskom in <strong>2012</strong>. It makes statistical plots look beautiful with very little code. It works hand-in-hand with <strong>pandas DataFrames</strong>.</p>
+
+  <h3>Why Seaborn?</h3>
+  <ul>
+    <li><strong>Gorgeous defaults</strong> — charts look polished without extra styling work</li>
+    <li><strong>Statistical superpowers</strong> — built-in box plots, violin plots, pair plots, heatmaps</li>
+    <li><strong>DataFrame-friendly</strong> — just pass column names, no extracting needed</li>
+    <li><strong>Built on Matplotlib</strong> — you can still use <code>plt.title()</code>, <code>plt.xlabel()</code>, etc.</li>
+  </ul>
+
+  <h3>Key Relationship</h3>
+  <div class="callout">
+    <strong>🔑 Important:</strong> Seaborn is NOT a replacement for Matplotlib — it is a <em>layer on top of it</em>. Every Seaborn chart is a Matplotlib figure underneath. You still call <code>plt.show()</code> to display it!
+  </div>
+
+  <h3>Seaborn Scatter Plot</h3>
+  <div class="code-block">
+    <div class="code-block-header"><span>Python — Seaborn</span><span class="colab-note">📓 Run in Colab</span></div>
+<pre>
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Seaborn comes with built-in datasets!
+tips = sns.load_dataset('tips')
+
+sns.scatterplot(data=tips, x='total_bill', y='tip', hue='day')
+plt.title('Tips by Total Bill')
+plt.show()
+</pre>
+  </div>
+
+  <h3>Seaborn Box Plot</h3>
+  <div class="code-block">
+    <div class="code-block-header"><span>Python — Seaborn</span><span class="colab-note">📓 Run in Colab</span></div>
+<pre>
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+tips = sns.load_dataset('tips')
+
+sns.boxplot(data=tips, x='day', y='total_bill', palette='Set2')
+plt.title('Total Bill by Day of Week')
+plt.show()
+</pre>
+  </div>
+
+  <h3>Seaborn Heatmap (Correlation Matrix)</h3>
+  <div class="code-block">
+    <div class="code-block-header"><span>Python — Seaborn</span><span class="colab-note">📓 Run in Colab</span></div>
+<pre>
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+tips = sns.load_dataset('tips')
+
+sns.heatmap(tips.corr(numeric_only=True), annot=True, cmap='coolwarm')
+plt.title('Correlation Heatmap')
+plt.show()
+</pre>
+  </div>
+
+  <h3>Seaborn Pair Plot — The One-Liner Wonder</h3>
+  <div class="code-block">
+    <div class="code-block-header"><span>Python — Seaborn</span><span class="colab-note">📓 Run in Colab</span></div>
+<pre>
+import seaborn as sns
+
+iris = sns.load_dataset('iris')
+
+# One line → a grid of ALL pairwise relationships!
+sns.pairplot(iris, hue='species')
+plt.show()
+</pre>
+  </div>
+  <p class="colab-note">⬆️ This one line creates a full grid of scatter plots and histograms for every pair of columns. That would take dozens of lines in Matplotlib!</p>
+
+  <div class="callout">
+    <strong>📓 Colab Notebook:</strong> <a href="https://github.com/sjasthi/Python-DS-Data-Science/blob/main/matplotlib/6_matplotlib_seaborn_visualizations_breast_cancer_dataset.ipynb" target="_blank" style="color:var(--accent-sns);">Open the Seaborn Notebook →</a>
+  </div>
+</div>
+
+<!-- ──────── PLOTLY TAB ──────── -->
+<div class="tab-panel" id="tab-plotly">
+  <span class="badge badge-plotly">New</span>
+  <h2 class="accent-plotly">Plotly — Interactive &amp; Web-Ready</h2>
+  <p>Plotly is a modern graphing library released in <strong>2012</strong>. Unlike Matplotlib and Seaborn, it creates <strong>interactive</strong> charts using JavaScript. You can hover over data points, zoom in, pan around, and export charts as HTML files.</p>
+
+  <h3>Why Plotly?</h3>
+  <ul>
+    <li><strong>Interactive by default</strong> — hover tooltips, zoom, pan, and click right out of the box</li>
+    <li><strong>Web-ready</strong> — charts are rendered in the browser using JavaScript (D3.js &amp; Plotly.js)</li>
+    <li><strong>Great 3D support</strong> — rotate and explore 3D scatter plots and surfaces</li>
+    <li><strong>Plotly Express</strong> — a simple, high-level API (similar to Seaborn's ease-of-use)</li>
+    <li><strong>Shareable</strong> — save charts as standalone HTML files anyone can open</li>
+  </ul>
+
+  <h3>Key Difference from Matplotlib &amp; Seaborn</h3>
+  <div class="callout">
+    <strong>🔑 Important:</strong> Plotly is a <em>completely separate library</em> — it does NOT use Matplotlib under the hood. It uses its own JavaScript-based rendering engine. That's what makes it interactive!
+  </div>
+
+  <h3>Plotly Express Scatter Plot</h3>
+  <div class="code-block">
+    <div class="code-block-header"><span>Python — Plotly Express</span><span class="colab-note">📓 Run in Colab</span></div>
+<pre>
+import plotly.express as px
+
+df = px.data.iris()
+
+fig = px.scatter(df, x='sepal_width', y='sepal_length',
+                 color='species',
+                 title='Iris: Sepal Width vs Length')
+fig.show()
+</pre>
+  </div>
+  <p class="colab-note">⬆️ Hover over any point to see its exact values. Try zooming with your scroll wheel!</p>
+
+  <h3>Plotly Express Bar Chart</h3>
+  <div class="code-block">
+    <div class="code-block-header"><span>Python — Plotly Express</span><span class="colab-note">📓 Run in Colab</span></div>
+<pre>
+import plotly.express as px
+
+df = px.data.tips()
+
+fig = px.bar(df, x='day', y='total_bill', color='sex',
+             barmode='group',
+             title='Total Bill by Day and Gender')
+fig.show()
+</pre>
+  </div>
+
+  <h3>Plotly Express Line Chart</h3>
+  <div class="code-block">
+    <div class="code-block-header"><span>Python — Plotly Express</span><span class="colab-note">📓 Run in Colab</span></div>
+<pre>
+import plotly.express as px
+
+df = px.data.gapminder().query("country == 'United States'")
+
+fig = px.line(df, x='year', y='gdpPercap',
+              title='US GDP Per Capita Over Time')
+fig.show()
+</pre>
+  </div>
+
+  <h3>Plotly 3D Scatter Plot</h3>
+  <div class="code-block">
+    <div class="code-block-header"><span>Python — Plotly Express</span><span class="colab-note">📓 Run in Colab</span></div>
+<pre>
+import plotly.express as px
+
+df = px.data.iris()
+
+fig = px.scatter_3d(df, x='sepal_length', y='sepal_width',
+                    z='petal_length', color='species',
+                    title='3D Iris Dataset')
+fig.show()
+</pre>
+  </div>
+  <p class="colab-note">⬆️ In Colab, you can click and drag to rotate this 3D plot in any direction!</p>
+
+  <div class="callout">
+    <strong>📓 Colab Notebook:</strong> <a href="https://github.com/sjasthi/Python-DS-Data-Science/blob/main/matplotlib/7_matplotlib_plotly_Introduction.ipynb" target="_blank" style="color:var(--accent-plotly);">Open the Plotly Notebook →</a>
+  </div>
+</div>
+
+<!-- ──────── COMPARISON TAB ──────── -->
+<div class="tab-panel" id="tab-comparison">
+  <span class="badge badge-compare">Overview</span>
+  <h2 class="accent-compare">Comparison — Picking the Right Tool</h2>
+  <p>All three libraries are great — the key is knowing <strong>when to reach for each one</strong>.</p>
+
+  <h3>How They Relate</h3>
+  <div class="diagram-box">┌───────────────────────────────────────────────┐
+│               MATPLOTLIB (2003)               │
+│          The Foundation — Static Plots         │
+│          Fine-grained, manual control          │
+│                                               │
+│      ┌───────────────────────────┐            │
+│      │     SEABORN (2012)        │            │
+│      │   Built ON Matplotlib     │            │
+│      │   Stats plots, pretty     │            │
+│      │   defaults, DataFrames    │            │
+│      └───────────────────────────┘            │
+└───────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────┐
+│               PLOTLY (2012)                   │
+│        Independent Library — JavaScript       │
+│        Interactive, web-based, 3D             │
+└───────────────────────────────────────────────┘</div>
+
+  <h3>Feature Comparison</h3>
+  <table class="cmp-table">
+    <thead>
+      <tr><th>Feature</th><th>Matplotlib</th><th>Seaborn</th><th>Plotly</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Created</td><td>2003</td><td>2012</td><td>2012</td></tr>
+      <tr><td>Built On</td><td>Own engine</td><td>Matplotlib</td><td>JavaScript (D3.js)</td></tr>
+      <tr><td>Interactivity</td><td>Static</td><td>Static</td><td>Interactive ✨</td></tr>
+      <tr><td>Learning Curve</td><td>Steeper</td><td>Easier</td><td>Easiest (Express)</td></tr>
+      <tr><td>Default Look</td><td>Plain</td><td>Beautiful 🎨</td><td>Modern &amp; polished</td></tr>
+      <tr><td>Statistical Plots</td><td>Manual setup</td><td>Excellent ⭐</td><td>Some built-in</td></tr>
+      <tr><td>DataFrame Support</td><td>Manual columns</td><td>Best-in-class ⭐</td><td>Great</td></tr>
+      <tr><td>3D Plots</td><td>Basic</td><td>None</td><td>Excellent ⭐</td></tr>
+      <tr><td>Output</td><td>PNG, PDF, SVG</td><td>PNG, PDF, SVG</td><td>HTML, PNG, SVG</td></tr>
+      <tr><td>Best For</td><td>Reports, papers</td><td>EDA, statistics</td><td>Dashboards, web</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Quick Decision Guide</h3>
+  <table class="decision-table">
+    <thead>
+      <tr><th>I want to…</th><th>Use…</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Create a static figure for a report</td><td class="accent-mpl">Matplotlib</td></tr>
+      <tr><td>Quickly explore data distributions</td><td class="accent-sns">Seaborn</td></tr>
+      <tr><td>Make a chart users can hover &amp; zoom</td><td class="accent-plotly">Plotly</td></tr>
+      <tr><td>Build a correlation heatmap</td><td class="accent-sns">Seaborn</td></tr>
+      <tr><td>Create a 3D plot I can rotate</td><td class="accent-plotly">Plotly</td></tr>
+      <tr><td>See ALL pairwise relationships at once</td><td class="accent-sns">Seaborn (pair plot)</td></tr>
+      <tr><td>Share an interactive chart as a file</td><td class="accent-plotly">Plotly (HTML)</td></tr>
+      <tr><td>Have pixel-level control over a plot</td><td class="accent-mpl">Matplotlib</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Syntax Side-by-Side: Scatter Plot</h3>
+  <div class="code-block">
+    <div class="code-block-header"><span>Matplotlib</span></div>
+<pre>
+plt.scatter(df['x'], df['y'], c='blue')
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.title('Scatter Plot')
+plt.show()
+</pre>
+  </div>
+  <div class="code-block">
+    <div class="code-block-header"><span>Seaborn</span></div>
+<pre>
+sns.scatterplot(data=df, x='x', y='y')
+plt.title('Scatter Plot')
+plt.show()
+</pre>
+  </div>
+  <div class="code-block">
+    <div class="code-block-header"><span>Plotly Express</span></div>
+<pre>
+fig = px.scatter(df, x='x', y='y', title='Scatter Plot')
+fig.show()
+</pre>
+  </div>
+
+  <div class="callout">
+    <strong>📝 Full Comparison Document:</strong> <a href="https://github.com/sjasthi/Python-DS-Data-Science/blob/main/matplotlib/matplotlib_vs_plotly.md" target="_blank" style="color:var(--accent-compare);">Matplotlib vs Plotly (GitHub) →</a>
+  </div>
+</div>
+
+<!-- ──────── QUIZ TAB ──────── -->
+<div class="tab-panel" id="tab-quiz">
+  <div class="quiz-intro">
+    <span class="badge" style="background:rgba(224,92,122,0.15);color:var(--accent-quiz);">10 Questions</span>
+    <h2 style="color:var(--accent-quiz);">Quiz — Test Your Knowledge</h2>
+    <p>Answer all 10 questions, then submit to see your score breakdown.</p>
+  </div>
+
+  <div class="name-field">
+    <label for="studentName">Your Name:</label>
+    <input type="text" id="studentName" placeholder="Enter your name">
+  </div>
+
+  <div id="quizContainer"></div>
+
+  <div class="submit-area">
+    <button class="submit-btn" id="submitQuiz" onclick="submitQuiz()" disabled>Submit Quiz</button>
+    <p id="submitMsg" style="margin-top:10px;font-size:13px;color:var(--wrong);display:none;"></p>
+  </div>
+
+  <div class="score-panel" id="scorePanel">
+    <div class="student-name-display" id="scoreName"></div>
+    <h2>Your Results</h2>
+    <div class="score-big" id="scoreBig"></div>
+    <div class="score-msg" id="scoreMsg"></div>
+    <div class="breakdown" id="breakdown"></div>
+    <p class="screenshot-hint">📸 Take a screenshot of this score panel and submit it to Google Classroom.</p>
+  </div>
+</div>
+
+</div><!-- /tab-content -->
+
+<!-- ════════ FOOTER ════════ -->
+<div class="footer">
+  <strong><a href="http://www.learnandhelp.com" target="_blank">Learn and Help</a></strong> — Empowering the next generation of data scientists
+</div>
+
+<!-- ════════ PYODIDE ════════ -->
+<script src="https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js"></script>
+<script>
+// ── Tab Switching ──
+function switchTab(tabName) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.tab-btn[data-tab="${tabName}"]`).classList.add('active');
+  document.getElementById('tab-' + tabName).classList.add('active');
+}
+
+// ── Pyodide Setup ──
+let pyodideReady = false;
+let pyodide = null;
+
+async function initPyodide() {
+  const status = document.getElementById('pyodide-status');
+  try {
+    pyodide = await loadPyodide();
+    await pyodide.loadPackage('matplotlib');
+    pyodideReady = true;
+    status.textContent = '✅ Python engine ready — you can run code!';
+    status.classList.add('ready');
+    document.querySelectorAll('.run-btn').forEach(b => b.disabled = false);
+  } catch(e) {
+    status.textContent = '⚠️ Could not load Python engine. Try refreshing.';
+    status.classList.add('error');
+  }
+}
+initPyodide();
+
+async function runCode(editorId, outputId) {
+  if (!pyodideReady) return;
+  const code = document.getElementById(editorId).value;
+  const out = document.getElementById(outputId);
+  out.innerHTML = '⏳ Running…';
+  try {
+    pyodide.runPython(`
+import sys, io
+_old_stdout = sys.stdout
+sys.stdout = io.StringIO()
+`);
+    pyodide.runPython(code);
+    let stdout = pyodide.runPython('sys.stdout.getvalue()');
+    pyodide.runPython('sys.stdout = _old_stdout');
+    let html = '';
+    for (const line of stdout.split('\n')) {
+      if (line.startsWith('CHART:')) {
+        const fname = line.substring(6);
+        const imgBytes = pyodide.FS.readFile(fname);
+        const blob = new Blob([imgBytes], {type:'image/png'});
+        const url = URL.createObjectURL(blob);
+        html += `<img src="${url}" alt="chart">`;
+      } else if (line.trim()) {
+        html += `<div>${line}</div>`;
+      }
+    }
+    out.innerHTML = html || '<span style="color:var(--correct)">✅ Code ran successfully (no output)</span>';
+  } catch(e) {
+    out.innerHTML = `<span style="color:var(--wrong)">❌ Error: ${e.message}</span>`;
+  }
+}
+
+// ── Quiz Data ──
+const questions = [
+  {
+    q: "Which library is the oldest and serves as the foundation for Python plotting?",
+    options: ["Seaborn", "Plotly", "Matplotlib", "Pandas"],
+    answer: 2,
+    category: "Matplotlib"
+  },
+  {
+    q: "What type of plots does Matplotlib create by default?",
+    options: ["Interactive plots", "3D plots only", "Static plots", "Web-based dashboards"],
+    answer: 2,
+    category: "Matplotlib"
+  },
+  {
+    q: "Seaborn is built on top of which library?",
+    options: ["Plotly", "Pandas", "Matplotlib", "NumPy"],
+    answer: 2,
+    category: "Seaborn"
+  },
+  {
+    q: "Which Seaborn function creates a grid showing ALL pairwise relationships between columns?",
+    options: ["sns.heatmap()", "sns.scatterplot()", "sns.pairplot()", "sns.boxplot()"],
+    answer: 2,
+    category: "Seaborn"
+  },
+  {
+    q: "What is a major advantage of Seaborn over plain Matplotlib?",
+    options: ["It creates interactive charts", "It has beautiful defaults and built-in statistical plots", "It supports 3D plots", "It uses JavaScript"],
+    answer: 1,
+    category: "Seaborn"
+  },
+  {
+    q: "What technology does Plotly use under the hood to make charts interactive?",
+    options: ["Matplotlib's engine", "Python's Tkinter", "JavaScript (D3.js / Plotly.js)", "Java applets"],
+    answer: 2,
+    category: "Plotly"
+  },
+  {
+    q: "Which library is best for creating interactive 3D plots that you can rotate and zoom?",
+    options: ["Matplotlib", "Seaborn", "Plotly", "Pandas"],
+    answer: 2,
+    category: "Plotly"
+  },
+  {
+    q: "You want to quickly explore the distributions and correlations in a new dataset. Which library is the best fit?",
+    options: ["Matplotlib", "Seaborn", "Plotly", "None of these"],
+    answer: 1,
+    category: "Comparison"
+  },
+  {
+    q: "Which of these statements is TRUE?",
+    options: [
+      "Seaborn is completely independent from Matplotlib",
+      "Plotly is built on top of Matplotlib",
+      "Seaborn charts still use plt.show() from Matplotlib",
+      "Matplotlib creates interactive charts by default"
+    ],
+    answer: 2,
+    category: "Comparison"
+  },
+  {
+    q: "You need to share a chart as an HTML file that anyone can open in a browser and interact with. Which library should you choose?",
+    options: ["Matplotlib", "Seaborn", "Plotly", "All three can do this equally"],
+    answer: 2,
+    category: "Comparison"
+  }
+];
+
+// ── Build Quiz ──
+const catColors = {
+  'Matplotlib': 'q-cat-mpl',
+  'Seaborn': 'q-cat-sns',
+  'Plotly': 'q-cat-plotly',
+  'Comparison': 'q-cat-compare'
+};
+
+let userAnswers = new Array(questions.length).fill(-1);
+
+function buildQuiz() {
+  const container = document.getElementById('quizContainer');
+  let html = '';
+  questions.forEach((q, i) => {
+    html += `<div class="question-card" id="qcard${i}">
+      <div class="q-number">Question ${i+1} of ${questions.length}
+        <span class="q-cat ${catColors[q.category]}">${q.category}</span>
+      </div>
+      <div class="q-text">${q.q}</div>`;
+    q.options.forEach((opt, j) => {
+      html += `<button class="option-btn" id="opt${i}_${j}" onclick="selectAnswer(${i},${j})">${opt}</button>`;
+    });
+    html += `<div class="q-feedback" id="feedback${i}"></div></div>`;
+  });
+  container.innerHTML = html;
+}
+
+function selectAnswer(qi, oi) {
+  if (document.getElementById(`opt${qi}_0`).classList.contains('locked')) return;
+  userAnswers[qi] = oi;
+  questions[qi].options.forEach((_, j) => {
+    document.getElementById(`opt${qi}_${j}`).classList.remove('selected');
+  });
+  document.getElementById(`opt${qi}_${oi}`).classList.add('selected');
+  checkAllAnswered();
+}
+
+function checkAllAnswered() {
+  const allDone = userAnswers.every(a => a >= 0);
+  const nameOk = document.getElementById('studentName').value.trim().length > 0;
+  document.getElementById('submitQuiz').disabled = !(allDone && nameOk);
+  const msg = document.getElementById('submitMsg');
+  if (!allDone || !nameOk) {
+    const missing = [];
+    if (!nameOk) missing.push('enter your name');
+    const unanswered = userAnswers.reduce((acc, a, i) => a < 0 ? [...acc, i+1] : acc, []);
+    if (unanswered.length) missing.push(`answer question${unanswered.length > 1 ? 's' : ''} ${unanswered.join(', ')}`);
+    msg.textContent = `Please ${missing.join(' and ')} before submitting.`;
+    msg.style.display = 'block';
+  } else {
+    msg.style.display = 'none';
+  }
+}
+
+document.getElementById('studentName').addEventListener('input', checkAllAnswered);
+
+function submitQuiz() {
+  const name = document.getElementById('studentName').value.trim();
+  if (!name || userAnswers.some(a => a < 0)) return;
+
+  let total = 0;
+  const catScores = {};
+
+  questions.forEach((q, i) => {
+    const correct = userAnswers[i] === q.answer;
+    if (correct) total++;
+    if (!catScores[q.category]) catScores[q.category] = {right:0, total:0};
+    catScores[q.category].total++;
+    if (correct) catScores[q.category].right++;
+
+    // Lock & highlight
+    q.options.forEach((_, j) => {
+      const btn = document.getElementById(`opt${i}_${j}`);
+      btn.classList.add('locked');
+      btn.classList.remove('selected');
+      if (j === q.answer) btn.classList.add('show-correct');
+      else if (j === userAnswers[i] && !correct) btn.classList.add('show-wrong');
+    });
+
+    const card = document.getElementById(`qcard${i}`);
+    const fb = document.getElementById(`feedback${i}`);
+    if (correct) {
+      card.classList.add('answered-correct');
+      fb.className = 'q-feedback correct';
+      fb.textContent = '✅ Correct!';
+    } else {
+      card.classList.add('answered-wrong');
+      fb.className = 'q-feedback wrong';
+      fb.textContent = `❌ Incorrect — the correct answer is: ${q.options[q.answer]}`;
+    }
+  });
+
+  // Score panel
+  const pct = Math.round((total / questions.length) * 100);
+  document.getElementById('scoreName').textContent = name;
+  const big = document.getElementById('scoreBig');
+  big.textContent = `${total} / ${questions.length} (${pct}%)`;
+  big.className = 'score-big ' + (pct >= 80 ? 'great' : pct >= 50 ? 'ok' : 'low');
+
+  const msgs = pct === 100 ? "🎉 Perfect score! You're a visualization master!"
+    : pct >= 80 ? "🌟 Great job! You really know your plotting libraries!"
+    : pct >= 60 ? "👍 Good effort! Review the tabs above to strengthen your knowledge."
+    : "📚 Keep learning! Go through each tab again and try the quiz once more.";
+  document.getElementById('scoreMsg').textContent = msgs;
+
+  let bdHTML = '';
+  const catAccentMap = {
+    'Matplotlib': 'var(--accent-mpl)',
+    'Seaborn': 'var(--accent-sns)',
+    'Plotly': 'var(--accent-plotly)',
+    'Comparison': 'var(--accent-compare)'
+  };
+  for (const cat in catScores) {
+    const s = catScores[cat];
+    bdHTML += `<div class="breakdown-item">
+      <div class="cat-label" style="color:${catAccentMap[cat]}">${cat}</div>
+      <div class="cat-score">${s.right} / ${s.total}</div>
+    </div>`;
+  }
+  document.getElementById('breakdown').innerHTML = bdHTML;
+
+  const panel = document.getElementById('scorePanel');
+  panel.classList.add('visible');
+  panel.scrollIntoView({behavior:'smooth', block:'center'});
+
+  document.getElementById('submitQuiz').disabled = true;
+  document.getElementById('submitQuiz').textContent = 'Submitted ✓';
+}
+
+// Init
+buildQuiz();
+checkAllAnswered();
+</script>
+</body>
+</html>
