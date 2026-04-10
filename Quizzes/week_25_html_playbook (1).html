@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML for Data Scientists — Interactive Playbook</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #232736;
+    --border: #2e3348;
+    --text: #e2e4ed;
+    --text-dim: #8b8fa7;
+    --accent: #6c9cfc;
+    --accent-bg: rgba(108,156,252,0.1);
+    --green: #5ce0a8;
+    --green-bg: rgba(92,224,168,0.1);
+    --red: #f76e6e;
+    --red-bg: rgba(247,110,110,0.1);
+    --orange: #f5a623;
+    --orange-bg: rgba(245,166,35,0.1);
+    --purple: #b389f9;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+
+  .header {
+    text-align:center; padding:32px 20px 20px;
+    background:linear-gradient(135deg,#161927,#1e2235);
+    border-bottom:1px solid var(--border);
+  }
+  .header .org { font-size:13px; color:var(--accent); letter-spacing:2px; text-transform:uppercase; }
+  .header h1 { font-size:28px; margin:8px 0 4px; font-weight:700; }
+  .header .sub { font-size:14px; color:var(--text-dim); }
+
+  .tabs {
+    display:flex; justify-content:center; gap:4px; padding:16px 20px 0;
+    background:var(--bg); position:sticky; top:0; z-index:100;
+    border-bottom:1px solid var(--border);
+  }
+  .tab {
+    padding:10px 22px; font-size:14px; font-weight:500; cursor:pointer;
+    border:1px solid transparent; border-bottom:none; border-radius:8px 8px 0 0;
+    background:transparent; color:var(--text-dim); transition:all .2s;
+    font-family:inherit;
+  }
+  .tab:hover { color:var(--text); background:var(--surface); }
+  .tab.active { background:var(--surface); color:var(--accent); border-color:var(--border); }
+
+  .panel { display:none; max-width:860px; margin:0 auto; padding:28px 20px 60px; }
+  .panel.active { display:block; }
+
+  h2 { font-size:22px; margin:28px 0 12px; color:var(--accent); }
+  h2:first-child { margin-top:0; }
+  h3 { font-size:17px; margin:20px 0 8px; color:var(--purple); }
+  p, li { font-size:15px; margin-bottom:8px; }
+  ul, ol { padding-left:24px; }
+
+  .concept-box {
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:20px; margin:16px 0;
+  }
+  .concept-box.highlight {
+    border-left:3px solid var(--accent);
+  }
+
+  .tag-label {
+    display:inline-block; background:var(--accent-bg); color:var(--accent);
+    font-family:'JetBrains Mono',monospace; font-size:13px; padding:2px 8px;
+    border-radius:4px; margin:2px;
+  }
+  .tag-label.green { background:var(--green-bg); color:var(--green); }
+  .tag-label.orange { background:var(--orange-bg); color:var(--orange); }
+
+  /* Code blocks */
+  pre {
+    background:var(--surface2); border:1px solid var(--border); border-radius:8px;
+    padding:16px; margin:10px 0; overflow-x:auto;
+    font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.5;
+    color:#c8cce0;
+  }
+  code {
+    font-family:'JetBrains Mono',monospace; font-size:13px;
+    background:var(--surface2); padding:1px 5px; border-radius:3px;
+  }
+  pre code { background:none; padding:0; }
+
+  /* Live editor */
+  .editor-wrap {
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    margin:16px 0; overflow:hidden;
+  }
+  .editor-bar {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:8px 14px; background:var(--surface2); border-bottom:1px solid var(--border);
+    font-size:13px; color:var(--text-dim);
+  }
+  .editor-bar button {
+    background:var(--green); color:#111; border:none; padding:6px 16px;
+    border-radius:6px; font-size:13px; font-weight:600; cursor:pointer;
+    font-family:inherit; transition:all .15s;
+  }
+  .editor-bar button:hover { filter:brightness(1.1); transform:translateY(-1px); }
+  .editor-area {
+    display:grid; grid-template-columns:1fr 1fr; min-height:200px;
+  }
+  .editor-area textarea {
+    background:var(--bg); color:var(--text); border:none; border-right:1px solid var(--border);
+    padding:14px; font-family:'JetBrains Mono',monospace; font-size:13px;
+    line-height:1.5; resize:vertical; outline:none;
+  }
+  .editor-area .preview {
+    padding:14px; background:#fff; color:#222; font-family:serif; font-size:14px;
+    overflow:auto;
+  }
+  .editor-area .preview table { border-collapse:collapse; margin:8px 0; }
+  .editor-area .preview th, .editor-area .preview td { border:1px solid #ccc; padding:6px 10px; text-align:left; }
+  .editor-area .preview th { background:#f0f0f0; }
+
+  /* Tree diagram */
+  .tree { font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.7; color:var(--green); }
+
+  /* Table */
+  table.ref { width:100%; border-collapse:collapse; margin:12px 0; font-size:14px; }
+  table.ref th { background:var(--surface2); text-align:left; padding:10px 12px; color:var(--accent); border:1px solid var(--border); }
+  table.ref td { padding:10px 12px; border:1px solid var(--border); }
+
+  /* Scraping connection callout */
+  .scraping-callout {
+    background:var(--green-bg); border:1px solid rgba(92,224,168,0.25);
+    border-radius:10px; padding:16px 20px; margin:16px 0;
+  }
+  .scraping-callout .label { font-size:12px; font-weight:700; color:var(--green); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+
+  /* Quiz */
+  .quiz-intro {
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:20px; margin-bottom:20px; text-align:center;
+  }
+  .quiz-intro input {
+    background:var(--bg); border:1px solid var(--border); border-radius:6px;
+    padding:10px 16px; color:var(--text); font-size:15px; font-family:inherit;
+    width:280px; margin-top:8px; outline:none; text-align:center;
+  }
+  .quiz-intro input:focus { border-color:var(--accent); }
+
+  .q-card {
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:20px; margin:12px 0;
+  }
+  .q-card .q-num { font-size:12px; color:var(--accent); font-weight:700; text-transform:uppercase; letter-spacing:1px; }
+  .q-card .q-text { font-size:15px; margin:8px 0 12px; }
+  .q-card .q-text code { font-size:13px; }
+  .q-card label {
+    display:block; padding:8px 12px; margin:4px 0; border-radius:6px;
+    cursor:pointer; font-size:14px; transition:background .15s;
+  }
+  .q-card label:hover { background:var(--surface2); }
+  .q-card input[type="radio"] { margin-right:8px; }
+
+  .q-card.correct { border-color:var(--green); }
+  .q-card.incorrect { border-color:var(--red); }
+  .q-card .feedback {
+    margin-top:10px; padding:8px 12px; border-radius:6px; font-size:13px; display:none;
+  }
+  .q-card .feedback.correct-fb { background:var(--green-bg); color:var(--green); display:block; }
+  .q-card .feedback.incorrect-fb { background:var(--red-bg); color:var(--red); display:block; }
+
+  #submit-quiz {
+    display:block; margin:24px auto; padding:12px 40px; font-size:16px; font-weight:700;
+    background:var(--accent); color:#111; border:none; border-radius:8px;
+    cursor:pointer; font-family:inherit; transition:all .15s;
+  }
+  #submit-quiz:hover { filter:brightness(1.1); transform:translateY(-1px); }
+  #submit-quiz:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
+
+  .score-panel {
+    display:none; background:var(--surface); border:2px solid var(--accent);
+    border-radius:12px; padding:28px; margin:24px 0; text-align:center;
+  }
+  .score-panel.show { display:block; }
+  .score-panel .big-score { font-size:48px; font-weight:700; color:var(--accent); }
+  .score-panel .breakdown { margin:16px 0; font-size:14px; }
+  .score-panel .breakdown span { display:inline-block; margin:4px 10px; }
+  .score-panel .reminder {
+    margin-top:12px; padding:10px; background:var(--orange-bg);
+    border-radius:6px; font-size:13px; color:var(--orange);
+  }
+
+  .footer {
+    text-align:center; padding:24px; font-size:13px; color:var(--text-dim);
+    border-top:1px solid var(--border);
+  }
+  .footer a { color:var(--accent); text-decoration:none; }
+
+  @media(max-width:700px) {
+    .editor-area { grid-template-columns:1fr; }
+    .editor-area textarea { border-right:none; border-bottom:1px solid var(--border); min-height:150px; }
+    .tabs { flex-wrap:wrap; }
+    .tab { padding:8px 14px; font-size:13px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="org">Learn and Help — Python DS</div>
+  <h1>HTML for Data Scientists</h1>
+  <div class="sub">Week 25 Interactive Playbook</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('concepts')">Concepts</button>
+  <button class="tab" onclick="showTab('playground')">Playground</button>
+  <button class="tab" onclick="showTab('tables')">Tables &amp; Scraping</button>
+  <button class="tab" onclick="showTab('quiz')">Quiz</button>
+</div>
+
+<!-- ========== CONCEPTS TAB ========== -->
+<div id="concepts" class="panel active">
+  <h2>What is HTML?</h2>
+  <div class="concept-box highlight">
+    <p><strong>HTML</strong> = <strong>H</strong>yper<strong>T</strong>ext <strong>M</strong>arkup <strong>L</strong>anguage</p>
+    <p>HTML is the <strong>skeleton</strong> of every web page. It tells the browser <em>what</em> content is on the page and <em>how</em> it is organized. As data scientists, we read HTML to extract data from websites.</p>
+  </div>
+
+  <h2>Tags — The Building Blocks</h2>
+  <p>HTML uses <strong>tags</strong> — labels wrapped in angle brackets <code>&lt; &gt;</code>. Most tags come in pairs:</p>
+  <pre><code>&lt;tagname&gt;Content goes here&lt;/tagname&gt;</code></pre>
+  <p>The closing tag has a forward slash: <code>&lt;/tagname&gt;</code></p>
+
+  <h3>Common Tags You'll See</h3>
+  <table class="ref">
+    <tr><th>Tag</th><th>What It Does</th></tr>
+    <tr><td><span class="tag-label">&lt;h1&gt;</span> to <span class="tag-label">&lt;h6&gt;</span></td><td>Headings (h1 = largest, h6 = smallest)</td></tr>
+    <tr><td><span class="tag-label">&lt;p&gt;</span></td><td>Paragraph of text</td></tr>
+    <tr><td><span class="tag-label">&lt;a href="..."&gt;</span></td><td>Link to another page</td></tr>
+    <tr><td><span class="tag-label">&lt;img src="..."&gt;</span></td><td>Image (self-closing — no closing tag needed)</td></tr>
+    <tr><td><span class="tag-label">&lt;ul&gt;</span> + <span class="tag-label">&lt;li&gt;</span></td><td>Unordered (bullet) list</td></tr>
+    <tr><td><span class="tag-label">&lt;ol&gt;</span> + <span class="tag-label">&lt;li&gt;</span></td><td>Ordered (numbered) list</td></tr>
+    <tr><td><span class="tag-label">&lt;br&gt;</span></td><td>Line break (self-closing)</td></tr>
+    <tr><td><span class="tag-label">&lt;hr&gt;</span></td><td>Horizontal line (self-closing)</td></tr>
+  </table>
+
+  <h2>The HTML Document Structure</h2>
+  <p>Every HTML page follows this skeleton:</p>
+  <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Page Title&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Hello World!&lt;/h1&gt;
+    &lt;p&gt;Content goes here.&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+  <div class="concept-box">
+    <h3>The HTML Tree (DOM)</h3>
+    <p>HTML is organized like a <strong>family tree</strong>. Tags can be <em>parents</em>, <em>children</em>, and <em>siblings</em>:</p>
+    <pre class="tree">html
+├── head
+│   └── title
+└── body
+    ├── h1
+    ├── p
+    └── ul
+        ├── li
+        ├── li
+        └── li</pre>
+    <p>This tree is called the <strong>DOM</strong> (Document Object Model) — it's what Beautiful Soup navigates to find data!</p>
+  </div>
+
+  <h2>Attributes — Extra Info on Tags</h2>
+  <p>Attributes go <strong>inside</strong> the opening tag and provide additional details:</p>
+  <pre><code>&lt;a <strong>href</strong>="https://google.com"&gt;Click here&lt;/a&gt;
+&lt;img <strong>src</strong>="cat.jpg" <strong>alt</strong>="A cute cat"&gt;
+&lt;div <strong>id</strong>="header" <strong>class</strong>="main"&gt;...&lt;/div&gt;</code></pre>
+
+  <table class="ref">
+    <tr><th>Attribute</th><th>Purpose</th></tr>
+    <tr><td><span class="tag-label green">id</span></td><td>A <strong>unique</strong> name for one element on the page</td></tr>
+    <tr><td><span class="tag-label green">class</span></td><td>A <strong>group</strong> label — many elements can share the same class</td></tr>
+    <tr><td><span class="tag-label">href</span></td><td>Where a link goes</td></tr>
+    <tr><td><span class="tag-label">src</span></td><td>Source file for images or media</td></tr>
+  </table>
+
+  <div class="scraping-callout">
+    <div class="label">🔗 Beautiful Soup Connection</div>
+    <p><code>id</code> and <code>class</code> are the two most important attributes for web scraping. Next week you'll write code like:<br>
+    <code>soup.find('div', id='main-content')</code><br>
+    <code>soup.find_all('p', class_='article')</code></p>
+  </div>
+
+  <h2>Nesting — Tags Inside Tags</h2>
+  <p>Tags are often nested inside each other, like boxes within boxes:</p>
+  <pre><code>&lt;div class="card"&gt;
+  &lt;h2&gt;Product Name&lt;/h2&gt;
+  &lt;p&gt;Price: &lt;span class="price"&gt;$29.99&lt;/span&gt;&lt;/p&gt;
+  &lt;a href="/buy"&gt;Buy Now&lt;/a&gt;
+&lt;/div&gt;</code></pre>
+  <p><strong>Rule:</strong> Tags must close in the <em>reverse</em> order they opened — like unstacking plates.</p>
+
+  <h2>Containers: &lt;div&gt; and &lt;span&gt;</h2>
+  <div class="concept-box">
+    <p><span class="tag-label">&lt;div&gt;</span> — a <strong>block</strong> container (takes full width, stacks vertically)</p>
+    <p><span class="tag-label">&lt;span&gt;</span> — an <strong>inline</strong> container (wraps just a few words within a line)</p>
+    <p>Websites use <code>&lt;div&gt;</code> and <code>&lt;span&gt;</code> with <code>class</code> and <code>id</code> attributes to organize content — these are your primary targets when scraping!</p>
+  </div>
+</div>
+
+<!-- ========== PLAYGROUND TAB ========== -->
+<div id="playground" class="panel">
+  <h2>Live HTML Playground</h2>
+  <p>Edit the HTML on the left and click <strong>▶ Run</strong> to see the result on the right. Experiment!</p>
+
+  <div class="editor-wrap">
+    <div class="editor-bar">
+      <span>✏️ HTML Editor</span>
+      <button onclick="runEditor('ed1')">▶ Run</button>
+    </div>
+    <div class="editor-area">
+      <textarea id="ed1" spellcheck="false"><h1>Hello, Data Scientists!</h1>
+<p>This is a <strong>paragraph</strong> with <em>italic</em> text.</p>
+<a href="https://www.learnandhelp.com">Visit Learn and Help</a>
+<hr>
+<h2>My Favorite Fruits</h2>
+<ul>
+  <li>Apples</li>
+  <li>Bananas</li>
+  <li>Cherries</li>
+</ul></textarea>
+      <div class="preview" id="prev1"></div>
+    </div>
+  </div>
+
+  <h3>Try This: Build a Table</h3>
+  <div class="editor-wrap">
+    <div class="editor-bar">
+      <span>✏️ HTML Editor</span>
+      <button onclick="runEditor('ed2')">▶ Run</button>
+    </div>
+    <div class="editor-area">
+      <textarea id="ed2" spellcheck="false"><table border="1">
+  <tr>
+    <th>Name</th>
+    <th>Age</th>
+    <th>Favorite Subject</th>
+  </tr>
+  <tr>
+    <td>Alice</td>
+    <td>14</td>
+    <td>Math</td>
+  </tr>
+  <tr>
+    <td>Bob</td>
+    <td>13</td>
+    <td>Science</td>
+  </tr>
+  <tr>
+    <td>Carol</td>
+    <td>14</td>
+    <td>Art</td>
+  </tr>
+</table></textarea>
+      <div class="preview" id="prev2"></div>
+    </div>
+  </div>
+
+  <h3>Try This: Nested Divs with Classes</h3>
+  <div class="editor-wrap">
+    <div class="editor-bar">
+      <span>✏️ HTML Editor</span>
+      <button onclick="runEditor('ed3')">▶ Run</button>
+    </div>
+    <div class="editor-area">
+      <textarea id="ed3" spellcheck="false"><div class="product-card" style="border:2px solid #333; padding:12px; margin:8px; border-radius:8px;">
+  <h2>Wireless Headphones</h2>
+  <p>Brand: <span class="brand">SoundMax</span></p>
+  <p>Price: <span class="price" style="color:green; font-weight:bold;">$49.99</span></p>
+  <p>Rating: ⭐⭐⭐⭐☆</p>
+  <a href="/buy/headphones">Buy Now</a>
+</div>
+
+<div class="product-card" style="border:2px solid #333; padding:12px; margin:8px; border-radius:8px;">
+  <h2>Bluetooth Speaker</h2>
+  <p>Brand: <span class="brand">BassWave</span></p>
+  <p>Price: <span class="price" style="color:green; font-weight:bold;">$29.99</span></p>
+  <p>Rating: ⭐⭐⭐⭐⭐</p>
+  <a href="/buy/speaker">Buy Now</a>
+</div></textarea>
+      <div class="preview" id="prev3"></div>
+    </div>
+  </div>
+
+  <div class="scraping-callout">
+    <div class="label">💡 Think Like a Scraper</div>
+    <p>Look at the product cards above. If you wanted to extract all the prices, you'd look for <code>&lt;span class="price"&gt;</code> tags. In Beautiful Soup: <code>soup.find_all('span', class_='price')</code></p>
+  </div>
+
+  <h3>Online Playgrounds for More Practice</h3>
+  <div class="concept-box">
+    <p>🔗 <a href="https://www.w3schools.com/html/tryit.asp?filename=tryhtml_default" target="_blank" style="color:var(--accent);">W3Schools Tryit Editor</a> — edit and preview HTML instantly</p>
+    <p>🔗 <a href="https://codepen.io/pen/" target="_blank" style="color:var(--accent);">CodePen</a> — write HTML, CSS, and JS in a split-screen editor</p>
+    <p>🔗 <a href="https://jsfiddle.net/" target="_blank" style="color:var(--accent);">JSFiddle</a> — another popular HTML playground</p>
+    <p>🔗 <a href="https://www.w3schools.com/html/" target="_blank" style="color:var(--accent);">W3Schools HTML Tutorial</a> — step-by-step lessons with exercises</p>
+  </div>
+</div>
+
+<!-- ========== TABLES & SCRAPING TAB ========== -->
+<div id="tables" class="panel">
+  <h2>HTML Tables — A Data Scientist's Best Friend</h2>
+  <p>A huge amount of data on the web lives inside HTML tables. Understanding the table tags is critical for scraping.</p>
+
+  <div class="concept-box highlight">
+    <h3>Table Tag Anatomy</h3>
+    <table class="ref">
+      <tr><th>Tag</th><th>Stands For</th><th>Purpose</th></tr>
+      <tr><td><span class="tag-label">&lt;table&gt;</span></td><td>Table</td><td>Wraps the entire table</td></tr>
+      <tr><td><span class="tag-label">&lt;tr&gt;</span></td><td>Table Row</td><td>One horizontal row</td></tr>
+      <tr><td><span class="tag-label">&lt;th&gt;</span></td><td>Table Header</td><td>Header cell (bold, centered)</td></tr>
+      <tr><td><span class="tag-label">&lt;td&gt;</span></td><td>Table Data</td><td>Regular data cell</td></tr>
+      <tr><td><span class="tag-label orange">&lt;thead&gt;</span></td><td>Table Head</td><td>Groups header rows (optional)</td></tr>
+      <tr><td><span class="tag-label orange">&lt;tbody&gt;</span></td><td>Table Body</td><td>Groups data rows (optional)</td></tr>
+    </table>
+  </div>
+
+  <h3>How a Table Maps to a DataFrame</h3>
+  <p>This HTML table:</p>
+  <pre><code>&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;City&lt;/th&gt;
+    &lt;th&gt;Population&lt;/th&gt;
+    &lt;th&gt;State&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Atlanta&lt;/td&gt;
+    &lt;td&gt;498,715&lt;/td&gt;
+    &lt;td&gt;GA&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Boston&lt;/td&gt;
+    &lt;td&gt;675,647&lt;/td&gt;
+    &lt;td&gt;MA&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;</code></pre>
+  <p>…becomes this Pandas DataFrame:</p>
+  <pre><code>     City  Population State
+0  Atlanta    498,715    GA
+1   Boston    675,647    MA</code></pre>
+
+  <div class="scraping-callout">
+    <div class="label">🐍 Beautiful Soup Preview</div>
+    <p>Next week you'll extract tables with code like this:</p>
+    <pre style="background:transparent; border:none; padding:4px 0; color:var(--green);"><code>from bs4 import BeautifulSoup
+
+soup = BeautifulSoup(html, 'html.parser')
+table = soup.find('table')
+rows = table.find_all('tr')
+
+for row in rows:
+    cells = row.find_all(['th', 'td'])
+    data = [cell.text for cell in cells]
+    print(data)</code></pre>
+  </div>
+
+  <h3>Try It: Edit a Data Table</h3>
+  <div class="editor-wrap">
+    <div class="editor-bar">
+      <span>✏️ HTML Editor</span>
+      <button onclick="runEditor('ed4')">▶ Run</button>
+    </div>
+    <div class="editor-area">
+      <textarea id="ed4" spellcheck="false"><table border="1" cellpadding="6">
+  <thead>
+    <tr>
+      <th>Student</th>
+      <th>Math</th>
+      <th>Science</th>
+      <th>English</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Alice</td>
+      <td>95</td>
+      <td>88</td>
+      <td>92</td>
+    </tr>
+    <tr>
+      <td>Bob</td>
+      <td>78</td>
+      <td>91</td>
+      <td>85</td>
+    </tr>
+    <tr>
+      <td>Carol</td>
+      <td>88</td>
+      <td>94</td>
+      <td>90</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><em>Try adding a new student row!</em></p></textarea>
+      <div class="preview" id="prev4"></div>
+    </div>
+  </div>
+
+  <h2>Real-World Scraping Targets</h2>
+  <div class="concept-box">
+    <p>Here are the kinds of HTML structures data scientists commonly scrape:</p>
+    <table class="ref">
+      <tr><th>Data Source</th><th>HTML Tags Used</th></tr>
+      <tr><td>Wikipedia tables</td><td><code>&lt;table class="wikitable"&gt;</code></td></tr>
+      <tr><td>Product listings</td><td><code>&lt;div class="product"&gt;</code> with <code>&lt;span class="price"&gt;</code></td></tr>
+      <tr><td>News headlines</td><td><code>&lt;h2 class="headline"&gt;</code> or <code>&lt;a class="title"&gt;</code></td></tr>
+      <tr><td>Sports scores</td><td><code>&lt;table&gt;</code> with <code>&lt;td class="score"&gt;</code></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ========== QUIZ TAB ========== -->
+<div id="quiz" class="panel">
+  <h2>HTML for Data Scientists — Quiz</h2>
+
+  <div class="quiz-intro">
+    <p><strong>Enter your name to begin:</strong></p>
+    <input type="text" id="studentName" placeholder="Your full name">
+    <p style="margin-top:8px; font-size:13px; color:var(--text-dim);">Answer all 10 questions, then click Submit.</p>
+  </div>
+
+  <div id="quiz-questions"></div>
+
+  <button id="submit-quiz" onclick="submitQuiz()">Submit Quiz</button>
+
+  <div class="score-panel" id="scorePanel">
+    <div class="big-score" id="scoreText"></div>
+    <p id="scoreName" style="font-size:16px; margin:4px 0;"></p>
+    <div class="breakdown" id="scoreBreakdown"></div>
+    <div class="reminder">📸 Take a screenshot of this score and submit it to Google Classroom!</div>
+  </div>
+</div>
+
+<div class="footer">
+  Python for Data Science — <a href="https://www.learnandhelp.com">Learn and Help</a> — empowering students through technology and service.
+</div>
+
+<script>
+// Tab switching
+function showTab(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// Live editor
+function runEditor(id) {
+  const code = document.getElementById(id).value;
+  const num = id.replace('ed','');
+  const prev = document.getElementById('prev'+num);
+  prev.innerHTML = code;
+}
+// Auto-run editors on load
+window.addEventListener('DOMContentLoaded', () => {
+  ['ed1','ed2','ed3','ed4'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) {
+      const num = id.replace('ed','');
+      const prev = document.getElementById('prev'+num);
+      if(prev) prev.innerHTML = el.value;
+    }
+  });
+});
+
+// Quiz data
+const questions = [
+  // Category: HTML Basics (3)
+  { cat:"HTML Basics", q:"What does HTML stand for?", opts:["Hyper Trainer Marking Language","HyperText Markup Language","HyperText Marketing Language","High Text Markup Language"], ans:1 },
+  { cat:"HTML Basics", q:"Which section of an HTML document contains the <strong>visible</strong> content?", opts:["<code>&lt;head&gt;</code>","<code>&lt;body&gt;</code>","<code>&lt;title&gt;</code>","<code>&lt;html&gt;</code>"], ans:1 },
+  { cat:"HTML Basics", q:"Which tag is <strong>self-closing</strong> (does not need a closing tag)?", opts:["<code>&lt;p&gt;</code>","<code>&lt;div&gt;</code>","<code>&lt;br&gt;</code>","<code>&lt;a&gt;</code>"], ans:2 },
+
+  // Category: Tags & Structure (4)
+  { cat:"Tags & Structure", q:"What does the <code>&lt;ul&gt;</code> tag create?", opts:["An ordered (numbered) list","An underline","An unordered (bullet) list","A URL link"], ans:2 },
+  { cat:"Tags & Structure", q:"Which attribute specifies where a link goes?", opts:["<code>src</code>","<code>link</code>","<code>href</code>","<code>url</code>"], ans:2 },
+  { cat:"Tags & Structure", q:"What is the difference between <code>&lt;div&gt;</code> and <code>&lt;span&gt;</code>?", opts:["div is inline, span is block","div is block-level, span is inline","They are identical","div is for images, span is for text"], ans:1 },
+  { cat:"Tags & Structure", q:"The tree-like structure of an HTML document is called the:", opts:["HTML Tree","DOM (Document Object Model)","Tag Map","Web Graph"], ans:1 },
+
+  // Category: Tables & Scraping (3)
+  { cat:"Tables & Scraping", q:"Which tag represents a single <strong>row</strong> in an HTML table?", opts:["<code>&lt;td&gt;</code>","<code>&lt;table&gt;</code>","<code>&lt;tr&gt;</code>","<code>&lt;th&gt;</code>"], ans:2 },
+  { cat:"Tables & Scraping", q:"What is the difference between <code>&lt;th&gt;</code> and <code>&lt;td&gt;</code>?", opts:["th is for data, td is for headers","th is for headers, td is for data","th is for rows, td is for columns","They are the same"], ans:1 },
+  { cat:"Tables & Scraping", q:"A data scientist wants to extract every price from product cards that use <code>&lt;span class=\"price\"&gt;</code>. Which Beautiful Soup code is correct?", opts:["<code>soup.find('span', id='price')</code>","<code>soup.find_all('span', class_='price')</code>","<code>soup.find_all('price')</code>","<code>soup.get('span.price')</code>"], ans:1 }
+];
+
+// Render quiz
+const qContainer = document.getElementById('quiz-questions');
+questions.forEach((q, i) => {
+  let optsHTML = q.opts.map((o,j) =>
+    `<label><input type="radio" name="q${i}" value="${j}"> ${o}</label>`
+  ).join('');
+  qContainer.innerHTML += `
+    <div class="q-card" id="qcard${i}">
+      <div class="q-num">${q.cat} — Question ${i+1}</div>
+      <div class="q-text">${q.q}</div>
+      ${optsHTML}
+      <div class="feedback" id="fb${i}"></div>
+    </div>`;
+});
+
+function submitQuiz() {
+  const name = document.getElementById('studentName').value.trim();
+  if (!name) { alert('Please enter your name before submitting.'); return; }
+
+  // Check all answered
+  for (let i = 0; i < questions.length; i++) {
+    const sel = document.querySelector(`input[name="q${i}"]:checked`);
+    if (!sel) { alert(`Please answer Question ${i+1} before submitting.`); return; }
+  }
+
+  let total = 0;
+  const catScores = {};
+  questions.forEach((q,i) => {
+    if (!catScores[q.cat]) catScores[q.cat] = {correct:0, total:0};
+    catScores[q.cat].total++;
+    const sel = parseInt(document.querySelector(`input[name="q${i}"]:checked`).value);
+    const card = document.getElementById('qcard'+i);
+    const fb = document.getElementById('fb'+i);
+    // Disable inputs
+    card.querySelectorAll('input').forEach(inp => inp.disabled = true);
+
+    if (sel === q.ans) {
+      total++;
+      catScores[q.cat].correct++;
+      card.classList.add('correct');
+      fb.className = 'feedback correct-fb';
+      fb.textContent = '✓ Correct!';
+    } else {
+      card.classList.add('incorrect');
+      fb.className = 'feedback incorrect-fb';
+      const correctText = q.opts[q.ans].replace(/<[^>]*>/g,'');
+      fb.textContent = '✗ Incorrect — Answer: ' + correctText;
+    }
+  });
+
+  // Show score
+  const pct = Math.round(total/questions.length*100);
+  document.getElementById('scoreText').textContent = `${total}/${questions.length} (${pct}%)`;
+  document.getElementById('scoreName').textContent = name;
+  let bd = '';
+  for (const cat in catScores) {
+    bd += `<span><strong>${cat}:</strong> ${catScores[cat].correct}/${catScores[cat].total}</span>`;
+  }
+  document.getElementById('scoreBreakdown').innerHTML = bd;
+  document.getElementById('scorePanel').classList.add('show');
+  document.getElementById('submit-quiz').disabled = true;
+  document.getElementById('scorePanel').scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body>
+</html>
