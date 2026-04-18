@@ -39,7 +39,8 @@ By the end of this lesson, students will be able to:
 | Resource | Type | Link |
 | --- | --- | --- |
 | Beautiful Soup Guide | Markdown | [Web Scraping with Beautiful Soup](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Presentations/webscraping_with_beautiful_soup.md) |
-| Beautiful Soup Examples | Jupyter Notebook | [web\_scraping\_with\_beautiful\_soup.ipynb](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Presentations/python_ds_web_scraping_with_beautiful_soup.ipynb) |
+| Beautiful Soup Examples 1 | Jupyter Notebook | [web\_scraping\_with\_beautiful\_soup.ipynb](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Presentations/python_ds_beautiful_soup.ipynb) |
+| Beautiful Soup Examples 2 | Jupyter Notebook | [web\_scraping\_with\_beautiful\_soup.ipynb](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Presentations/python_ds_web_scraping_with_beautiful_soup.ipynb) |
 | Interactive Playbook & Quiz | HTML | [Beautiful Soup](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Quizzes/beautiful_soup_playbook_and_quiz.html) |
 | Assignment | Markdown | [Beautiful Soup Assignment](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Assignments/beautiful_soup_assignment.md) |
 | Beautiful Soup Docs | External | [beautiful-soup-4.readthedocs.io](https://beautiful-soup-4.readthedocs.io/en/latest/) |
