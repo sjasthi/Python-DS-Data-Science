@@ -39,20 +39,20 @@ By the end of this lesson, students will be able to:
 | Resource | Type | Link |
 | --- | --- | --- |
 | Beautiful Soup Guide | Markdown | [Web Scraping with Beautiful Soup](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Presentations/webscraping_with_beautiful_soup.md) |
-| Beautiful Soup Examples | Jupyter Notebook | [web_scraping_with_beautiful_soup.ipynb](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Presentations/python_ds_web_scraping_with_beautiful_soup.ipynb) |
+| Beautiful Soup Examples | Jupyter Notebook | [web\_scraping\_with\_beautiful\_soup.ipynb](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Presentations/python_ds_web_scraping_with_beautiful_soup.ipynb) |
 | Interactive Playbook & Quiz | HTML | [Beautiful Soup](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Quizzes/beautiful_soup_playbook_and_quiz.html) |
 | Assignment | Markdown | [Beautiful Soup Assignment](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Assignments/beautiful_soup_assignment.md) |
 | Beautiful Soup Docs | External | [beautiful-soup-4.readthedocs.io](https://beautiful-soup-4.readthedocs.io/en/latest/) |
 | Requests Library Docs | External | [docs.python-requests.org](https://docs.python-requests.org/en/latest/) |
-| W3Schools HTML Tables | External | [www.w3schools.com/html/html_tables.asp](https://www.w3schools.com/html/html_tables.asp) |
+| W3Schools HTML Tables | External | [www.w3schools.com/html/html\_tables.asp](https://www.w3schools.com/html/html_tables.asp) |
 | GitHub Repo | External | [github.com/sjasthi/Python-DS-Data-Science](https://github.com/sjasthi/Python-DS-Data-Science) |
 
 ### Recommended YouTube Tutorials
 
-* **Tech With Tim** — "Beautiful Soup Tutorial — Web Scraping in Python" (clear, beginner-friendly)
-* **freeCodeCamp** — "Python Web Scraping with Beautiful Soup" (project-based)
-* **Corey Schafer** — "Python Tutorial: Web Scraping with BeautifulSoup and Requests" (well-paced)
-* **NetworkChuck** — "you need to learn Web Scraping RIGHT NOW!!" (engaging, practical)
+* **Tech With Tim** — [Beautiful Soup 4 Tutorial #1 - Web Scraping With Python](https://www.youtube.com/watch?v=gRLHr664tXA) (clear, beginner-friendly)
+* **freeCodeCamp** — [Web Scraping with Python - Beautiful Soup Crash Course](https://www.youtube.com/watch?v=XVv6mJpFOb0) (project-based)
+* **Corey Schafer** — [Python Tutorial: Web Scraping with BeautifulSoup and Requests](https://www.youtube.com/watch?v=ng2o98k983k) (well-paced)
+* **NetworkChuck** — [you need to learn Web Scraping RIGHT NOW!!](https://www.youtube.com/watch?v=4UMjGrL1tEk) (engaging, practical)
 
 ## Key Vocabulary
 
@@ -72,7 +72,7 @@ By the end of this lesson, students will be able to:
 
 ## Assessment
 
-* **Quiz:** 10 questions  — screenshot submission to Google Classroom
+* **Quiz:** 10 questions — screenshot submission to Google Classroom
 * **Assignment:** Exercises 1–5 completed in Google Colab (link to notebook submitted via Google Classroom)
 
 ---
