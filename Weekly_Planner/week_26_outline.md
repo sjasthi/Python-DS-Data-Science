@@ -52,7 +52,6 @@ By the end of this lesson, students will be able to:
 * **Tech With Tim** — [Beautiful Soup 4 Tutorial #1 - Web Scraping With Python](https://www.youtube.com/watch?v=gRLHr664tXA) (clear, beginner-friendly)
 * **freeCodeCamp** — [Web Scraping with Python - Beautiful Soup Crash Course](https://www.youtube.com/watch?v=XVv6mJpFOb0) (project-based)
 * **Corey Schafer** — [Python Tutorial: Web Scraping with BeautifulSoup and Requests](https://www.youtube.com/watch?v=ng2o98k983k) (well-paced)
-* **NetworkChuck** — [you need to learn Web Scraping RIGHT NOW!!](https://www.youtube.com/watch?v=4UMjGrL1tEk) (engaging, practical)
 
 ## Key Vocabulary
 
