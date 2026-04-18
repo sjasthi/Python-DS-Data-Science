@@ -38,10 +38,10 @@ By the end of this lesson, students will be able to:
 
 | Resource | Type | Link |
 | --- | --- | --- |
-| Beautiful Soup Guide | Markdown | `week_26_beautifulsoup.md` |
-| Beautiful Soup Examples | Jupyter Notebook | `week_26_beautifulsoup.ipynb` |
-| Interactive Playbook & Quiz | HTML | `week_26_playbook.html` |
-| Lab Exercises | Markdown | `week_26_lab.md` |
+| Beautiful Soup Guide | Markdown | [Web Scraping with Beautiful Soup](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Presentations/webscraping_with_beautiful_soup.md) |
+| Beautiful Soup Examples | Jupyter Notebook | [web_scraping_with_beautiful_soup.ipynb](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Presentations/python_ds_web_scraping_with_beautiful_soup.ipynb) |
+| Interactive Playbook & Quiz | HTML | [Beautiful Soup](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Quizzes/beautiful_soup_playbook_and_quiz.html) |
+| Assignment | Markdown | [Beautiful Soup Assignment] (https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Assignments/beautiful_soup_assignment.md) |
 | Beautiful Soup Docs | External | [beautiful-soup-4.readthedocs.io](https://beautiful-soup-4.readthedocs.io/en/latest/) |
 | Requests Library Docs | External | [docs.python-requests.org](https://docs.python-requests.org/en/latest/) |
 | W3Schools HTML Tables | External | [www.w3schools.com/html/html_tables.asp](https://www.w3schools.com/html/html_tables.asp) |
@@ -53,19 +53,6 @@ By the end of this lesson, students will be able to:
 * **freeCodeCamp** — "Python Web Scraping with Beautiful Soup" (project-based)
 * **Corey Schafer** — "Python Tutorial: Web Scraping with BeautifulSoup and Requests" (well-paced)
 * **NetworkChuck** — "you need to learn Web Scraping RIGHT NOW!!" (engaging, practical)
-
-## Lesson Flow (80 minutes)
-
-| Time | Activity | Details |
-| --- | --- | --- |
-| 0–5 min | **Warm-Up** | "Last week you built HTML by hand. Today Python reads it for you!" Quick poll: what kind of data would you want to scrape from the web? (sports stats, movie ratings, prices?) |
-| 5–15 min | **What is Web Scraping?** | Explain the concept: HTTP request → HTML response → parse → extract data. Show the big picture diagram in the playbook. Introduce `requests` + `beautifulsoup4`. |
-| 15–25 min | **Parsing HTML** | Walk through `BeautifulSoup(html, 'html.parser')`. Show `.prettify()`. Demo finding tags in a simple HTML string. Connect directly to Week 25 HTML knowledge. |
-| 25–40 min | **Finding Elements** | Deep-dive on `.find()` vs `.find_all()`. Searching by tag name, `class_`, `id`, attributes. Extracting `.text` and `.get('href')`. Live coding in Colab. |
-| 40–55 min | **Scraping Tables → DataFrames** | Walk through scraping an HTML table row-by-row. Build a DataFrame from the extracted data. Show `pd.read_html()` as a shortcut and discuss its limitations. |
-| 55–65 min | **Ethics & Real-World Scraping** | Discuss robots.txt, rate limiting, terms of service. Quick demo of `time.sleep()`. Talk about what is and isn't acceptable to scrape. |
-| 65–75 min | **Lab Time** | Students work on Lab Exercises 1–5 in Colab. Circulate and help with tag navigation and DataFrame construction. |
-| 75–80 min | **Quiz & Wrap-Up** | Students complete the 15-question quiz in the playbook. Screenshot score for Google Classroom. Preview Week 27. |
 
 ## Key Vocabulary
 
@@ -85,12 +72,8 @@ By the end of this lesson, students will be able to:
 
 ## Assessment
 
-* **Quiz:** 15 questions (5 Web Scraping Basics, 5 Finding & Extracting, 5 Tables & DataFrames) — screenshot submission to Google Classroom
-* **Lab:** Exercises 1–5 completed in Google Colab (link to notebook submitted via Google Classroom)
-
-## Looking Ahead
-
-* **Week 27:** APIs and JSON — fetching structured data directly from web APIs (a cleaner alternative to scraping when APIs are available)
+* **Quiz:** 10 questions  — screenshot submission to Google Classroom
+* **Assignment:** Exercises 1–5 completed in Google Colab (link to notebook submitted via Google Classroom)
 
 ---
 
