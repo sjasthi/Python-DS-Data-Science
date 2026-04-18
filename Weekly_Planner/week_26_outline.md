@@ -41,7 +41,7 @@ By the end of this lesson, students will be able to:
 | Beautiful Soup Guide | Markdown | [Web Scraping with Beautiful Soup](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Presentations/webscraping_with_beautiful_soup.md) |
 | Beautiful Soup Examples | Jupyter Notebook | [web_scraping_with_beautiful_soup.ipynb](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Presentations/python_ds_web_scraping_with_beautiful_soup.ipynb) |
 | Interactive Playbook & Quiz | HTML | [Beautiful Soup](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Quizzes/beautiful_soup_playbook_and_quiz.html) |
-| Assignment | Markdown | [Beautiful Soup Assignment] (https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Assignments/beautiful_soup_assignment.md) |
+| Assignment | Markdown | [Beautiful Soup Assignment](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Assignments/beautiful_soup_assignment.md) |
 | Beautiful Soup Docs | External | [beautiful-soup-4.readthedocs.io](https://beautiful-soup-4.readthedocs.io/en/latest/) |
 | Requests Library Docs | External | [docs.python-requests.org](https://docs.python-requests.org/en/latest/) |
 | W3Schools HTML Tables | External | [www.w3schools.com/html/html_tables.asp](https://www.w3schools.com/html/html_tables.asp) |
