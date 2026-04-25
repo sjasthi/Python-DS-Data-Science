@@ -51,7 +51,7 @@ This course introduces middle and high school students to Data Science using Pyt
 | 27 | 04/25/26 | 05/01/26 | Final Project - Working Session 1 |
 | 28 | 05/02/26 | 05/08/26 | Final Project - Working Session 2 |
 | 29 | 05/09/26 | 05/15/26 | Final Project - Working Session 3 |
-| 30 | 05/16/26 | 05/22/26 | **Final Project - Demonstration** |
+| 30 | 05/16/26 | - | **Final Project - Demonstration** |
 
 ---
 
