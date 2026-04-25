@@ -31,14 +31,14 @@ By the end of this project, we will have a polished, nationwide dataset of stude
 
 | # | Student | Assigned States | # States |
 |---|---|---|---|
-| 1 | **Amaira Srivastava** | Alabama, Alaska, Arizona, Arkansas, California, Colorado | 6 |
+| 1 | **Amaira Srivastava** | Alabama, Alaska, Arizona, Arkansas, California, Colorado, Oregon | 7 |
 | 2 | **Ayush** | Connecticut, Delaware, Florida, Georgia, Hawaii, Idaho | 6 |
-| 3 | **Bhargav Kodali** | Illinois, Indiana, Iowa, Kansas, Kentucky, Louisiana | 6 |
-| 4 | **Dakshin Gorugantu** | Maine, Maryland, Massachusetts, Michigan, Minnesota, Mississippi | 6 |
-| 5 | **Eesha Gorugantu** | Missouri, Montana, Nebraska, Nevada, New Hampshire, New Jersey | 6 |
+| 3 | **Bhargav Kodali** | Illinois, Indiana, Kansas, Kentucky, Louisiana, Minnesota, Wisconsin | 7 |
+| 4 | **Dakshin Gorugantu** | Maine, Maryland, Massachusetts, Michigan, Iowa, Mississippi | 6 |
+| 5 | **Eesha Gorugantu** | Missouri, Montana, Nebraska, Nevada, New Hampshire, Texas | 6 |
 | 6 | **Eli Muthyala** | New Mexico, New York, North Carolina, North Dakota, Ohio, Oklahoma | 6 |
-| 7 | **Lakshya Sri** | Oregon, Pennsylvania, Rhode Island, South Carolina, South Dakota, Tennessee, Texas | 7 |
-| 8 | **Saketh Gorugantu** | Utah, Vermont, Virginia, Washington, West Virginia, Wisconsin, Wyoming | 7 |
+| 7 | **Lakshya Sri** | New Jersey, Pennsylvania, Rhode Island, South Carolina, South Dakota, Tennessee | 6 |
+| 8 | **Saketh Gorugantu** | Utah, Vermont, Virginia, Washington, West Virginia, Wyoming | 6 |
 
 > **All students** should also identify **2–3 national programs** (programs available across all states) to add to the shared dataset under the state value `USA`.
 
