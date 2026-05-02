@@ -46,7 +46,7 @@ By the end of this project, we will have a polished, nationwide dataset of stude
 
 ## 25 Research Questions
 
-You must answer **all 25 questions** as part of your final project. Use the combined class dataset (all 50 states) for your analysis.
+You must answer a total of **16 questions** (25th question + another 15) as part of your final project. Use the combined class dataset (all 50 states) for your analysis.
 
 | # | Research Question |
 |---|---|
