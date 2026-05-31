@@ -1,5 +1,5 @@
 # Week 5 Outline - Data Encapsulation & Python Libraries
-**Date:** October 4, 2025
+**Date:** 
 
 ---
 
