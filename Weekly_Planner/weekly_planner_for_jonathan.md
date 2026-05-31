@@ -1,14 +1,11 @@
-# Python for Data Science - Weekly Planner (Revised from Week 5)
-
-Learn and Help  
-Academic Year: 2025–2026  
+# Python for Data Science - Weekly Planner for Jonathan
 
 ---
 
-## Weekly Schedule (Starting Week 5)
+## Weekly Schedule
 
 ### #1
-Week 1 
+Week 1 (5/31/26)
 Data Encapsulation & Exploring Python Libraries  
 
 ### #2
