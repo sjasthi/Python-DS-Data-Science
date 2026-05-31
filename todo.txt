@@ -1,0 +1,4 @@
+How to incorporate secrets in Google Colab Notebook?
+
+https://drlee.io/how-to-use-secrets-in-google-colab-for-api-key-protection-a-guide-for-openai-huggingface-and-c1ec9e1277e0
+
