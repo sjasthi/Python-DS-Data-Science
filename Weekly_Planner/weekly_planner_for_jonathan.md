@@ -1,4 +1,4 @@
-# Python Data Science Weekly Planner for Jonathana
+# Python Data Science Weekly Planner for Jonathan
 
 | Week # | Date | Topic |
 |--------|------|------|
