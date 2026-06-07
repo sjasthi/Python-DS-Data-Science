@@ -3,7 +3,7 @@
 | Week # | Date | Topic |
 |--------|------|------|
 | 1 | 5/31/2026 | Data Encapsulation & Exploring Python Libraries |
-| 2 | - | Data Types, Data Sources & Data Formats |
+| 2 | 6/7/2026 | Data Types, Data Sources & Data Formats |
 | 3 | - | Introduction to Excel |
 | 4 | - | Excel for Data Analysis |
 | 5 | - | Python Libraries for Data Science |
