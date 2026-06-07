@@ -73,8 +73,8 @@ Welcome to Week 6! This week we dive into the foundation of Data Science - under
 
 ## ✅ What's Due Today?
 
-### 📝 Quiz 4: Data Types
-**Due:** Today (Saturday, October 11, 2025)
+### 📝 Quiz: Data Types
+**Due:** Today
 
 🔗 [Take Quiz 4 in Google Classroom](https://docs.google.com/forms/d/1hCmU_U27EjhZ2n5Jl9dKClkHt4AKHMFCjv7BXcog5lA/edit)
 
@@ -89,7 +89,6 @@ Welcome to Week 6! This week we dive into the foundation of Data Science - under
 ## 📋 What's Due This Week?
 
 ### 💻 Assignment 5: Exploring the Requests Module
-**Due Date:** Friday, October 17, 2025
 
 🔗 [Assignment Details (Jupyter Notebook)](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Assignments/python_ds_exploring_requests_module_assignment.ipynb)
 
@@ -105,8 +104,8 @@ Welcome to Week 6! This week we dive into the foundation of Data Science - under
 
 - [ ] Review all three presentations
 - [ ] Practice with the Interactive Data Types Playbook
-- [ ] Complete Quiz 4 (Data Types) - **DUE TODAY**
-- [ ] Start Assignment 5 (Requests Module) - Due 10/17/25
+- [ ] Complete Quiz 4 (Data Types) 
+- [ ] Start Assignment 5 (Requests Module) 
 - [ ] Ask questions if anything is unclear!
 
 ---
