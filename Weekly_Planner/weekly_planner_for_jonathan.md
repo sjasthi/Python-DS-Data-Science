@@ -2,11 +2,11 @@
 
 | Week # | Date | Topic |
 |--------|------|------|
-| 1 | 5/31/2026 | Data Encapsulation & Exploring Python Libraries |
-| 2 | 6/7/2026 | Data Types, Data Sources & Data Formats |
-| 3 | - | Introduction to Excel |
-| 4 | - | Excel for Data Analysis |
-| 5 | - | Python Libraries for Data Science |
+| 5 | 5/31/2026 | Data Encapsulation & Exploring Python Libraries |
+| 6 | 6/7/2026 | Data Types, Data Sources & Data Formats |
+| 7 | - | Introduction to Excel |
+| 8 | - | Excel for Data Analysis |
+| 9 | - | Python Libraries for Data Science |
 | 6 | - | NumPy - Introduction |
 | 7 | - | Introduction to Pandas - DataFrame and Series |
 | 8 | - | DataFrame - CRUD Operations |
