@@ -4,8 +4,8 @@
 |--------|------|------|
 | 5 | 5/31/2026 | Data Encapsulation & Exploring Python Libraries |
 | 6 | 6/7/2026 | Data Types, Data Sources & Data Formats |
-| 7 | - | Introduction to Excel |
-| 8 | - | Excel for Data Analysis |
+| 7 | 6/21/2026 | Introduction to Excel |
+| 8 | 7/15/2026 | Excel for Data Analysis |
 | 9 | - | Python Libraries for Data Science |
 | 6 | - | NumPy - Introduction |
 | 7 | - | Introduction to Pandas - DataFrame and Series |
