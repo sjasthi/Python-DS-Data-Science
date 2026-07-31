@@ -49,8 +49,8 @@ This course introduces middle and high school students to Data Science using Pyt
 | 26 | 04/17/27 | 04/23/27 | Beautiful Soup |
 | 27 | 04/24/27 | 04/30/27 | Final Project - Working Session 1 |
 | 28 | 05/01/27 | 05/07/27 | Final Project - Working Session 2 |
-| 29 | 05/08/27 | 05/14/27 | Final Project - Working Session 3 |
-| 30 | 05/15/27 | 05/22/27 | Final Project - Demonstration |
+| 29 | 05/08/27 | 05/14/27 | Final Project - Demonstrations #1 |
+| 30 | 05/15/27 | 05/22/27 | Final Project - Demonstrations #2 |
 ---
 
 ## Course Structure Summary
