@@ -13,9 +13,6 @@ This course introduces middle and high school students to Data Science using Pyt
 
 ## Weekly Schedule
 
-```md
-## Weekly Schedule
-
 | Class # | Week Start | Week End (Due Date) | Topic |
 | --- | --- | --- | --- |
 | 1 | 09/12/26 | 09/18/26 | Syllabus, Logistics, Introductions |
@@ -54,9 +51,6 @@ This course introduces middle and high school students to Data Science using Pyt
 | 28 | 05/01/27 | 05/07/27 | Final Project - Working Session 2 |
 | 29 | 05/08/27 | 05/14/27 | Final Project - Working Session 3 |
 | 30 | 05/15/27 | 05/22/27 | Final Project - Demonstration |
-```
-
-
 ---
 
 ## Course Structure Summary
