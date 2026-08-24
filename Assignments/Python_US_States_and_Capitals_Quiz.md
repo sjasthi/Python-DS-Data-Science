@@ -231,6 +231,3 @@ If you encounter issues:
 
 **Good luck with your U.S. States and Capitals Quiz Program!** 🇺🇸
 
----
-
-*Last updated: [9.17.2025]*
