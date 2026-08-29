@@ -1,6 +1,6 @@
 # Python Data Science Weekly Planner for Jonathan
 
-| Week # | Date | Topic |
+| Topic # | Date | Topic |
 |--------|------|------|
 | 5 | 5/31/2026 | Data Encapsulation & Exploring Python Libraries |
 | 6 | 6/7/2026 | Data Types, Data Sources & Data Formats |
