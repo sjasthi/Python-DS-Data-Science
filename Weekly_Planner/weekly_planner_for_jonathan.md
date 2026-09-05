@@ -7,9 +7,9 @@
 | 7 | 6/21/2026 | Introduction to Excel |
 | 8 | 7/15/2026, 8/22/2026 | Excel for Data Analysis |
 | 9 | 8/29/2026 | Python Libraries for Data Science |
-| 6 | - | NumPy - Introduction |
-| 7 | - | Introduction to Pandas - DataFrame and Series |
-| 8 | - | DataFrame - CRUD Operations |
+| 10 | 9/5/2026 | NumPy - Introduction |
+| 11 | - | Introduction to Pandas - DataFrame and Series |
+| 12 | - | DataFrame - CRUD Operations |
 | 9 | - | Pandas - Data Input and Output (File I/O) |
 | 10 | - | Pandas - Exploratory Data Analysis (EDA) |
 | 11 | - | Pandas - Cleaning and Preprocessing |
