@@ -22,6 +22,8 @@ You will also take the **Python Basics Test** this week.
 
 ### Notebook
 
+https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Presentations/python_DS_requests_module.ipynb
+
 [Python DS – Data Sources and File Formats](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Presentations/python_DS_requests_module.ipynb)
 
 ### What the Notebook Covers
