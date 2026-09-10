@@ -7,7 +7,7 @@
 
 ---
 
-# Week 3 Outline
+# Week 3 Outline 
 
 This week, you will review two Google Colab notebooks:
 
