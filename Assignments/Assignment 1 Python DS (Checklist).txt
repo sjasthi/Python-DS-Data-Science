@@ -1,0 +1,47 @@
+Assignment 1: Python DS
+
+[1] Registered for the class  (yes)
+[x ] Yes   [  ] No
+
+[2] Made the payment (yes)
+[x  ] Yes   [  ] No
+
+[3] Reviewed the Class Timings / Weekly Planner
+[   ] Yes   [  ] No
+
+[4] Bookmarked the ZOOM link
+[   ] Yes   [  ] No
+
+[5] Audio and Video are enabled for the ZOOM
+[   ] Yes   [  ] No
+
+[6] Allocated the time for Quizzes/Labs/Assignments 
+[   ] Yes   [  ] No
+
+[7] Request a Homework Help session (wednesdays) if needed.
+[   ] Yes   [  ] No
+
+[8] Joined class-specific whatsapp group
+https://chat.whatsapp.com/KiI6G1jo4Sv0eQJdc289DQ
+[   ] Yes   [  ] No
+
+[9] Joined the main community whatsapp group
+https://chat.whatsapp.com/KAbXUzFf4NJEWPUx6Mynqz
+
+[   ] Yes   [  ] No
+
+[10] Created the GITHUB account.    _____________________
+
+
+[11]  Explore what you plan to do? (major?) What kind of data is there in that domain? Do you think "Data Science" is relevant for that domain or not? (You are welcome to take the  help of ChatGPT or any other LLM tool).   Write down your answer here.
+
+
+
+[12] Common project for the entire class - Pathways to Scholarship
+Review it here  https://github.com/sjasthi/Python-DS-Data-Science/blob/main/final_project_demo/DSCI2000_Final_Project_Pathways_To_Scholarships_Updated.pdf
+
+[   ] Yes   [  ] No
+
+[13] Interested in being a mentor and teaching assistant for Python 101? Consider taking PCEP certification.
+
+[   ] Yes   [  ] No  [  ] Not sure
