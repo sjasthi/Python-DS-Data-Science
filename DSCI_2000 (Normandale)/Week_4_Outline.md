@@ -33,4 +33,4 @@ By the end of Week 4, you should have completed the following:
 - [ ] Work through the **Colab Notebook** for NumPy.
 - [ ] Explore the **Interactive Playbook** for NumPy.
 
-## Footer
+
