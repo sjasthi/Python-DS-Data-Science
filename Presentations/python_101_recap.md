@@ -7,7 +7,8 @@
 <h3 align="center">Chapters 1–9 &amp; Core Data Structures</h3>
 
 <p align="center">
-  <b>Learn and Help</b> · <i>Coding education for middle &amp; high school students</i><br>
+  <b>Learn and Help</b> <br>
+  <i>Empowering Minds, Inspiring Generosity!</i><br>
   <sub>Python Programming by <b>Siva Jasthi</b> · Bridge notes for <b>Python for Data Science</b></sub>
 </p>
 
