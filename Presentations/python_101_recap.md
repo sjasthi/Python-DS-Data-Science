@@ -235,7 +235,7 @@ random.random()        # a decimal between 0 and 1
 | | `while` loop | `for` loop |
 |---|--------------|-----------|
 | **Type** | **Indefinite** — repeats while a condition holds | **Definite** — repeats over a range/sequence |
-| **Forms** | `while condition:` | `for i in range(start, stop, step)` · `for i in range(start, stop)` · `for i in range(stop)` · `for item in sequence` |
+| **Forms** | `while condition:` | `for i in range(start, stop, step)` <br> · `for i in range(start, stop)` · `for i in range(stop)` · `for item in sequence` |
 | **`break`** | Exit the loop (only valid *inside* a loop) | Exit the loop |
 | **`continue`** | Jump back to the start of the loop | Jump to the next iteration |
 
