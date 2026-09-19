@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pandas DataFrames - CRUD Playbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<style>
+  :root {
+    --bg: #12181f;
+    --panel: #1a232d;
+    --panel-2: #212c38;
+    --border: #2c3947;
+    --text: #e7edf3;
+    --text-dim: #9fb0c0;
+    --teal: #2dd4bf;
+    --amber: #f5b942;
+    --orange: #ff8a4c;
+    --red: #ff6b6b;
+    --green: #4ade80;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px 14px;
+    display: flex;
+    justify-content: center;
+  }
+  .wrap { width: 100%; max-width: 920px; }
+
+  .brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--panel-2);
+    border: 1px solid var(--teal);
+    color: var(--teal);
+    font-weight: 800;
+    font-size: 0.85rem;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .brand-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); }
+
+  header {
+    text-align: center;
+    padding: 24px 20px 20px;
+    background: linear-gradient(135deg, #1b3b3a 0%, #17222c 100%);
+    border: 1px solid var(--border);
+    border-radius: 18px 18px 0 0;
+  }
+  header h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.8rem;
+    color: var(--teal);
+  }
+  header p { color: var(--text-dim); margin-top: 8px; }
+
+  #pyodideStatus {
+    text-align: center;
+    padding: 10px;
+    background: var(--panel-2);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    color: var(--amber);
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  #pyodideStatus.ready { color: var(--green); }
+
+  .tabs {
+    display: flex;
+    background: var(--panel-2);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  .tab-btn {
+    flex: 1;
+    min-width: 110px;
+    padding: 15px 8px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  .tab-btn.active { color: var(--teal); border-bottom-color: var(--teal); background: var(--panel); }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 18px 18px;
+    padding: 28px 26px 32px;
+    min-height: 420px;
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .tab-content h2 { font-family: 'Fredoka One', cursive; color: var(--amber); font-size: 1.4rem; margin-bottom: 6px; }
+  .tab-content .lead { color: var(--text-dim); margin-bottom: 18px; }
+  .op-tag {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin: 18px 0 8px;
+  }
+  .op-create { background: rgba(45,212,191,0.15); color: var(--teal); }
+  .op-read   { background: rgba(245,185,66,0.15); color: var(--amber); }
+  .op-update { background: rgba(255,138,76,0.15); color: var(--orange); }
+  .op-delete { background: rgba(255,107,107,0.15); color: var(--red); }
+
+  /* Pyodide code cells */
+  .pyodide-cell {
+    background: #0d1319;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--teal);
+    border-radius: 10px;
+    margin: 10px 0 20px;
+    overflow: hidden;
+  }
+  .code-input {
+    width: 100%;
+    background: transparent;
+    color: #d4e8e2;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.92rem;
+    border: none;
+    resize: vertical;
+    padding: 14px 16px;
+    line-height: 1.5;
+    min-height: 90px;
+  }
+  .code-input:focus { outline: none; background: rgba(45,212,191,0.04); }
+  .cell-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 14px;
+    background: var(--panel-2);
+    border-top: 1px solid var(--border);
+  }
+  .run-btn {
+    background: var(--teal);
+    color: #062824;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 16px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .run-btn:hover { background: #24b6a4; }
+  .run-btn:disabled { opacity: 0.5; cursor: wait; }
+  .cell-label { color: var(--text-dim); font-size: 0.8rem; }
+  .output {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88rem;
+    color: #c3e8ff;
+    padding: 12px 16px;
+    white-space: pre-wrap;
+    border-top: 1px dashed var(--border);
+    min-height: 20px;
+    display: none;
+  }
+  .output.show { display: block; }
+  .output.error { color: var(--red); }
+
+  .nav-hint { text-align:center; margin-top: 22px; color: var(--text-dim); font-size: 0.92rem; }
+  .nav-hint b { color: var(--amber); }
+
+  /* Quiz */
+  .quiz-progress { width: 100%; height: 8px; background: var(--panel-2); border-radius: 4px; overflow: hidden; margin-bottom: 22px; }
+  .quiz-progress-fill { height: 100%; background: var(--teal); width: 0%; transition: width .4s ease; }
+  .q-number { display: inline-block; background: var(--panel-2); border: 1px solid var(--border); color: var(--amber); padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; margin-bottom: 16px; }
+  .q-text { font-size: 1.2rem; margin-bottom: 18px; line-height: 1.4; }
+  .q-code { background: #0d1319; border-left: 4px solid var(--teal); border-radius: 10px; padding: 14px 18px; font-family: 'JetBrains Mono', monospace; font-size: 1.02rem; margin-bottom: 18px; white-space: pre; overflow-x: auto; }
+  .answers { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 12px; }
+  .answer-btn { background: var(--panel-2); border: 1px solid var(--border); color: var(--text); padding: 14px 16px; border-radius: 12px; font-size: 0.98rem; font-weight: 700; cursor: pointer; text-align: left; font-family: 'JetBrains Mono', monospace; }
+  .answer-btn:hover { border-color: var(--teal); transform: translateY(-2px); }
+  .answer-btn.correct { background: rgba(74,222,128,0.18); border-color: var(--green); color: var(--green); }
+  .answer-btn.incorrect { background: rgba(255,107,107,0.18); border-color: var(--red); color: var(--red); }
+  .answer-btn[disabled] { cursor: default; transform: none; }
+  .feedback { margin-top: 18px; padding: 14px 16px; border-radius: 12px; font-size: 0.95rem; display: none; line-height: 1.5; }
+  .feedback.correct { display:block; background: rgba(74,222,128,0.12); border: 1px solid var(--green); color: #cdf7dc; }
+  .feedback.incorrect { display:block; background: rgba(255,107,107,0.12); border: 1px solid var(--red); color: #ffd9d9; }
+  .next-btn, .start-btn, .restart-btn { margin-top: 20px; background: var(--teal); color: #062824; border: none; padding: 13px 28px; border-radius: 24px; font-weight: 800; font-size: 1rem; cursor: pointer; display: none; }
+  .start-btn, .restart-btn { display: inline-block; }
+  .next-btn:hover, .start-btn:hover, .restart-btn:hover { background: #24b6a4; }
+  .quiz-screen { display:none; }
+  .quiz-screen.active { display:block; }
+  .quiz-start { text-align:center; }
+  .badges { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin: 16px 0 20px; }
+  .badge { background: var(--panel-2); border: 1px solid var(--border); padding: 8px 14px; border-radius: 18px; font-size: 0.86rem; color: var(--text-dim); }
+  .result-screen { text-align: center; }
+  .score-display { font-family: 'Fredoka One', cursive; font-size: 2.8rem; color: var(--teal); margin: 14px 0; }
+  .score-msg { color: var(--text-dim); font-size: 1.05rem; margin-bottom: 18px; }
+  .submit-box { background: rgba(245,185,66,0.1); border: 1px solid var(--amber); border-radius: 12px; padding: 16px 18px; margin-top: 20px; color: #ffe4b0; font-size: 0.95rem; text-align: left; }
+  .submit-box b { color: var(--amber); }
+
+  @media (max-width: 620px) {
+    header h1 { font-size: 1.4rem; }
+    .panel { padding: 20px 14px 26px; }
+    .tab-btn { font-size: 0.8rem; padding: 12px 4px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand-badge"><span class="dot"></span> Learn and Help &middot; Python for Data Science</div>
+
+  <header>
+    <h1>🐼 Pandas DataFrames — CRUD Playbook</h1>
+    <p>Create, Read, Update &amp; Delete — live, runnable Python right in this page</p>
+  </header>
+
+  <div id="pyodideStatus">⏳ Starting Python engine (Pyodide + pandas)... this takes about 10-15 seconds the first time.</div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="dataframe">🧱 DataFrame</button>
+    <button class="tab-btn" data-tab="column">📊 Column</button>
+    <button class="tab-btn" data-tab="row">➡️ Row</button>
+    <button class="tab-btn" data-tab="cell">🔲 Cell</button>
+    <button class="tab-btn" data-tab="quiz">📝 Quiz</button>
+  </div>
+
+  <div class="panel">
+
+    <!-- TAB 1: DATAFRAME -->
+    <div class="tab-content active" id="tab-dataframe">
+      <h2>🧱 What is a DataFrame?</h2>
+      <p class="lead">A pandas <b>DataFrame</b> is a table of data — rows and columns, just like a spreadsheet. There are several ways to build one. Try each cell below (click ▶ Run, or edit the code first)!</p>
+
+      <div class="op-tag op-create">Create — from a dictionary of lists</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false">import pandas as pd
+
+data = {
+    "name": ["Ana", "Ben", "Cleo", "Dax"],
+    "age": [12, 13, 12, 14],
+    "grade": [7, 8, 7, 9]
+}
+df = pd.DataFrame(data)
+print(df)</textarea>
+        <div class="cell-toolbar"><span class="cell-label">Run this first — it creates the "df" we'll use everywhere</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-create">Create — from a list of lists</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false">rows = [
+    ["Ana", 12, 7],
+    ["Ben", 13, 8],
+    ["Cleo", 12, 7],
+    ["Dax", 14, 9]
+]
+df_from_rows = pd.DataFrame(rows, columns=["name", "age", "grade"])
+print(df_from_rows)</textarea>
+        <div class="cell-toolbar"><span class="cell-label">Same data, built row by row</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-create">Create — from a list of dictionaries</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false">records = [
+    {"name": "Ana", "age": 12, "grade": 7},
+    {"name": "Ben", "age": 13, "grade": 8}
+]
+df_from_records = pd.DataFrame(records)
+print(df_from_records)</textarea>
+        <div class="cell-toolbar"><span class="cell-label">Each dictionary is one row</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-create">Create — by reading CSV text</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false">import io
+
+csv_text = """name,age,grade
+Ana,12,7
+Ben,13,8
+Cleo,12,7"""
+
+df_from_csv = pd.read_csv(io.StringIO(csv_text))
+print(df_from_csv)</textarea>
+        <div class="cell-toolbar"><span class="cell-label">This is how you'd load a real .csv file too: pd.read_csv("file.csv")</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <p class="nav-hint">Keep <b>df</b> alive — the next tabs use it to practice Read, Update, and Delete. Click <b>Column</b> next! ➡️</p>
+    </div>
+
+    <!-- TAB 2: COLUMN -->
+    <div class="tab-content" id="tab-column">
+      <h2>📊 Working with Columns</h2>
+      <p class="lead">A column is one field across every row (like a spreadsheet column). If df isn't defined yet, run the setup cell first.</p>
+
+      <div class="op-tag op-create">Setup (run once if needed)</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false">import pandas as pd
+data = {"name": ["Ana","Ben","Cleo","Dax"], "age": [12,13,12,14], "grade": [7,8,7,9]}
+df = pd.DataFrame(data)
+print(df)</textarea>
+        <div class="cell-toolbar"><span class="cell-label">Recreates df</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-read">Read a column</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false">print(df["name"])          # by column label -> a Series
+print()
+print(df.age)               # dot notation (only works with simple names)
+print()
+print(df[["name", "grade"]])  # multiple columns -> a DataFrame</textarea>
+        <div class="cell-toolbar"><span class="cell-label"></span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-update">Update a column</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false">df["grade"] = df["grade"] + 1        # add 1 to every grade
+print(df)
+print()
+
+df["passed"] = df["grade"] >= 8       # new column from a condition
+print(df)</textarea>
+        <div class="cell-toolbar"><span class="cell-label"></span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-delete">Delete a column</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false">without_passed = df.drop(columns=["passed"])   # returns a NEW DataFrame
+print(without_passed)
+print()
+
+del df["passed"]        # removes it from df itself (in place)
+print(df)</textarea>
+        <div class="cell-toolbar"><span class="cell-label"></span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <p class="nav-hint">Now let's do the same three operations, but for a whole <b>row</b>. ➡️</p>
+    </div>
+
+    <!-- TAB 3: ROW -->
+    <div class="tab-content" id="tab-row">
+      <h2>➡️ Working with Rows</h2>
+      <p class="lead">A row is one record — one student, one order, one observation.</p>
+
+      <div class="op-tag op-create">Setup (run once if needed)</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false">import pandas as pd
+data = {"name": ["Ana","Ben","Cleo","Dax"], "age": [12,13,12,14], "grade": [7,8,7,9]}
+df = pd.DataFrame(data)
+print(df)</textarea>
+        <div class="cell-toolbar"><span class="cell-label">Recreates df</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-read">Read a row</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false">print(df.loc[0])                    # row by label (index)
+print()
+print(df.iloc[1])                    # row by position
+print()
+print(df.loc[df["age"] > 12])        # rows matching a condition</textarea>
+        <div class="cell-toolbar"><span class="cell-label"></span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-update">Update a row</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false">df.loc[0, "age"] = 13          # update one value in row 0
+print(df)
+print()
+
+df.loc[1] = ["Ben", 14, 9]      # replace the entire row 1
+print(df)</textarea>
+        <div class="cell-toolbar"><span class="cell-label"></span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-delete">Delete a row</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false">fewer_rows = df.drop(index=2)        # returns a NEW DataFrame
+print(fewer_rows)
+print()
+
+df.drop(index=3, inplace=True)       # removes it from df itself
+print(df)</textarea>
+        <div class="cell-toolbar"><span class="cell-label"></span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <p class="nav-hint">Finally, let's zoom all the way in to a single <b>cell</b>. ➡️</p>
+    </div>
+
+    <!-- TAB 4: CELL -->
+    <div class="tab-content" id="tab-cell">
+      <h2>🔲 Working with a Single Cell</h2>
+      <p class="lead">A cell is one value at the intersection of a specific row and column.</p>
+
+      <div class="op-tag op-create">Setup (run once if needed)</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false">import pandas as pd
+import numpy as np
+data = {"name": ["Ana","Ben","Cleo","Dax"], "age": [12,13,12,14], "grade": [7,8,7,9]}
+df = pd.DataFrame(data)
+print(df)</textarea>
+        <div class="cell-toolbar"><span class="cell-label">Recreates df</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-read">Read a cell</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false">print(df.loc[0, "name"])   # by label
+print(df.iloc[0, 0])        # by position
+print(df.at[0, "age"])       # fast scalar access, by label
+print(df.iat[0, 1])           # fast scalar access, by position</textarea>
+        <div class="cell-toolbar"><span class="cell-label"></span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-update">Update a cell</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false">df.loc[0, "grade"] = 10
+print(df)
+print()
+
+df.at[1, "name"] = "Benji"
+print(df)</textarea>
+        <div class="cell-toolbar"><span class="cell-label"></span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-delete">"Delete" a cell</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false"># Pandas has no way to truly remove a single cell and leave a gap.
+# Instead, we mark it as missing using NaN (Not a Number):
+
+df.loc[0, "age"] = np.nan
+print(df)
+print()
+print(df.isna())   # True shows where values are missing</textarea>
+        <div class="cell-toolbar"><span class="cell-label"></span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <p class="nav-hint">Ready to test yourself? Click the <b>Quiz</b> tab! ➡️</p>
+    </div>
+
+    <!-- TAB 5: QUIZ -->
+    <div class="tab-content" id="tab-quiz">
+
+      <div class="quiz-screen active" id="quizStart">
+        <div class="quiz-start">
+          <h2>📝 Pandas DataFrame CRUD Quiz</h2>
+          <p class="lead">10 questions on creating, reading, updating and deleting DataFrames, columns, rows, and cells.</p>
+          <div class="badges">
+            <span class="badge">📝 10 questions</span>
+            <span class="badge">🎯 No time limit</span>
+            <span class="badge">📸 Screenshot your score</span>
+          </div>
+          <button class="start-btn" onclick="startQuiz()">🚀 Start Quiz</button>
+        </div>
+      </div>
+
+      <div class="quiz-screen" id="quizQuestion">
+        <div class="quiz-progress"><div class="quiz-progress-fill" id="progressFill"></div></div>
+        <div class="q-number" id="qNumber">Question 1 of 10</div>
+        <div class="q-text" id="qText"></div>
+        <div class="q-code" id="qCode" style="display:none;"></div>
+        <div class="answers" id="answers"></div>
+        <div class="feedback" id="feedback"></div>
+        <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
+      </div>
+
+      <div class="quiz-screen" id="quizResult">
+        <div class="result-screen">
+          <h2>🎉 Quiz Complete!</h2>
+          <div class="score-display" id="scoreDisplay">0/10</div>
+          <div class="score-msg" id="scoreMsg"></div>
+          <button class="restart-btn" onclick="restartQuiz()">🔄 Try Again</button>
+          <div class="submit-box">
+            📸 <b>Submission:</b> Take a screenshot of this results screen showing your score, and submit it to <b>Google Classroom</b>.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ---------- Tab switching ----------
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ---------- Pyodide setup ----------
+  let pyodideReady = false;
+  let pyodide = null;
+  let outputBuffer = [];
+
+  async function initPyodide() {
+    const statusEl = document.getElementById('pyodideStatus');
+    try {
+      pyodide = await loadPyodide();
+      statusEl.textContent = '📦 Loading pandas + numpy...';
+      await pyodide.loadPackage(['pandas', 'numpy']);
+      pyodide.setStdout({ batched: (msg) => { outputBuffer.push(msg + "\n"); } });
+      pyodideReady = true;
+      statusEl.textContent = '✅ Python engine ready — click ▶ Run on any code cell!';
+      statusEl.classList.add('ready');
+      setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
+    } catch (err) {
+      statusEl.textContent = '⚠️ Could not load the Python engine. Check your internet connection and reload the page.';
+    }
+  }
+  initPyodide();
+
+  async function runCell(button) {
+    const cell = button.closest('.pyodide-cell');
+    const code = cell.querySelector('.code-input').value;
+    const output = cell.querySelector('.output');
+
+    if (!pyodideReady) {
+      output.textContent = 'Python engine is still loading — please wait a few seconds and try again.';
+      output.className = 'output show error';
+      return;
+    }
+
+    button.disabled = true;
+    button.textContent = 'Running...';
+    outputBuffer = [];
+
+    try {
+      await pyodide.runPythonAsync(code);
+      output.textContent = outputBuffer.join('') || '(no output — code ran successfully)';
+      output.className = 'output show';
+    } catch (err) {
+      output.textContent = 'Error:\n' + err.message.split('\n').slice(-4).join('\n');
+      output.className = 'output show error';
+    }
+    button.disabled = false;
+    button.textContent = '▶ Run';
+  }
+
+  // ---------- Quiz ----------
+  const questions = [
+    {
+      q: "Which line correctly creates a DataFrame from a dictionary of lists?",
+      code: 'data = {"name": ["Ana","Ben"], "age": [12,13]}',
+      options: ["pd.DataFrame(data)", "pd.Series(data)", "pd.read_dict(data)", "pd.Table(data)"],
+      correct: 0,
+      explain: "pd.DataFrame(data) turns a dictionary of lists into a table, with each key becoming a column."
+    },
+    {
+      q: "Which function reads a CSV file (or CSV text) into a DataFrame?",
+      options: ["pd.read_csv()", "pd.open_csv()", "pd.load_csv()", "pd.import_csv()"],
+      correct: 0,
+      explain: "pd.read_csv() is the standard way to load CSV data into a DataFrame."
+    },
+    {
+      q: "How do you select just the \"age\" column from a DataFrame df?",
+      options: ["df.row(\"age\")", "df[\"age\"]", "df.get_column(\"age\")", "df->age"],
+      correct: 1,
+      explain: "df[\"age\"] selects a column by its label and returns it as a Series."
+    },
+    {
+      q: "What does df.loc[2] return?",
+      options: ["The column named \"2\"", "An error", "The row with label/index 2", "The value 2"],
+      correct: 2,
+      explain: "df.loc[label] returns the row whose index label matches — here, the row labeled 2."
+    },
+    {
+      q: "What's the key difference between .loc and .iloc?",
+      options: [
+        ".loc uses labels, .iloc uses integer positions",
+        ".loc is only for columns",
+        "They always return the same thing",
+        ".iloc can't select rows"
+      ],
+      correct: 0,
+      explain: ".loc selects by label (index/column name); .iloc selects by numeric position, starting at 0."
+    },
+    {
+      q: "Which line adds 1 to every value in the \"grade\" column?",
+      options: [
+        "df.grade.update(+1)",
+        "df.updateColumn(\"grade\", 1)",
+        "df[\"grade\"] = df[\"grade\"] + 1",
+        "df[\"grade\"].add(1)"
+      ],
+      correct: 2,
+      explain: "Assigning df[\"grade\"] = df[\"grade\"] + 1 updates every value in that column at once."
+    },
+    {
+      q: "Which command removes a column named \"passed\" from df, returning a new DataFrame?",
+      options: [
+        "df.remove(\"passed\")",
+        "df.drop(columns=[\"passed\"])",
+        "df.delete_column(\"passed\")",
+        "df[\"passed\"].drop()"
+      ],
+      correct: 1,
+      explain: "df.drop(columns=[...]) removes the given column(s) and returns a new DataFrame by default."
+    },
+    {
+      q: "Which command removes the row at index 3?",
+      options: ["df.pop(3)", "df.remove(3)", "df.delete(3)", "df.drop(index=3)"],
+      correct: 3,
+      explain: "df.drop(index=3) removes the row with that index label."
+    },
+    {
+      q: "Which gives fast, direct access to a single cell value by label (row, column)?",
+      options: ["df.cell(0, \"name\")", "df.at[0, \"name\"]", "df.value(0, \"name\")", "df[\"name\"][0].get()"],
+      correct: 1,
+      explain: "df.at[row_label, column_label] is the fast way to read or write one scalar value."
+    },
+    {
+      q: "True or False: Pandas lets you truly delete a single cell (leaving a gap), so you typically mark it as missing (NaN) instead.",
+      options: ["True", "False"],
+      correct: 0,
+      explain: "True — a DataFrame must stay rectangular, so instead of deleting one cell you set it to NaN (missing)."
+    }
+  ];
+
+  let current = 0;
+  let score = 0;
+
+  function showScreen(id) {
+    document.querySelectorAll('.quiz-screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function startQuiz() {
+    current = 0;
+    score = 0;
+    showScreen('quizQuestion');
+    showQuestion();
+  }
+
+  function showQuestion() {
+    const item = questions[current];
+    document.getElementById('progressFill').style.width = (current / questions.length * 100) + '%';
+    document.getElementById('qNumber').textContent = `Question ${current + 1} of ${questions.length}`;
+    document.getElementById('qText').textContent = item.q;
+
+    const codeEl = document.getElementById('qCode');
+    if (item.code) { codeEl.style.display = 'block'; codeEl.textContent = item.code; }
+    else { codeEl.style.display = 'none'; }
+
+    const answersDiv = document.getElementById('answers');
+    answersDiv.innerHTML = '';
+    item.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'answer-btn';
+      btn.textContent = opt;
+      btn.onclick = () => selectAnswer(i);
+      answersDiv.appendChild(btn);
+    });
+
+    document.getElementById('feedback').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'none';
+  }
+
+  function selectAnswer(i) {
+    const item = questions[current];
+    const buttons = document.querySelectorAll('.answer-btn');
+    buttons.forEach(b => b.disabled = true);
+
+    const feedback = document.getElementById('feedback');
+    if (i === item.correct) {
+      score++;
+      buttons[i].classList.add('correct');
+      feedback.className = 'feedback correct';
+      feedback.innerHTML = `<strong>Correct! 🎉</strong><br>${item.explain}`;
+    } else {
+      buttons[i].classList.add('incorrect');
+      buttons[item.correct].classList.add('correct');
+      feedback.className = 'feedback incorrect';
+      feedback.innerHTML = `<strong>Not quite. 🤔</strong> The correct answer was <b>${item.options[item.correct]}</b>.<br>${item.explain}`;
+    }
+    feedback.style.display = 'block';
+    document.getElementById('nextBtn').style.display = 'inline-block';
+  }
+
+  function nextQuestion() {
+    current++;
+    if (current >= questions.length) { showResults(); }
+    else { showQuestion(); }
+  }
+
+  function showResults() {
+    document.getElementById('progressFill').style.width = '100%';
+    showScreen('quizResult');
+    document.getElementById('scoreDisplay').textContent = `${score}/${questions.length}`;
+    let msg;
+    if (score >= 9) msg = "Outstanding! You've mastered DataFrame CRUD! 🏆";
+    else if (score >= 7) msg = "Great job! Solid grasp of the fundamentals. 🎯";
+    else if (score >= 5) msg = "Good start — revisit the tabs and try again! 📚";
+    else msg = "No worries — go back through the DataFrame, Column, Row, and Cell tabs, then retake it! 💪";
+    document.getElementById('scoreMsg').textContent = msg;
+  }
+
+  function restartQuiz() { showScreen('quizStart'); }
+</script>
+</body>
+</html>
