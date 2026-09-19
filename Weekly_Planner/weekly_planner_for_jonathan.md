@@ -9,7 +9,7 @@
 | 9 | 8/29/2026 | Python Libraries for Data Science |
 | 10 | 9/5/2026 | NumPy - Introduction |
 | 11 | 9/12/2026 | Introduction to Pandas - DataFrame and Series |
-| 12 | - | DataFrame - CRUD Operations |
+| 12 | 9/19/2026 | DataFrame - CRUD Operations |
 | 9 | - | Pandas - Data Input and Output (File I/O) |
 | 10 | - | Pandas - Exploratory Data Analysis (EDA) |
 | 11 | - | Pandas - Cleaning and Preprocessing |
