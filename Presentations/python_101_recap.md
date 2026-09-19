@@ -602,6 +602,6 @@ Create new lists from existing ones. The **condition is optional**.
 
 <p align="center">
   <img src="learn_and_help_logo.png" alt="Learn and Help" width="90"><br>
-  <b>Learn and Help</b> · Python Programming by <b>Siva Jasthi</b><br>
+  <b>Learn and Help</b> <br> Python Programming by <b>Siva Jasthi</b><br>
   <i>You've got the foundations — now let's use them for Data Science! 📊</i>
 </p>
