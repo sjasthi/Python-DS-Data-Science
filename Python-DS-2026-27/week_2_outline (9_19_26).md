@@ -10,7 +10,7 @@
 
 ## **📋 Weekly Activities Overview**
 
-Welcome back! This week your instructor will lead a recap of **Python 101** in class. Before and after the session, use the two references below to refresh your memory, then take the quiz to check what stuck.
+Welcome back! We will lead a recap of **Python 101** in class. Before and after the session, use the two references below to refresh your memory, then take the quiz to check what stuck.
 
 ---
 
@@ -22,9 +22,9 @@ Refresh the Python 101 foundations you will use all year in Data Science.
 
 ### **Tasks:**
 
-1. **Join the Recap Session:**
+1. **Recap Session:**
 
-  - Your instructor will walk through the key ideas from Python 101
+  - We will walk through the key ideas from Python 101
   - Topics: lists, tuples, sets, dictionaries, strings, loops, and functions
 
 2. **Follow Along and Ask Questions:**
@@ -103,21 +103,6 @@ Check your understanding of the Python 101 topics.
 
 - **Topic:** Chapter 10: Objects and Classes
 - **Dates:** 09/26/26 - 10/02/26
-
-### **Preparation Tips:**
-
-- [ ] Finish the Python 101 recap quiz and submit your screenshot
-- [ ] Skim the cheat sheet sections on functions and data structures
-- [ ] Write down any questions you have about how Python organizes data and code
-
----
-
-## **💡 Success Tips**
-
-1. **Use the References:** The recap and cheat sheet are there for you all year
-2. **Retake the Quiz:** Effort matters more than a perfect first try
-3. **Ask Early:** If a topic feels fuzzy, bring it up in class
-4. **Stay Organized:** Check the Weekly Planner for due dates
 
 ---
 
