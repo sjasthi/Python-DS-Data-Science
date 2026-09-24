@@ -1,8 +1,8 @@
 # 🐍 Python Certification Path
 
-> **For:** Learn and Help Python DS students
-> **Certifying body:** [OpenEDG Python Institute](https://pythoninstitute.org)
-> **Last checked:** September 2026 — exam versions and prices change, so always confirm on the official page before you buy a voucher.
+> **For:** Learn and Help Python DS students <br>
+> **Certifying body:** [OpenEDG Python Institute](https://pythoninstitute.org)  <br>
+> **Last checked:** September 2026 — exam versions and prices change, so always confirm on the official page before you buy a voucher.  <br>
 
 ---
 
