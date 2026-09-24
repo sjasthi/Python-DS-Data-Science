@@ -1,6 +1,6 @@
 # Python for Data Science — Final Project Expert Panel
 ## Likely Questions from Industry Experts
-**Learn and Help | Academic Year 2025–26**
+**Learn and Help | www.learnandhelp.com**
 *Prepared to help students practice and present with confidence*
 
 ---
@@ -188,4 +188,4 @@ Read each question carefully, think about how it connects to your project, and p
 ---
 
 *Prepared by Learn and Help | www.learnandhelp.com*
-*Python for Data Science — 2025–26 | Final Project Demonstration Week*
+*Python for Data Science| Final Project Demonstration Week*
