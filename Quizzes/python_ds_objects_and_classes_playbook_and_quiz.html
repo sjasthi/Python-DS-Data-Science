@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Objects and Classes - Playbook and Quiz</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            color: white;
+            text-align: center;
+            padding: 30px 30px 0;
+        }
+        .header h1 { font-size: 2.5em; margin-bottom: 8px; }
+        .header p { margin-bottom: 24px; opacity: 0.95; }
+
+        /* ---------- Tabs ---------- */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: rgba(255,255,255,0.25);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border-radius: 14px 14px 0 0;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .tab-btn:hover { background: rgba(255,255,255,0.4); }
+        .tab-btn[aria-selected="true"] { background: white; color: #ee5a24; }
+        .tab-btn:focus-visible { outline: 3px solid #2d3748; outline-offset: 2px; }
+
+        .tab-panel { display: none; padding: 30px; }
+        .tab-panel.active { display: block; }
+
+        /* ---------- Playbook styles ---------- */
+        .section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+        }
+        .section:last-child { margin-bottom: 0; }
+        .section h2 { color: #667eea; margin-bottom: 15px; font-size: 1.8em; }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+            white-space: pre;
+            line-height: 1.5;
+        }
+        .code-block pre { margin: 0; white-space: pre; line-height: 1.5; }
+
+        .interactive-demo {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .pet-container { display: flex; flex-wrap: wrap; gap: 20px; margin: 20px 0; }
+        .pet-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            min-width: 200px;
+            transition: transform 0.3s ease;
+        }
+        .pet-card:hover { transform: translateY(-5px); }
+        .pet-emoji { font-size: 3em; text-align: center; margin-bottom: 10px; }
+        .pet-info { color: #333; }
+        .pet-info h3 { color: #667eea; margin-bottom: 10px; }
+
+        .button {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        .button:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+        .create-form { background: #e3f2fd; padding: 20px; border-radius: 15px; margin: 20px 0; }
+        .form-group { margin: 15px 0; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #1976d2; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 10px; border: 2px solid #90caf9; border-radius: 8px; font-size: 1em;
+        }
+
+        .analogy-box {
+            background: linear-gradient(135deg, #ffecd2, #fcb69f);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        .analogy-box h3 { color: #d84315; margin-bottom: 15px; }
+
+        .highlight {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #ff9800;
+            margin: 15px 0;
+        }
+
+        .next-step {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        /* ---------- Quiz styles ---------- */
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .quiz-header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .quiz-title { font-size: 2em; font-weight: bold; margin-bottom: 10px; }
+        .quiz-subtitle { font-size: 1.2em; opacity: 0.9; }
+        .progress-bar {
+            background: rgba(255,255,255,0.3);
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: white;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+        .question-container { padding: 40px; }
+        .question-number { color: #666; font-size: 1.1em; margin-bottom: 10px; }
+        .question-text { font-size: 1.5em; font-weight: 600; color: #333; margin-bottom: 20px; line-height: 1.4; }
+        .question-container .code-block { font-size: 0.9em; margin: 20px 0; }
+
+        .answers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+        .answer-btn {
+            background: #f8f9fa;
+            border: 3px solid #e9ecef;
+            border-radius: 15px;
+            padding: 20px;
+            font-size: 1.1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            color: #333;
+        }
+        .answer-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+        .answer-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .answer-btn:hover::before { left: 100%; }
+        .answer-btn.correct {
+            background: #51cf66; color: white; border-color: #40c057;
+            animation: correctPulse 0.6s ease;
+        }
+        .answer-btn.incorrect {
+            background: #ff6b6b; color: white; border-color: #fa5252;
+            animation: shake 0.6s ease;
+        }
+        @keyframes correctPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+        .answer-letter {
+            display: inline-block;
+            width: 30px; height: 30px;
+            background: #4dabf7;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 0.9em;
+        }
+        .answer-btn.correct .answer-letter { background: #40c057; }
+        .answer-btn.incorrect .answer-letter { background: #fa5252; }
+
+        .feedback {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 5px solid #4dabf7;
+            display: none;
+        }
+        .feedback.show { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .next-btn, .restart-btn {
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .next-btn {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            margin-top: 20px;
+            display: none;
+        }
+        .next-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(116,185,255,0.3); }
+        .restart-btn { background: linear-gradient(135deg, #ff6b6b, #ee5a52); }
+        .restart-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255,107,107,0.3); }
+
+        .results { text-align: center; padding: 40px; display: none; }
+        .results.show { display: block; }
+        .score { font-size: 3em; font-weight: bold; color: #4dabf7; margin-bottom: 20px; }
+        .score-message { font-size: 1.5em; margin-bottom: 20px; color: #333; }
+        .results p { margin-bottom: 25px; }
+
+        @media (max-width: 640px) {
+            body { padding: 10px; }
+            .header h1 { font-size: 1.9em; }
+            .tab-btn { padding: 12px 18px; font-size: 1em; }
+            .tab-panel { padding: 18px; }
+            .question-container { padding: 22px; }
+            .answers-grid { grid-template-columns: 1fr; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before { animation: none !important; transition: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐍 Objects and Classes 🐍</h1>
+            <p>Learn programming concepts through fun examples!</p>
+            <div class="tabs" role="tablist" aria-label="Playbook sections">
+                <button class="tab-btn" role="tab" id="tab-intro" aria-controls="panel-intro" aria-selected="true">Introduction</button>
+                <button class="tab-btn" role="tab" id="tab-play" aria-controls="panel-play" aria-selected="false" tabindex="-1">Play</button>
+                <button class="tab-btn" role="tab" id="tab-quiz" aria-controls="panel-quiz" aria-selected="false" tabindex="-1">Quiz</button>
+            </div>
+        </div>
+
+        <!-- ================= INTRODUCTION ================= -->
+        <div class="tab-panel active" role="tabpanel" id="panel-intro" aria-labelledby="tab-intro">
+            <div class="section">
+                <h2>🎯 What are Objects and Classes?</h2>
+                <div class="analogy-box">
+                    <h3>🏭 Think of it like a Cookie Factory!</h3>
+                    <p><strong>Class = Cookie Cutter</strong> - It's the template that defines what shape cookies will have</p>
+                    <p><strong>Object = The Actual Cookie</strong> - Each cookie made from the cutter is unique but follows the same pattern</p>
+                </div>
+                <div class="highlight">
+                    <p><strong>In Programming Terms:</strong></p>
+                    <p>• A <strong>Class</strong> is like a blueprint that describes what something should look like and what it can do</p>
+                    <p>• An <strong>Object</strong> is a specific instance created from that blueprint</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🐕 Let's Create a Pet Class!</h2>
+                <p>Here's how we define a class in Python:</p>
+                <div class="code-block"><pre>class Pet:
+    def __init__(self, name, animal_type, age):
+        self.name = name
+        self.animal_type = animal_type
+        self.age = age
+        self.happiness = 50
+
+    def feed(self):
+        self.happiness += 10
+        return f"{self.name} is happy! Happiness: {self.happiness}"
+
+    def play(self):
+        self.happiness += 15
+        return f"{self.name} loves playing! Happiness: {self.happiness}"
+
+    def introduce(self):
+        return f"Hi! I'm {self.name}, a {self.age} year old {self.animal_type}!"</pre></div>
+                <div class="highlight">
+                    <p><strong>Key Parts Explained:</strong></p>
+                    <p>• <code>__init__</code> - This is the constructor, it runs when we create a new pet</p>
+                    <p>• <code>self</code> - This refers to the specific pet object we're working with</p>
+                    <p>• Methods like <code>feed()</code> and <code>play()</code> are things our pet can do</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>💡 Understanding the Code</h2>
+                <p>Here's how we create and use pet objects:</p>
+                <div class="code-block"><pre># Creating objects from our Pet class
+my_dog = Pet("Buddy", "Dog", 3)
+my_cat = Pet("Whiskers", "Cat", 2)
+
+# Using the objects
+print(my_dog.introduce())  # Output: Hi! I'm Buddy, a 3 year old Dog!
+print(my_cat.feed())       # Output: Whiskers is happy! Happiness: 60</pre></div>
+            </div>
+
+            <div class="section">
+                <h2>🎉 What We Learned!</h2>
+                <div class="highlight">
+                    <p><strong>Classes</strong> are like blueprints that define:</p>
+                    <p>• What data an object will store (attributes like name, age)</p>
+                    <p>• What actions an object can perform (methods like feed, play)</p>
+                    <br>
+                    <p><strong>Objects</strong> are individual instances created from a class:</p>
+                    <p>• Each object has its own unique data</p>
+                    <p>• All objects from the same class can do the same actions</p>
+                    <p>• You can create as many objects as you want from one class!</p>
+                </div>
+            </div>
+
+            <div class="next-step">
+                <button class="button" onclick="showTab('play')">Next: Play with Pets 🎮</button>
+            </div>
+        </div>
+
+        <!-- ================= PLAY ================= -->
+        <div class="tab-panel" role="tabpanel" id="panel-play" aria-labelledby="tab-play">
+            <div class="section">
+                <h2>🎮 Interactive Pet Creator</h2>
+                <p>Each time you click "Create My Pet!", you are calling <code>Pet(name, type, age)</code> to build a new object.</p>
+                <div class="create-form">
+                    <div class="form-group">
+                        <label for="petName">Pet Name:</label>
+                        <input type="text" id="petName" placeholder="Enter your pet's name">
+                    </div>
+                    <div class="form-group">
+                        <label for="petType">Pet Type:</label>
+                        <select id="petType">
+                            <option value="Dog">Dog 🐕</option>
+                            <option value="Cat">Cat 🐱</option>
+                            <option value="Bird">Bird 🐦</option>
+                            <option value="Fish">Fish 🐠</option>
+                            <option value="Hamster">Hamster 🐹</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="petAge">Pet Age:</label>
+                        <input type="number" id="petAge" min="1" max="20" value="1">
+                    </div>
+                    <button class="button" onclick="createPet()">Create My Pet!</button>
+                </div>
+                <div id="petDisplay"></div>
+            </div>
+
+            <div class="section">
+                <h2>🏠 Pet Collection</h2>
+                <p>Let's create multiple pets to show how each object is unique:</p>
+                <button class="button" onclick="createSamplePets()">Create Sample Pets</button>
+                <button class="button" onclick="feedAllPets()">Feed All Pets</button>
+                <button class="button" onclick="playWithAllPets()">Play with All Pets</button>
+                <div class="pet-container" id="petCollection"></div>
+            </div>
+
+            <div class="section">
+                <h2>🧪 Try It Yourself!</h2>
+                <div class="code-block"><pre>my_dog = Pet("Buddy", "Dog", 3)
+my_cat = Pet("Whiskers", "Cat", 2)
+print(my_dog.introduce())
+print(my_cat.feed())</pre></div>
+                <div class="interactive-demo">
+                    <p>Click the button to see the code in action:</p>
+                    <button class="button" onclick="runCodeExample()">Run Code Example</button>
+                    <div id="codeOutput"></div>
+                </div>
+            </div>
+
+            <div class="next-step">
+                <button class="button" onclick="showTab('quiz')">Next: Take the Quiz 🧠</button>
+            </div>
+        </div>
+
+        <!-- ================= QUIZ ================= -->
+        <div class="tab-panel" role="tabpanel" id="panel-quiz" aria-labelledby="tab-quiz">
+            <div class="quiz-container">
+                <div class="quiz-header">
+                    <div class="quiz-title">🧠 Python Quiz</div>
+                    <p class="quiz-subtitle">Classes &amp; Objects Mastery</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+                <div class="question-container" id="questionContainer"></div>
+                <div class="results" id="results"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ================= TABS ================= */
+        const tabNames = ['intro', 'play', 'quiz'];
+
+        function showTab(name) {
+            tabNames.forEach(t => {
+                const tab = document.getElementById('tab-' + t);
+                const panel = document.getElementById('panel-' + t);
+                const active = (t === name);
+                tab.setAttribute('aria-selected', active);
+                tab.tabIndex = active ? 0 : -1;
+                panel.classList.toggle('active', active);
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        tabNames.forEach((t, i) => {
+            const tab = document.getElementById('tab-' + t);
+            tab.addEventListener('click', () => showTab(t));
+            tab.addEventListener('keydown', e => {
+                let next = null;
+                if (e.key === 'ArrowRight') next = tabNames[(i + 1) % tabNames.length];
+                if (e.key === 'ArrowLeft') next = tabNames[(i - 1 + tabNames.length) % tabNames.length];
+                if (next) {
+                    showTab(next);
+                    document.getElementById('tab-' + next).focus();
+                }
+            });
+        });
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                            .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        /* ================= PLAY ================= */
+        // Pet class in JavaScript (similar to Python)
+        let nextPetId = 1;
+
+        class Pet {
+            constructor(name, animalType, age) {
+                this.id = nextPetId++;
+                this.name = name;
+                this.animalType = animalType;
+                this.age = age;
+                this.happiness = 50;
+            }
+            feed() {
+                this.happiness += 10;
+                return `${this.name} is happy! Happiness: ${this.happiness}`;
+            }
+            play() {
+                this.happiness += 15;
+                return `${this.name} loves playing! Happiness: ${this.happiness}`;
+            }
+            introduce() {
+                return `Hi! I'm ${this.name}, a ${this.age} year old ${this.animalType}!`;
+            }
+            getEmoji() {
+                const emojis = { Dog: '🐕', Cat: '🐱', Bird: '🐦', Fish: '🐠', Hamster: '🐹' };
+                return emojis[this.animalType] || '🐾';
+            }
+        }
+
+        let myPet = null;     // pet made with the creator form
+        let pets = [];        // sample pet collection
+
+        function findPet(id) {
+            if (myPet && myPet.id === id) return myPet;
+            return pets.find(p => p.id === id);
+        }
+
+        function displayPet(pet, containerId) {
+            const container = document.getElementById(containerId);
+            const petCard = document.createElement('div');
+            petCard.className = 'pet-card';
+            petCard.innerHTML = `
+                <div class="pet-emoji">${pet.getEmoji()}</div>
+                <div class="pet-info">
+                    <h3>${escapeHtml(pet.name)}</h3>
+                    <p><strong>Type:</strong> ${pet.animalType}</p>
+                    <p><strong>Age:</strong> ${pet.age} years old</p>
+                    <p><strong>Happiness:</strong> <span id="happiness-${pet.id}">${pet.happiness}</span></p>
+                    <button class="button" onclick="feedPet(${pet.id})">Feed</button>
+                    <button class="button" onclick="playWithPet(${pet.id})">Play</button>
+                </div>
+            `;
+            if (containerId === 'petDisplay') container.innerHTML = '';
+            container.appendChild(petCard);
+        }
+
+        function updateHappiness(pet) {
+            const el = document.getElementById(`happiness-${pet.id}`);
+            if (el) el.textContent = pet.happiness;
+        }
+
+        function createPet() {
+            const name = document.getElementById('petName').value.trim();
+            const type = document.getElementById('petType').value;
+            const age = parseInt(document.getElementById('petAge').value) || 1;
+            if (!name) {
+                alert('Please enter a pet name!');
+                return;
+            }
+            myPet = new Pet(name, type, age);
+            displayPet(myPet, 'petDisplay');
+            document.getElementById('petName').value = '';
+        }
+
+        function createSamplePets() {
+            pets = [
+                new Pet('Buddy', 'Dog', 3),
+                new Pet('Whiskers', 'Cat', 2),
+                new Pet('Chirpy', 'Bird', 1),
+                new Pet('Goldie', 'Fish', 1)
+            ];
+            document.getElementById('petCollection').innerHTML = '';
+            pets.forEach(pet => displayPet(pet, 'petCollection'));
+        }
+
+        function feedPet(id) {
+            const pet = findPet(id);
+            if (pet) { pet.feed(); updateHappiness(pet); }
+        }
+
+        function playWithPet(id) {
+            const pet = findPet(id);
+            if (pet) { pet.play(); updateHappiness(pet); }
+        }
+
+        function feedAllPets() {
+            if (pets.length === 0) { alert('Click "Create Sample Pets" first!'); return; }
+            pets.forEach(pet => { pet.feed(); updateHappiness(pet); });
+        }
+
+        function playWithAllPets() {
+            if (pets.length === 0) { alert('Click "Create Sample Pets" first!'); return; }
+            pets.forEach(pet => { pet.play(); updateHappiness(pet); });
+        }
+
+        function runCodeExample() {
+            const dog = new Pet('Buddy', 'Dog', 3);
+            const cat = new Pet('Whiskers', 'Cat', 2);
+            document.getElementById('codeOutput').innerHTML = `
+                <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">
+                    <p><strong>Creating pets:</strong></p>
+                    <p>my_dog = Pet("Buddy", "Dog", 3)</p>
+                    <p>my_cat = Pet("Whiskers", "Cat", 2)</p>
+                    <br>
+                    <p><strong>Output:</strong></p>
+                    <p>${dog.introduce()}</p>
+                    <p>${cat.feed()}</p>
+                </div>
+            `;
+        }
+
+        /* ================= QUIZ ================= */
+        const quizData = [
+            {
+                question: "What is a class?",
+                answers: ["A specific pet like \"Buddy\"", "A blueprint or template for creating objects", "A method that feeds pets", "A variable that stores a number"],
+                correct: 1,
+                explanation: "A class is a blueprint. Objects like \"Buddy\" are specific instances built from that blueprint."
+            },
+            {
+                question: "What is the correct way to define a class in Python?",
+                answers: ["class MyClass:", "Class MyClass():", "def MyClass:", "create MyClass:"],
+                correct: 0,
+                explanation: "Classes in Python are defined using the 'class' keyword followed by the class name and a colon."
+            },
+            {
+                question: "What is the purpose of the __init__ method?",
+                answers: ["To delete an object", "To initialize object attributes", "To print the object", "To copy an object"],
+                correct: 1,
+                explanation: "The __init__ method is a constructor that initializes object attributes when an instance is created."
+            },
+            {
+                question: "What does 'self' refer to in a class method?",
+                code: "class Car:\n    def __init__(self, model):\n        self.model = model",
+                answers: ["The class itself", "The current instance", "A global variable", "The parent class"],
+                correct: 1,
+                explanation: "'self' refers to the current instance of the class, allowing access to instance attributes and methods."
+            },
+            {
+                question: "Which method is called when you use print(object)?",
+                answers: ["__repr__", "__str__", "__print__", "__display__"],
+                correct: 1,
+                explanation: "The __str__ method is called when using print() or str(). If __str__ isn't defined, __repr__ is used as fallback."
+            },
+            {
+                question: "What's the difference between class and instance attributes?",
+                code: "class Dog:\n    species = 'Canis lupus'  # ?\n    def __init__(self, name):\n        self.name = name     # ?",
+                answers: ["No difference", "Instance: shared, Class: unique", "Class: shared, Instance: unique", "Both are always shared"],
+                correct: 2,
+                explanation: "Class attributes are shared by all instances, while instance attributes are unique to each object."
+            },
+            {
+                question: "How do you create an instance of a class called 'Student'?",
+                answers: ["Student.new()", "create Student()", "Student()", "new Student()"],
+                correct: 2,
+                explanation: "You create an instance by calling the class name followed by parentheses: Student()."
+            },
+            {
+                question: "What will this code output?",
+                code: "class Test:\n    def __repr__(self):\n        return 'Test Object'\n\nobj = Test()\nprint(repr(obj))",
+                answers: ["Test Object", "<Test object at ...>", "repr(obj)", "Error"],
+                correct: 0,
+                explanation: "The __repr__ method returns 'Test Object', which is displayed when using repr() or when the object appears in containers."
+            },
+            {
+                question: "Which is true about private attributes in Python?",
+                code: "class MyClass:\n    def __init__(self):\n        self._protected = 1\n        self.__private = 2",
+                answers: ["__ makes truly private", "_ makes truly private", "__ signals private by convention", "Both are exactly the same"],
+                correct: 2,
+                explanation: "Double underscore (__) triggers name mangling for privacy by convention, but nothing is truly private in Python."
+            },
+            {
+                question: "What happens when you call len(obj) on a custom object?",
+                answers: ["Always returns 1", "Calls obj.__len__()", "Returns object size in memory", "Raises an error always"],
+                correct: 1,
+                explanation: "Python calls the __len__ method when len() is used. If __len__ isn't defined, it raises a TypeError."
+            },
+            {
+                question: "What's the output of this inheritance example?",
+                code: "class Animal:\n    def sound(self):\n        return 'Some sound'\n\nclass Dog(Animal):\n    def sound(self):\n        return 'Woof'\n\ndog = Dog()\nprint(dog.sound())",
+                answers: ["Some sound", "Woof", "Error", "Both sounds"],
+                correct: 1,
+                explanation: "Method overriding allows the child class (Dog) to provide its own implementation, so 'Woof' is returned."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedAnswer = null;
+
+        function loadQuestion() {
+            const q = quizData[currentQuestion];
+            const container = document.getElementById('questionContainer');
+            const codeBlock = q.code ? `<div class="code-block">${escapeHtml(q.code)}</div>` : '';
+
+            container.innerHTML = `
+                <div class="question-number">Question ${currentQuestion + 1} of ${quizData.length}</div>
+                <div class="question-text">${escapeHtml(q.question)}</div>
+                ${codeBlock}
+                <div class="answers-grid">
+                    ${q.answers.map((answer, index) => `
+                        <button class="answer-btn" onclick="selectAnswer(${index})">
+                            <span class="answer-letter">${String.fromCharCode(65 + index)}</span>${escapeHtml(answer)}
+                        </button>
+                    `).join('')}
+                </div>
+                <div class="feedback" id="feedback"></div>
+                <button class="next-btn" id="nextBtn" onclick="nextQuestion()">
+                    ${currentQuestion === quizData.length - 1 ? 'See Results' : 'Next Question'}
+                </button>
+            `;
+            updateProgress();
+        }
+
+        function selectAnswer(answerIndex) {
+            if (selectedAnswer !== null) return;
+            selectedAnswer = answerIndex;
+            const q = quizData[currentQuestion];
+            const buttons = document.querySelectorAll('#questionContainer .answer-btn');
+
+            buttons.forEach((btn, index) => {
+                btn.style.pointerEvents = 'none';
+                if (index === q.correct) btn.classList.add('correct');
+                else if (index === answerIndex) btn.classList.add('incorrect');
+            });
+
+            const isCorrect = answerIndex === q.correct;
+            if (isCorrect) score++;
+
+            const feedback = document.getElementById('feedback');
+            feedback.innerHTML = `<strong>${isCorrect ? '🎉 Correct!' : '❌ Incorrect!'}</strong><br>${escapeHtml(q.explanation)}`;
+            feedback.classList.add('show');
+            document.getElementById('nextBtn').style.display = 'inline-block';
+        }
+
+        function nextQuestion() {
+            selectedAnswer = null;
+            currentQuestion++;
+            if (currentQuestion < quizData.length) loadQuestion();
+            else showResults();
+        }
+
+        function updateProgress() {
+            document.getElementById('progressFill').style.width = (currentQuestion / quizData.length) * 100 + '%';
+        }
+
+        function showResults() {
+            const percentage = Math.round((score / quizData.length) * 100);
+            let message, emoji;
+            if (percentage >= 90)      { message = "Outstanding! You're a Python classes expert! 🏆"; emoji = "🌟"; }
+            else if (percentage >= 80) { message = "Great job! You have a solid understanding! 👏"; emoji = "🎯"; }
+            else if (percentage >= 70) { message = "Good work! Keep practicing to improve! 📚"; emoji = "👍"; }
+            else if (percentage >= 60) { message = "Not bad! Review the concepts and try again! 💪"; emoji = "📖"; }
+            else                       { message = "Keep learning! Practice makes perfect! 🌱"; emoji = "🔄"; }
+
+            document.getElementById('questionContainer').style.display = 'none';
+            const results = document.getElementById('results');
+            results.innerHTML = `
+                <div class="score">${emoji} ${score}/${quizData.length}</div>
+                <div class="score-message">${message}</div>
+                <p>You scored ${percentage}% on Python Classes &amp; Objects!</p>
+                <button class="restart-btn" onclick="restartQuiz()">Try Again</button>
+                <button class="button" onclick="showTab('intro')">Review Introduction</button>
+            `;
+            results.classList.add('show');
+            document.getElementById('progressFill').style.width = '100%';
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            selectedAnswer = null;
+            document.getElementById('questionContainer').style.display = 'block';
+            document.getElementById('results').classList.remove('show');
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>
