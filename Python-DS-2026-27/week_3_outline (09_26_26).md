@@ -50,7 +50,7 @@ This week we cover **Objects and Classes**. Use the resources below, take the qu
 
 ### **Next Class (Week 4):**
 
-- **Topic:** TBD
+- **Topic:** Further Exploration into Objects and Classes
 - **Dates:** 10/03/26 - 10/09/26
 
 ---
