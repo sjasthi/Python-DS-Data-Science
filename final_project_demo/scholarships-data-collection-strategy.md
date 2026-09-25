@@ -172,3 +172,4 @@ All other states have a single student, who covers every state/local scholarship
 - Every row has an official provider URL, and the "National vs. state/local" field matches the rule in Section 2.
 - Every national row falls within your assigned theme **and** your sponsor-name range.
 - Text copied from websites is cleaned: no leading/trailing spaces, and no non-breaking spaces (a common problem with copy-paste).
+- Please focus on the data gathering first. A web application being developed by ICS 325 students will be used to batch-load the data you collected so as to generate a comprehensive set of data. This final dataset will be used in your analysis.
