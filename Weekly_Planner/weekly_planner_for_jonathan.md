@@ -10,8 +10,8 @@
 | 10 | 9/5/2026 | NumPy - Introduction |
 | 11 | 9/12/2026 | Introduction to Pandas - DataFrame and Series |
 | 12 | 9/19/2026 | DataFrame - CRUD Operations |
-| 9 | - | Pandas - Data Input and Output (File I/O) |
-| 10 | - | Pandas - Exploratory Data Analysis (EDA) |
+| 13 | 9/26/2026 | Pandas - Exploratory Data Analysis (EDA) |
+| x | - | Pandas - Data Input and Output (File I/O) |
 | 11 | - | Pandas - Cleaning and Preprocessing |
 | 12 | - | Pandas - Searching, Sorting, Locating Data |
 | 13 | - | Pandas - Summarizing and Aggregations |
