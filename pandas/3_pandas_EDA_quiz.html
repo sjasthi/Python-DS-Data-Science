@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pandas DataFrames - EDA Playbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<style>
+  :root {
+    --bg: #12181f;
+    --panel: #1a232d;
+    --panel-2: #212c38;
+    --border: #2c3947;
+    --text: #e7edf3;
+    --text-dim: #9fb0c0;
+    --teal: #2dd4bf;
+    --amber: #f5b942;
+    --orange: #ff8a4c;
+    --red: #ff6b6b;
+    --green: #4ade80;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px 14px;
+    display: flex;
+    justify-content: center;
+  }
+  .wrap { width: 100%; max-width: 920px; }
+
+  .brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--panel-2);
+    border: 1px solid var(--teal);
+    color: var(--teal);
+    font-weight: 800;
+    font-size: 0.85rem;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .brand-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); }
+
+  header {
+    text-align: center;
+    padding: 24px 20px 20px;
+    background: linear-gradient(135deg, #1b3b3a 0%, #17222c 100%);
+    border: 1px solid var(--border);
+    border-radius: 18px 18px 0 0;
+  }
+  header h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.8rem;
+    color: var(--teal);
+  }
+  header p { color: var(--text-dim); margin-top: 8px; }
+
+  #pyodideStatus {
+    text-align: center;
+    padding: 10px;
+    background: var(--panel-2);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    color: var(--amber);
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  #pyodideStatus.ready { color: var(--green); }
+
+  .tabs {
+    display: flex;
+    background: var(--panel-2);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  .tab-btn {
+    flex: 1;
+    min-width: 110px;
+    padding: 15px 8px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  .tab-btn.active { color: var(--teal); border-bottom-color: var(--teal); background: var(--panel); }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 18px 18px;
+    padding: 28px 26px 32px;
+    min-height: 420px;
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .tab-content h2 { font-family: 'Fredoka One', cursive; color: var(--amber); font-size: 1.4rem; margin-bottom: 6px; }
+  .tab-content .lead { color: var(--text-dim); margin-bottom: 18px; }
+  .op-tag {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin: 18px 0 8px;
+  }
+  .op-create { background: rgba(45,212,191,0.15); color: var(--teal); }
+  .op-read   { background: rgba(245,185,66,0.15); color: var(--amber); }
+  .op-update { background: rgba(255,138,76,0.15); color: var(--orange); }
+  .op-delete { background: rgba(255,107,107,0.15); color: var(--red); }
+  .op-setup     { background: rgba(159,176,192,0.15); color: var(--text-dim); }
+  .op-load      { background: rgba(45,212,191,0.15); color: var(--teal); }
+  .op-size      { background: rgba(96,165,250,0.15); color: #60a5fa; }
+  .op-structure { background: rgba(245,185,66,0.15); color: var(--amber); }
+  .op-missing   { background: rgba(255,107,107,0.15); color: var(--red); }
+  .op-stats     { background: rgba(192,132,252,0.15); color: #c084fc; }
+
+  /* Pyodide code cells */
+  .pyodide-cell {
+    background: #0d1319;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--teal);
+    border-radius: 10px;
+    margin: 10px 0 20px;
+    overflow: hidden;
+  }
+  .code-input {
+    width: 100%;
+    background: transparent;
+    color: #d4e8e2;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.92rem;
+    border: none;
+    resize: vertical;
+    padding: 14px 16px;
+    line-height: 1.5;
+    min-height: 40px;
+  }
+  .code-input:focus { outline: none; background: rgba(45,212,191,0.04); }
+  .cell-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 14px;
+    background: var(--panel-2);
+    border-top: 1px solid var(--border);
+  }
+  .run-btn {
+    background: var(--teal);
+    color: #062824;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 16px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .run-btn:hover { background: #24b6a4; }
+  .run-btn:disabled { opacity: 0.5; cursor: wait; }
+  .cell-label { color: var(--text-dim); font-size: 0.8rem; }
+  .output {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88rem;
+    color: #c3e8ff;
+    padding: 12px 16px;
+    white-space: pre;
+    overflow-x: auto;
+    border-top: 1px dashed var(--border);
+    min-height: 20px;
+    display: none;
+  }
+  .output.show { display: block; }
+  .output.error { color: var(--red); }
+
+  .nav-hint { text-align:center; margin-top: 22px; color: var(--text-dim); font-size: 0.92rem; }
+  .nav-hint b { color: var(--amber); }
+
+  /* Quiz */
+  .quiz-progress { width: 100%; height: 8px; background: var(--panel-2); border-radius: 4px; overflow: hidden; margin-bottom: 22px; }
+  .quiz-progress-fill { height: 100%; background: var(--teal); width: 0%; transition: width .4s ease; }
+  .q-number { display: inline-block; background: var(--panel-2); border: 1px solid var(--border); color: var(--amber); padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; margin-bottom: 16px; }
+  .q-text { font-size: 1.2rem; margin-bottom: 18px; line-height: 1.4; }
+  .q-code { background: #0d1319; border-left: 4px solid var(--teal); border-radius: 10px; padding: 14px 18px; font-family: 'JetBrains Mono', monospace; font-size: 1.02rem; margin-bottom: 18px; white-space: pre; overflow-x: auto; }
+  .answers { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 12px; }
+  .answer-btn { background: var(--panel-2); border: 1px solid var(--border); color: var(--text); padding: 14px 16px; border-radius: 12px; font-size: 0.98rem; font-weight: 700; cursor: pointer; text-align: left; font-family: 'JetBrains Mono', monospace; }
+  .answer-btn:hover { border-color: var(--teal); transform: translateY(-2px); }
+  .answer-btn.correct { background: rgba(74,222,128,0.18); border-color: var(--green); color: var(--green); }
+  .answer-btn.incorrect { background: rgba(255,107,107,0.18); border-color: var(--red); color: var(--red); }
+  .answer-btn[disabled] { cursor: default; transform: none; }
+  .feedback { margin-top: 18px; padding: 14px 16px; border-radius: 12px; font-size: 0.95rem; display: none; line-height: 1.5; }
+  .feedback.correct { display:block; background: rgba(74,222,128,0.12); border: 1px solid var(--green); color: #cdf7dc; }
+  .feedback.incorrect { display:block; background: rgba(255,107,107,0.12); border: 1px solid var(--red); color: #ffd9d9; }
+  .next-btn, .start-btn, .restart-btn { margin-top: 20px; background: var(--teal); color: #062824; border: none; padding: 13px 28px; border-radius: 24px; font-weight: 800; font-size: 1rem; cursor: pointer; display: none; }
+  .start-btn, .restart-btn { display: inline-block; }
+  .next-btn:hover, .start-btn:hover, .restart-btn:hover { background: #24b6a4; }
+  .quiz-screen { display:none; }
+  .quiz-screen.active { display:block; }
+  .quiz-start { text-align:center; }
+  .badges { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin: 16px 0 20px; }
+  .badge { background: var(--panel-2); border: 1px solid var(--border); padding: 8px 14px; border-radius: 18px; font-size: 0.86rem; color: var(--text-dim); }
+  .result-screen { text-align: center; }
+  .score-display { font-family: 'Fredoka One', cursive; font-size: 2.8rem; color: var(--teal); margin: 14px 0; }
+  .score-msg { color: var(--text-dim); font-size: 1.05rem; margin-bottom: 18px; }
+  .submit-box { background: rgba(245,185,66,0.1); border: 1px solid var(--amber); border-radius: 12px; padding: 16px 18px; margin-top: 20px; color: #ffe4b0; font-size: 0.95rem; text-align: left; }
+  .submit-box b { color: var(--amber); }
+
+  @media (max-width: 620px) {
+    header h1 { font-size: 1.4rem; }
+    .panel { padding: 20px 14px 26px; }
+    .tab-btn { font-size: 0.8rem; padding: 12px 4px; }
+  }
+
+  .tab-btn { min-width: 100px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand-badge"><span class="dot"></span> Learn and Help &middot; Python for Data Science</div>
+
+  <header>
+    <h1>🐼 Pandas DataFrames — EDA Playbook</h1>
+    <p>Exploratory Data Analysis on the Titanic dataset — live, runnable Python right in this page</p>
+  </header>
+
+  <div id="pyodideStatus">⏳ Starting Python engine (Pyodide + pandas)... this takes about 10-15 seconds the first time.</div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="load">📥 Load &amp; Peek</button>
+    <button class="tab-btn" data-tab="size">📏 Size</button>
+    <button class="tab-btn" data-tab="structure">🧬 Structure</button>
+    <button class="tab-btn" data-tab="missing">🕳️ Missing</button>
+    <button class="tab-btn" data-tab="stats">📈 Statistics</button>
+    <button class="tab-btn" data-tab="quiz">📝 Quiz</button>
+  </div>
+
+  <div class="panel">
+
+    <!-- TAB 1: LOAD & PEEK -->
+    <div class="tab-content active" id="tab-load">
+      <h2>📥 Load the Data &amp; Take a Peek</h2>
+      <p class="lead"><b>EDA</b> (Exploratory Data Analysis) means getting to know your data <i>before</i> you clean it or build models: How big is it? What columns does it have? What types? What's missing? What values are typical? We'll explore the famous <b>Titanic</b> passenger list. Click ▶ Run on each cell (or edit the code first)!</p>
+
+      <div class="op-tag op-load">Load — read a CSV from a GitHub URL</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false" rows="11">import pandas as pd
+
+url = "https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv"
+df = load_csv(url)   # in Colab/Jupyter you'd write: df = pd.read_csv(url)
+
+print(type(df))
+print("Loaded", len(df), "passengers")</textarea>
+        <div class="cell-toolbar"><span class="cell-label">Run this first — it creates the "df" we'll use everywhere</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-load">Peek — the first rows with head()</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false" rows="4">print(df.head())       # top 5 rows (the default)
+print()
+print(df.head(9))      # top N rows — pass an int</textarea>
+        <div class="cell-toolbar"><span class="cell-label">Wide tables wrap — scroll the output if needed</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-load">Peek — the last rows with tail()</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false" rows="4">print(df.tail())       # bottom 5 rows
+print()
+print(df.tail(3))      # bottom N rows</textarea>
+        <div class="cell-toolbar"><span class="cell-label">tail() is handy for spotting junk rows at the end of a file</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-load">Peek — just a few columns</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false" rows="3"># Too many columns to read comfortably? Peek at a few of them.
+print(df[["Name", "Sex", "Age", "Survived"]].head())</textarea>
+        <div class="cell-toolbar"><span class="cell-label"></span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <p class="nav-hint">Now that you've seen the data, let's measure how <b>big</b> it is. ➡️</p>
+    </div>
+
+    <!-- TAB 2: SIZE -->
+    <div class="tab-content" id="tab-size">
+      <h2>📏 How Big Is the Data?</h2>
+      <p class="lead">Before anything else, count the rows and columns. If df isn't defined yet, run the setup cell first.</p>
+
+      <div class="op-tag op-setup">Setup (run once if needed)</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false" rows="3">import pandas as pd
+df = load_csv("https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv")
+print(df.head(3))</textarea>
+        <div class="cell-toolbar"><span class="cell-label">Recreates df</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-size">shape and size</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false" rows="4">print("shape (rows, columns):", df.shape)
+print("size (total cells):    ", df.size)
+print()
+print("Check: rows × columns =", df.shape[0] * df.shape[1])</textarea>
+        <div class="cell-toolbar"><span class="cell-label">shape is a tuple; size is a single number</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-size">Count the rows — two ways</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false" rows="2">print("len(df)     :", len(df))
+print("df.shape[0] :", df.shape[0])</textarea>
+        <div class="cell-toolbar"><span class="cell-label">Both give the number of rows</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-size">Count the columns — two ways</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false" rows="2">print("len(df.columns) :", len(df.columns))
+print("df.shape[1]     :", df.shape[1])</textarea>
+        <div class="cell-toolbar"><span class="cell-label">Both give the number of columns</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <p class="nav-hint">Next: what are those columns, and what <b>type</b> of data does each hold? ➡️</p>
+    </div>
+
+    <!-- TAB 3: STRUCTURE -->
+    <div class="tab-content" id="tab-structure">
+      <h2>🧬 Structure &amp; Data Types</h2>
+      <p class="lead">Learn the column names, the row labels (the index), and the data type of every column.</p>
+
+      <div class="op-tag op-setup">Setup (run once if needed)</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false" rows="3">import pandas as pd
+df = load_csv("https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv")
+print(df.head(3))</textarea>
+        <div class="cell-toolbar"><span class="cell-label">Recreates df</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-structure">Column names</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false" rows="9">cols = df.columns
+print(type(cols))          # an Index object, not a list
+print(cols)
+print()
+
+column_list = list(df.columns)   # convert to a plain Python list
+print(column_list)
+for index, name in enumerate(column_list):
+    print(index, name)</textarea>
+        <div class="cell-toolbar"><span class="cell-label"></span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-structure">Row labels (the index)</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false" rows="4">print(type(df.index))      # RangeIndex: 0, 1, 2, ...
+print(df.index)
+print()
+print(list(df.index)[:10], "...")   # first 10 labels as a list</textarea>
+        <div class="cell-toolbar"><span class="cell-label"></span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-structure">Data types with dtypes</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false" rows="1">print(df.dtypes)</textarea>
+        <div class="cell-toolbar"><span class="cell-label">int64 / float64 = numbers, object = text</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-structure">Everything at once with info()</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false" rows="3">df.info()     # rows, columns, non-null counts, dtypes, memory
+
+# Notice: info() PRINTS its report and returns None, so no print() needed.</textarea>
+        <div class="cell-toolbar"><span class="cell-label">Compare each Non-Null Count with the total rows</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <p class="nav-hint">Did you spot columns with fewer non-null values? Let's hunt for <b>missing data</b>. ➡️</p>
+    </div>
+
+    <!-- TAB 4: MISSING -->
+    <div class="tab-content" id="tab-missing">
+      <h2>🕳️ Finding Missing Values</h2>
+      <p class="lead">Missing values show up as <b>NaN</b> ("Not a Number"). Real data almost always has some — the question is where and how many.</p>
+
+      <div class="op-tag op-setup">Setup (run once if needed)</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false" rows="3">import pandas as pd
+df = load_csv("https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv")
+print(df.head(3))</textarea>
+        <div class="cell-toolbar"><span class="cell-label">Recreates df</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-missing">Is anything missing at all?</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false" rows="2">nan_in_df = df.isnull().values.any()
+print("Any missing values?", nan_in_df)</textarea>
+        <div class="cell-toolbar"><span class="cell-label">One True/False for the whole table</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-missing">What does isnull() actually return?</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false" rows="2"># A True/False table the same shape as df — True where the value is missing
+print(df[["Name", "Age", "Cabin"]].isnull().head(8))</textarea>
+        <div class="cell-toolbar"><span class="cell-label">isna() is an alias — it does exactly the same thing</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-missing">Count missing values per column</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false" rows="4">print(df.isnull().sum())      # True counts as 1, False as 0
+print()
+pct = (df.isnull().sum() / len(df) * 100).round(1)
+print("Percent missing:\n", pct[pct > 0])</textarea>
+        <div class="cell-toolbar"><span class="cell-label">Percentages help you decide: fill it, drop it, or ignore it?</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <p class="nav-hint">Finally, let's summarize what the typical values look like with <b>statistics</b>. ➡️</p>
+    </div>
+
+    <!-- TAB 5: STATISTICS -->
+    <div class="tab-content" id="tab-stats">
+      <h2>📈 Descriptive Statistics</h2>
+      <p class="lead">Statistics summarize each column in a few numbers. Numeric columns get mean, std, quartiles…; text (categorical) columns get counts and the most frequent value.</p>
+
+      <div class="op-tag op-setup">Setup (run once if needed)</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false" rows="3">import pandas as pd
+df = load_csv("https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv")
+print(df.head(3))</textarea>
+        <div class="cell-toolbar"><span class="cell-label">Recreates df</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-stats">Watch out: statistics on text columns</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false" rows="7">try:
+    print(df.mean())
+except TypeError as e:
+    print("TypeError! You can't average text like names.")
+    print()
+
+print("Mean of numeric columns only:")
+print(df.mean(numeric_only=True))</textarea>
+        <div class="cell-toolbar"><span class="cell-label">In pandas 2.x, df.mean() fails when text columns are present</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-stats">One statistic at a time</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false" rows="7">nums = df.select_dtypes(include="number")   # keep only numeric columns
+
+print("Median:\n", nums.median(), "\n")
+print("Std deviation:\n", nums.std().round(2), "\n")
+print("Minimum:\n", nums.min(), "\n")
+print("Maximum:\n", nums.max(), "\n")
+print("Mode of Pclass:", df["Pclass"].mode().iloc[0])</textarea>
+        <div class="cell-toolbar"><span class="cell-label">Also try .var() and .mean()</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-stats">describe() — numeric columns</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false" rows="5">stats = df.describe()
+print(stats.round(2))
+print()
+print(type(stats))                       # it's a DataFrame!
+print("Average age:", round(stats.loc["mean", "Age"], 1))</textarea>
+        <div class="cell-toolbar"><span class="cell-label">count, mean, std, min, 25%, 50% (median), 75%, max</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="op-tag op-stats">describe() — categorical (text) columns</div>
+      <div class="pyodide-cell">
+        <textarea class="code-input" spellcheck="false" rows="1">print(df.describe(include=["object", "category"]))</textarea>
+        <div class="cell-toolbar"><span class="cell-label">count, unique, top (most frequent), freq (how often)</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div>
+        <pre class="output"></pre>
+      </div>
+
+      <p class="nav-hint">Ready to test yourself? Click the <b>Quiz</b> tab! ➡️</p>
+    </div>
+
+    <!-- TAB 6: QUIZ -->
+    <div class="tab-content" id="tab-quiz">
+
+      <div class="quiz-screen active" id="quizStart">
+        <div class="quiz-start">
+          <h2>📝 Pandas EDA Quiz</h2>
+          <p class="lead">10 questions on loading, sizing, inspecting, finding missing values, and summarizing a DataFrame.</p>
+          <div class="badges">
+            <span class="badge">📝 10 questions</span>
+            <span class="badge">🎯 No time limit</span>
+            <span class="badge">📸 Screenshot your score</span>
+          </div>
+          <button class="start-btn" onclick="startQuiz()">🚀 Start Quiz</button>
+        </div>
+      </div>
+
+      <div class="quiz-screen" id="quizQuestion">
+        <div class="quiz-progress"><div class="quiz-progress-fill" id="progressFill"></div></div>
+        <div class="q-number" id="qNumber">Question 1 of 10</div>
+        <div class="q-text" id="qText"></div>
+        <div class="q-code" id="qCode" style="display:none;"></div>
+        <div class="answers" id="answers"></div>
+        <div class="feedback" id="feedback"></div>
+        <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
+      </div>
+
+      <div class="quiz-screen" id="quizResult">
+        <div class="result-screen">
+          <h2>🎉 Quiz Complete!</h2>
+          <div class="score-display" id="scoreDisplay">0/10</div>
+          <div class="score-msg" id="scoreMsg"></div>
+          <button class="restart-btn" onclick="restartQuiz()">🔄 Try Again</button>
+          <div class="submit-box">
+            📸 <b>Submission:</b> Take a screenshot of this results screen showing your score, and submit it to <b>Google Classroom</b>.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ---------- Tab switching ----------
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ---------- Pyodide setup ----------
+  let pyodideReady = false;
+  let pyodide = null;
+  let outputBuffer = [];
+
+  async function initPyodide() {
+    const statusEl = document.getElementById('pyodideStatus');
+    try {
+      pyodide = await loadPyodide();
+      statusEl.textContent = '📦 Loading pandas + numpy...';
+      await pyodide.loadPackage(['pandas', 'numpy']);
+
+      statusEl.textContent = '🚢 Preparing the Titanic dataset helper...';
+      await pyodide.runPythonAsync(`
+import io
+import pandas as pd
+pd.set_option("display.width", 200)
+pd.set_option("display.max_columns", 20)
+_TITANIC_SAMPLE = """PassengerId,Survived,Pclass,Name,Sex,Age,SibSp,Parch,Ticket,Fare,Cabin,Embarked
+1,0,3,"Braund, Mr. Owen Harris",male,22,1,0,A/5 21171,7.25,,S
+2,1,1,"Cumings, Mrs. John Bradley (Florence Briggs Thayer)",female,38,1,0,PC 17599,71.2833,C85,C
+3,1,3,"Heikkinen, Miss. Laina",female,26,0,0,STON/O2. 3101282,7.925,,S
+4,1,1,"Futrelle, Mrs. Jacques Heath (Lily May Peel)",female,35,1,0,113803,53.1,C123,S
+5,0,3,"Allen, Mr. William Henry",male,35,0,0,373450,8.05,,S
+6,0,3,"Moran, Mr. James",male,,0,0,330877,8.4583,,Q
+7,0,1,"McCarthy, Mr. Timothy J",male,54,0,0,17463,51.8625,E46,S
+8,0,3,"Palsson, Master. Gosta Leonard",male,2,3,1,349909,21.075,,S
+9,1,3,"Johnson, Mrs. Oscar W (Elisabeth Vilhelmina Berg)",female,27,0,2,347742,11.1333,,S
+10,1,2,"Nasser, Mrs. Nicholas (Adele Achem)",female,14,1,0,237736,30.0708,,C
+11,1,3,"Sandstrom, Miss. Marguerite Rut",female,4,1,1,PP 9549,16.7,G6,S
+12,1,1,"Bonnell, Miss. Elizabeth",female,58,0,0,113783,26.55,C103,S"""
+_cache = {}
+def load_csv(url):
+    """Browser-friendly stand-in for pd.read_csv(url). Falls back to a small sample when offline."""
+    if url not in _cache:
+        try:
+            from pyodide.http import open_url
+            _cache[url] = open_url(url).read()
+        except Exception:
+            print("(Could not reach GitHub - using a built-in 12-row sample of the Titanic data.)")
+            return pd.read_csv(io.StringIO(_TITANIC_SAMPLE))
+    return pd.read_csv(io.StringIO(_cache[url]))
+`);
+      pyodide.setStdout({ batched: (msg) => { outputBuffer.push(msg + "\n"); } });
+      pyodideReady = true;
+      statusEl.textContent = '✅ Python engine ready — click ▶ Run on any code cell!';
+      statusEl.classList.add('ready');
+      setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
+    } catch (err) {
+      statusEl.textContent = '⚠️ Could not load the Python engine. Check your internet connection and reload the page.';
+    }
+  }
+  initPyodide();
+
+  async function runCell(button) {
+    const cell = button.closest('.pyodide-cell');
+    const code = cell.querySelector('.code-input').value;
+    const output = cell.querySelector('.output');
+
+    if (!pyodideReady) {
+      output.textContent = 'Python engine is still loading — please wait a few seconds and try again.';
+      output.className = 'output show error';
+      return;
+    }
+
+    button.disabled = true;
+    button.textContent = 'Running...';
+    outputBuffer = [];
+
+    try {
+      await pyodide.runPythonAsync(code);
+      output.textContent = outputBuffer.join('') || '(no output — code ran successfully)';
+      output.className = 'output show';
+    } catch (err) {
+      output.textContent = 'Error:\n' + err.message.split('\n').slice(-4).join('\n');
+      output.className = 'output show error';
+    }
+    button.disabled = false;
+    button.textContent = '▶ Run';
+  }
+
+  // ---------- Quiz ----------
+  const questions = [
+    {
+      q: "What is the main goal of Exploratory Data Analysis (EDA)?",
+      options: [
+        "To train a machine learning model",
+        "To get to know the data — its size, columns, types, missing values, and typical values",
+        "To delete all rows that have missing values",
+        "To convert a CSV file into Excel"
+      ],
+      correct: 1,
+      explain: "EDA is the 'get to know your data' step that comes before cleaning and modeling."
+    },
+    {
+      q: "What does df.head() return when you don't pass a number?",
+      options: ["The first row only", "The first 10 rows", "The first 5 rows", "The column names"],
+      correct: 2,
+      explain: "head() and tail() default to 5 rows. Pass an int, like df.head(9), to get a different number."
+    },
+    {
+      q: "The Titanic DataFrame has this shape. What is df.size?",
+      code: "df.shape   # (891, 12)",
+      options: ["891", "12", "903", "10692"],
+      correct: 3,
+      explain: "df.size counts every cell: rows × columns = 891 × 12 = 10,692. It is NOT the number of rows."
+    },
+    {
+      q: "Which of these does NOT give you the number of rows?",
+      options: ["len(df)", "df.shape[0]", "df.size", "len(df.index)"],
+      correct: 2,
+      explain: "df.size is the total number of cells (rows × columns). The other three all count rows."
+    },
+    {
+      q: "df.columns returns an Index object. How do you get the column names as a plain Python list?",
+      options: ["list(df.columns)", "df.columns.list", "df.get_columns()", "df.columns[]"],
+      correct: 0,
+      explain: "Wrapping it in list() converts the Index into an ordinary list you can loop over or print."
+    },
+    {
+      q: "Which single method shows each column's data type AND its non-null count?",
+      options: ["df.dtypes", "df.info()", "df.describe()", "df.shape"],
+      correct: 1,
+      explain: "df.info() prints the row count, each column's non-null count and dtype, and memory use. df.dtypes shows types only."
+    },
+    {
+      q: "What does this line return?",
+      code: "df.isnull().sum()",
+      options: [
+        "The total of all numbers in df",
+        "True or False for the whole table",
+        "The number of missing values in each column",
+        "A copy of df with missing values removed"
+      ],
+      correct: 2,
+      explain: "isnull() gives a True/False table; sum() counts the Trues (True = 1) down each column."
+    },
+    {
+      q: "In pandas 2.x the Titanic df has text columns like Name. What happens with df.mean()?",
+      options: [
+        "It raises a TypeError — use df.mean(numeric_only=True)",
+        "It returns the mean of every column, including Name",
+        "It returns one number for the whole table",
+        "It silently fills text columns with 0"
+      ],
+      correct: 0,
+      explain: "pandas can't average text. Pass numeric_only=True, or select numeric columns first with df.select_dtypes(include='number')."
+    },
+    {
+      q: "By default, which columns does df.describe() summarize?",
+      options: ["All columns", "Only text (object) columns", "Only columns with missing values", "Only numeric columns"],
+      correct: 3,
+      explain: "describe() summarizes numeric columns by default: count, mean, std, min, 25%, 50%, 75%, max."
+    },
+    {
+      q: "Which statistics does this line report for text columns?",
+      code: "df.describe(include=['object', 'category'])",
+      options: [
+        "mean, std, min, max",
+        "count, unique, top, freq",
+        "sum, median, mode",
+        "dtype and non-null count"
+      ],
+      correct: 1,
+      explain: "For categorical columns you get count, number of unique values, the most frequent value (top), and how often it appears (freq)."
+    }
+  ];
+
+  let current = 0;
+  let score = 0;
+
+  function showScreen(id) {
+    document.querySelectorAll('.quiz-screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function startQuiz() {
+    current = 0;
+    score = 0;
+    showScreen('quizQuestion');
+    showQuestion();
+  }
+
+  function showQuestion() {
+    const item = questions[current];
+    document.getElementById('progressFill').style.width = (current / questions.length * 100) + '%';
+    document.getElementById('qNumber').textContent = `Question ${current + 1} of ${questions.length}`;
+    document.getElementById('qText').textContent = item.q;
+
+    const codeEl = document.getElementById('qCode');
+    if (item.code) { codeEl.style.display = 'block'; codeEl.textContent = item.code; }
+    else { codeEl.style.display = 'none'; }
+
+    const answersDiv = document.getElementById('answers');
+    answersDiv.innerHTML = '';
+    item.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'answer-btn';
+      btn.textContent = opt;
+      btn.onclick = () => selectAnswer(i);
+      answersDiv.appendChild(btn);
+    });
+
+    document.getElementById('feedback').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'none';
+  }
+
+  function selectAnswer(i) {
+    const item = questions[current];
+    const buttons = document.querySelectorAll('.answer-btn');
+    buttons.forEach(b => b.disabled = true);
+
+    const feedback = document.getElementById('feedback');
+    if (i === item.correct) {
+      score++;
+      buttons[i].classList.add('correct');
+      feedback.className = 'feedback correct';
+      feedback.innerHTML = `<strong>Correct! 🎉</strong><br>${item.explain}`;
+    } else {
+      buttons[i].classList.add('incorrect');
+      buttons[item.correct].classList.add('correct');
+      feedback.className = 'feedback incorrect';
+      feedback.innerHTML = `<strong>Not quite. 🤔</strong> The correct answer was <b>${item.options[item.correct]}</b>.<br>${item.explain}`;
+    }
+    feedback.style.display = 'block';
+    document.getElementById('nextBtn').style.display = 'inline-block';
+  }
+
+  function nextQuestion() {
+    current++;
+    if (current >= questions.length) { showResults(); }
+    else { showQuestion(); }
+  }
+
+  function showResults() {
+    document.getElementById('progressFill').style.width = '100%';
+    showScreen('quizResult');
+    document.getElementById('scoreDisplay').textContent = `${score}/${questions.length}`;
+    let msg;
+    if (score >= 9) msg = "Outstanding! You're an EDA detective! 🏆";
+    else if (score >= 7) msg = "Great job! Solid grasp of the fundamentals. 🎯";
+    else if (score >= 5) msg = "Good start — revisit the tabs and try again! 📚";
+    else msg = "No worries — go back through the Load, Size, Structure, Missing, and Statistics tabs, then retake it! 💪";
+    document.getElementById('scoreMsg').textContent = msg;
+  }
+
+  function restartQuiz() { showScreen('quizStart'); }
+</script>
+</body>
+</html>
