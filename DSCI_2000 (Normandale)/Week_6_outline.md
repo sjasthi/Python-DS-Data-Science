@@ -16,7 +16,7 @@
 ### References
 
 1. [Colab Notebook – Exploratory Data Analysis](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/pandas/3_pandas_EDA_Exploratory_Data_Analysis.ipynb)
-2. [One Pager Summary – Exploratory Data Analysis](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/pandas/3_pandas_EDA_Exploratory_Data_Analysis.ipynb)
+2. [One Pager Summary – Exploratory Data Analysis](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/pandas/3_pandas_EDA_Exploratory_Data_Analysis_one_pager.png)
 3. [Playbook and Quiz – Exploratory Data Analysis](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/pandas/3_pandas_EDA_quiz.html)
 
 ---
