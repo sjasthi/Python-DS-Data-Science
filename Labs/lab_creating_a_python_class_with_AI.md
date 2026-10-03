@@ -1,6 +1,6 @@
 # Lab: Build a Car Class with AI
 
-In this lab you will use an AI assistant (Claude.ai or similar) to help you design, build, test, and explain **one Python class: `Car`**. The goal is not just to get working code, but to understand every line of it well enough to explain it to someone else.
+In this lab you will use an AI assistant (GitHub Copilot https://github.com/copilot  or Claude Code Claude.ai) to help you design, build, test, and explain **one Python class: `Car`**. The goal is not just to get working code, but to understand every line of it well enough to explain it to someone else.
 
 Before starting, review the prompts in [Advanced Exploration of Objects and Classes through AI](exploring_objects_and_classes_advanced.md).
 
@@ -78,7 +78,7 @@ Answer these briefly in a `README.md` or in markdown cells at the end of your no
 
 Submit through a GitHub repo link or the course upload:
 
-- Your `.py` file or Jupyter notebook (`.ipynb`)
+- Your Jupyter notebook (`.ipynb`)
 - Your reflection (`README.md` or markdown cells)
 - A screenshot or pasted output showing your test section running
 
