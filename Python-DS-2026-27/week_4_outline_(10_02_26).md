@@ -45,32 +45,8 @@ Review comprehensive examples of object-oriented programming
 ---
 
 ## **[5] 🧪 Lab (Due This Week)**
----
 
-## ** 🤖 Claude.ai Prompting Practice**
-
-### **Objective:** 
-Learn to use AI effectively for programming assistance
-
-### **Platform:** 
-Visit [Claude.ai](http://www.claude.ai)
-
-### **Required Prompts:**
-
-Try out these prompts provided at this LINK
-[https://github.com/sjasthi/Python-DS-Data-Science/blob/main/play/exploring_objects_and_classes_advanced.md](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Labs/exploring_objects_and_classes_advanced.md)
-
-### **Tasks:**
-- [ ] Try each prompt exactly as written
-- [ ] Study the responses carefully
-- [ ] Take notes on key concepts explained
-- [ ] Compare AI explanations with course materials
-
-### **Learning Goals:**
-- [ ] Practice effective AI prompting techniques
-- [ ] Understand special methods in Python classes
-- [ ] Learn about string representations in OOP
-
+https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Labs/lab_creating_a_python_class_with_AI.md
 ---
 
 ## **📞 Need Help?**
