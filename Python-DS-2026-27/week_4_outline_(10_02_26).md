@@ -44,15 +44,10 @@ Review comprehensive examples of object-oriented programming
 
 ---
 
-
-## **[4] ✅ Quiz (Due Today)**
-
+## **[5] 🧪 Lab (Due This Week)**
 ---
 
-## **[5] 🧪 In-Class Exercise (Due This Week)**
----
-
-## **[2] 🤖 Claude.ai Prompting Practice**
+## ** 🤖 Claude.ai Prompting Practice**
 
 ### **Objective:** 
 Learn to use AI effectively for programming assistance
@@ -63,7 +58,7 @@ Visit [Claude.ai](http://www.claude.ai)
 ### **Required Prompts:**
 
 Try out these prompts provided at this LINK
-https://github.com/sjasthi/Python-DS-Data-Science/blob/main/play/exploring_objects_and_classes_advanced.md
+[https://github.com/sjasthi/Python-DS-Data-Science/blob/main/play/exploring_objects_and_classes_advanced.md](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Labs/exploring_objects_and_classes_advanced.md)
 
 ### **Tasks:**
 - [ ] Try each prompt exactly as written
@@ -75,38 +70,6 @@ https://github.com/sjasthi/Python-DS-Data-Science/blob/main/play/exploring_objec
 - [ ] Practice effective AI prompting techniques
 - [ ] Understand special methods in Python classes
 - [ ] Learn about string representations in OOP
-
----
-
-## **[3] 📝 Quiz 3: Objects and Classes Assessment**
-
-### **Objective:** 
-Test your understanding of objects and classes concepts
-
-### **Tasks:**
-1. **Take the Quiz:**
-   - Link: https://docs.google.com/forms/d/1CWUFP8jJLTvayvIFPAdBI0M38V2ZB7eEnI2_kC1R8o4/edit
-
-
-### **Important Notes:**
-- ⚠️ **Don't worry if some concepts aren't clear!**
-- 🔄 **We will revisit these concepts later in the course**
-- 🎯 **Focus on understanding, not just getting a perfect score**
-
-### **Learning Goals:**
-- [ ] Self-assess understanding of objects and classes
-- [ ] Identify areas that need more practice
-- [ ] Build confidence with the material
-
-
----
-
-## **[6] 🔮 Looking Ahead!**
-
-### **Next Class (Week 4):**
-
-- **Topic:** Further Exploration into Objects and Classes
-- **Dates:** 10/03/26 - 10/09/26
 
 ---
 
