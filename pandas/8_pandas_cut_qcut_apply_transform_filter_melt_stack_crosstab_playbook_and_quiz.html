@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pandas — Binning, Applying, Transforming and Reshaping</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<style>
+  :root {
+    --bg: #12181f;
+    --panel: #1a232d;
+    --panel-2: #212c38;
+    --border: #2c3947;
+    --text: #e7edf3;
+    --text-dim: #9fb0c0;
+    --teal: #2dd4bf;
+    --amber: #f5b942;
+    --orange: #ff8a4c;
+    --red: #ff6b6b;
+    --green: #4ade80;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px 14px;
+    display: flex;
+    justify-content: center;
+  }
+  .wrap { width: 100%; max-width: 920px; }
+
+  .brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--panel-2);
+    border: 1px solid var(--teal);
+    color: var(--teal);
+    font-weight: 800;
+    font-size: 0.85rem;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .brand-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); }
+
+  header {
+    text-align: center;
+    padding: 24px 20px 20px;
+    background: linear-gradient(135deg, #1b3b3a 0%, #17222c 100%);
+    border: 1px solid var(--border);
+    border-radius: 18px 18px 0 0;
+  }
+  header h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.8rem;
+    color: var(--teal);
+  }
+  header p { color: var(--text-dim); margin-top: 8px; }
+
+  #pyodideStatus {
+    text-align: center;
+    padding: 10px;
+    background: var(--panel-2);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    color: var(--amber);
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  #pyodideStatus.ready { color: var(--green); }
+
+  .tabs {
+    display: flex;
+    background: var(--panel-2);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  .tab-btn {
+    flex: 1;
+    min-width: 110px;
+    padding: 15px 8px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  .tab-btn.active { color: var(--teal); border-bottom-color: var(--teal); background: var(--panel); }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 18px 18px;
+    padding: 28px 26px 32px;
+    min-height: 420px;
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .tab-content h2 { font-family: 'Fredoka One', cursive; color: var(--amber); font-size: 1.4rem; margin-bottom: 6px; }
+  .tab-content .lead { color: var(--text-dim); margin-bottom: 18px; }
+  .op-tag {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin: 18px 0 8px;
+  }
+  .op-create { background: rgba(45,212,191,0.15); color: var(--teal); }
+  .op-read   { background: rgba(245,185,66,0.15); color: var(--amber); }
+  .op-update { background: rgba(255,138,76,0.15); color: var(--orange); }
+  .op-delete { background: rgba(255,107,107,0.15); color: var(--red); }
+  .op-setup     { background: rgba(159,176,192,0.15); color: var(--text-dim); }
+  .op-load      { background: rgba(45,212,191,0.15); color: var(--teal); }
+  .op-size      { background: rgba(96,165,250,0.15); color: #60a5fa; }
+  .op-structure { background: rgba(245,185,66,0.15); color: var(--amber); }
+  .op-missing   { background: rgba(255,107,107,0.15); color: var(--red); }
+  .op-stats     { background: rgba(192,132,252,0.15); color: #c084fc; }
+
+  /* Pyodide code cells */
+  .pyodide-cell {
+    background: #0d1319;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--teal);
+    border-radius: 10px;
+    margin: 10px 0 20px;
+    overflow: hidden;
+  }
+  .code-input {
+    width: 100%;
+    background: transparent;
+    color: #d4e8e2;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.92rem;
+    border: none;
+    resize: vertical;
+    padding: 14px 16px;
+    line-height: 1.5;
+    min-height: 40px;
+  }
+  .code-input:focus { outline: none; background: rgba(45,212,191,0.04); }
+  .cell-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 14px;
+    background: var(--panel-2);
+    border-top: 1px solid var(--border);
+  }
+  .run-btn {
+    background: var(--teal);
+    color: #062824;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 16px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .run-btn:hover { background: #24b6a4; }
+  .run-btn:disabled { opacity: 0.5; cursor: wait; }
+  .cell-label { color: var(--text-dim); font-size: 0.8rem; }
+  .output {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88rem;
+    color: #c3e8ff;
+    padding: 12px 16px;
+    white-space: pre;
+    overflow-x: auto;
+    border-top: 1px dashed var(--border);
+    min-height: 20px;
+    display: none;
+  }
+  .output.show { display: block; }
+  .output.error { color: var(--red); }
+
+  .nav-hint { text-align:center; margin-top: 22px; color: var(--text-dim); font-size: 0.92rem; }
+  .nav-hint b { color: var(--amber); }
+
+  /* Quiz */
+  .quiz-progress { width: 100%; height: 8px; background: var(--panel-2); border-radius: 4px; overflow: hidden; margin-bottom: 22px; }
+  .quiz-progress-fill { height: 100%; background: var(--teal); width: 0%; transition: width .4s ease; }
+  .q-number { display: inline-block; background: var(--panel-2); border: 1px solid var(--border); color: var(--amber); padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; margin-bottom: 16px; }
+  .q-text { font-size: 1.2rem; margin-bottom: 18px; line-height: 1.4; }
+  .q-code { background: #0d1319; border-left: 4px solid var(--teal); border-radius: 10px; padding: 14px 18px; font-family: 'JetBrains Mono', monospace; font-size: 1.02rem; margin-bottom: 18px; white-space: pre; overflow-x: auto; }
+  .answers { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 12px; }
+  .answer-btn { background: var(--panel-2); border: 1px solid var(--border); color: var(--text); padding: 14px 16px; border-radius: 12px; font-size: 0.98rem; font-weight: 700; cursor: pointer; text-align: left; font-family: 'JetBrains Mono', monospace; }
+  .answer-btn:hover { border-color: var(--teal); transform: translateY(-2px); }
+  .answer-btn.correct { background: rgba(74,222,128,0.18); border-color: var(--green); color: var(--green); }
+  .answer-btn.incorrect { background: rgba(255,107,107,0.18); border-color: var(--red); color: var(--red); }
+  .answer-btn[disabled] { cursor: default; transform: none; }
+  .feedback { margin-top: 18px; padding: 14px 16px; border-radius: 12px; font-size: 0.95rem; display: none; line-height: 1.5; }
+  .feedback.correct { display:block; background: rgba(74,222,128,0.12); border: 1px solid var(--green); color: #cdf7dc; }
+  .feedback.incorrect { display:block; background: rgba(255,107,107,0.12); border: 1px solid var(--red); color: #ffd9d9; }
+  .next-btn, .start-btn, .restart-btn { margin-top: 20px; background: var(--teal); color: #062824; border: none; padding: 13px 28px; border-radius: 24px; font-weight: 800; font-size: 1rem; cursor: pointer; display: none; }
+  .start-btn, .restart-btn { display: inline-block; }
+  .next-btn:hover, .start-btn:hover, .restart-btn:hover { background: #24b6a4; }
+  .quiz-screen { display:none; }
+  .quiz-screen.active { display:block; }
+  .quiz-start { text-align:center; }
+  .badges { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin: 16px 0 20px; }
+  .badge { background: var(--panel-2); border: 1px solid var(--border); padding: 8px 14px; border-radius: 18px; font-size: 0.86rem; color: var(--text-dim); }
+  .result-screen { text-align: center; }
+  .score-display { font-family: 'Fredoka One', cursive; font-size: 2.8rem; color: var(--teal); margin: 14px 0; }
+  .score-msg { color: var(--text-dim); font-size: 1.05rem; margin-bottom: 18px; }
+  .submit-box { background: rgba(245,185,66,0.1); border: 1px solid var(--amber); border-radius: 12px; padding: 16px 18px; margin-top: 20px; color: #ffe4b0; font-size: 0.95rem; text-align: left; }
+  .submit-box b { color: var(--amber); }
+
+  @media (max-width: 620px) {
+    header h1 { font-size: 1.4rem; }
+    .panel { padding: 20px 14px 26px; }
+    .tab-btn { font-size: 0.8rem; padding: 12px 4px; }
+  }
+
+  .tab-btn { min-width: 100px; }
+</style>
+</head>
+<body><div class="wrap"><div class="brand-badge"><span class="dot"></span> Learn and Help · Python for Data Science</div><header><h1>🐼 Advanced Pandas Techniques</h1><p>cut · qcut · apply · transform · filter · melt · stack · crosstab</p><p><a style="color:var(--teal)" href="https://colab.research.google.com/github/sjasthi/Python-DS-Data-Science/blob/main/pandas/8_pandas_cut_qcut_apply_transform_filter_melt_stack_crosstab.ipynb" target="_blank" rel="noopener">Open notebook in Colab</a></p></header><div id="pyodideStatus">Starting Python engine… lessons and quiz are available while it loads.</div><div class="tabs"><button class="tab-btn active" data-tab="setup">🚀 Start</button><button class="tab-btn " data-tab="cut">📦 cut</button><button class="tab-btn " data-tab="qcut">🏅 qcut</button><button class="tab-btn " data-tab="apply">⚙️ apply</button><button class="tab-btn " data-tab="transform">🔄 transform</button><button class="tab-btn " data-tab="filter">🔎 filter</button><button class="tab-btn " data-tab="melt">↔️ melt</button><button class="tab-btn " data-tab="stack">🥞 stack</button><button class="tab-btn " data-tab="crosstab">🗂️ crosstab</button><button class="tab-btn " data-tab="practice">✍️ Practice</button><button class="tab-btn" data-tab="quiz">📝 Quiz</button></div><div class="panel"><div class="tab-content active" id="tab-setup"><h2>Eight tools, one playbook</h2><p class="lead">Based on notebook 8 by Siva R Jasthi · Learn and Help. Predict, run, then edit the examples. Each worked example prepares its own data, so you can run tabs in any order. Internet is required to load Python, pandas, and NumPy. The quiz works without the Python engine.</p><div class="op-tag op-load">Check Python</div><div class="pyodide-cell"><textarea aria-label="Check Python code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+import numpy as np
+print(&quot;pandas:&quot;, pd.__version__)
+print(&quot;Ready to explore!&quot;)</textarea><div class="cell-toolbar"><span class="cell-label">Each example has its own imports and sample data.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-cut"><h2>Fixed ranges with cut</h2><p class="lead">Explicit edges need not be equally spaced. Default intervals are right-closed. For conventional integer grades, use [0,60,70,80,90,101] with right=False so 60 is D and 90 is A. Values outside the chosen edges become missing.</p><div class="op-tag op-load">📚 EXAMPLE 1: Converting Test Scores to Letter Grades</div><div class="pyodide-cell"><textarea aria-label="📚 EXAMPLE 1: Converting Test Scores to Letter Grades code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+import numpy as np
+# 📚 EXAMPLE 1: Converting Test Scores to Letter Grades
+import pandas as pd
+import numpy as np
+
+print(&quot;=&quot;*60)
+print(&quot;EXAMPLE 1: Test Scores → Letter Grades&quot;)
+print(&quot;=&quot;*60)
+
+# Create sample data: test scores for 10 students
+test_scores = [95, 87, 76, 92, 65, 88, 58, 73, 91, 82]
+students = ['Alice', 'Bob', 'Charlie', 'Diana', 'Ethan',
+            'Fiona', 'George', 'Hannah', 'Ian', 'Julia']
+
+df = pd.DataFrame({
+    'Student': students,
+    'Score': test_scores
+})
+
+print(&quot;\n📊 Original Data:&quot;)
+print(df)
+
+# Define grade bins
+# F: 0-59, D: 60-69, C: 70-79, B: 80-89, A: 90-100
+bins = [0, 60, 70, 80, 90, 101]
+labels = ['F', 'D', 'C', 'B', 'A']
+
+# Apply pd.cut to assign letter grades
+df['Letter_Grade'] = pd.cut(df['Score'],
+                             bins=bins,
+                             labels=labels,
+                             right=False, include_lowest=True)  # Include 0 in the first bin
+
+print(&quot;\n✅ After Adding Letter Grades:&quot;)
+print(df)
+
+# Count how many of each grade
+print(&quot;\n📈 Grade Distribution:&quot;)
+grade_counts = df['Letter_Grade'].value_counts().sort_index()
+print(grade_counts)
+
+# Visualize
+print(&quot;\n📊 Visual Grade Distribution:&quot;)
+for grade in ['A', 'B', 'C', 'D', 'F']:
+    count = grade_counts.get(grade, 0)
+    bar = '█' * count
+    print(f&quot;{grade}: {bar} ({count})&quot;)</textarea><div class="cell-toolbar"><span class="cell-label">Edit the values, rerun, and inspect the resulting table.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">📚 EXAMPLE 2: Age Groups for a Youth Program</div><div class="pyodide-cell"><textarea aria-label="📚 EXAMPLE 2: Age Groups for a Youth Program code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+import numpy as np
+# 📚 EXAMPLE 2: Age Groups for a Youth Program
+print(&quot;=&quot;*60)
+print(&quot;EXAMPLE 2: Sorting People by Age Groups&quot;)
+print(&quot;=&quot;*60)
+
+# Sample data: ages of program participants
+ages = [5, 12, 8, 15, 18, 22, 7, 14, 10, 19, 25, 6, 13, 17, 21]
+names = ['Emma', 'Liam', 'Olivia', 'Noah', 'Ava', 'Ethan', 'Sophia',
+         'Mason', 'Isabella', 'Lucas', 'Mia', 'Logan', 'Charlotte',
+         'Jacob', 'Amelia']
+
+df_ages = pd.DataFrame({
+    'Name': names,
+    'Age': ages
+})
+
+print(&quot;\n📊 Original Data:&quot;)
+print(df_ages.head(10))
+
+# Define age groups
+bins = [0, 10, 13, 18, 25]
+labels = ['Kids (5-10)', 'Tweens (11-13)', 'Teens (14-18)', 'Young Adults (19-25)']
+
+df_ages['Age_Group'] = pd.cut(df_ages['Age'],
+                              bins=bins,
+                              labels=labels,
+                              include_lowest=True)
+
+print(&quot;\n✅ After Categorizing by Age Group:&quot;)
+print(df_ages)
+
+# Group summary
+print(&quot;\n📈 Participants per Age Group:&quot;)
+for group in labels:
+    count = (df_ages['Age_Group'] == group).sum()
+    print(f&quot;  {group}: {count} participants&quot;)</textarea><div class="cell-toolbar"><span class="cell-label">Edit the values, rerun, and inspect the resulting table.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">🎨 VISUALIZATION: Before and After pd.cut()</div><div class="pyodide-cell"><textarea aria-label="🎨 VISUALIZATION: Before and After pd.cut() code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+import numpy as np
+# 🎨 VISUALIZATION: Before and After pd.cut()
+print(&quot;=&quot;*60)
+print(&quot;VISUAL COMPARISON: How pd.cut() Works&quot;)
+print(&quot;=&quot;*60)
+
+# Simple example
+data = [39, 36, 38, 37, 23, 37, 2, 5, 8, 10, 15, 18, 20, 25, 30, 35]
+df = pd.DataFrame({'values': data})
+
+print(&quot;\n📊 BEFORE - Just Numbers:&quot;)
+print(sorted(data))
+
+# Apply cut
+df['category'] = pd.cut(df['values'],
+                        bins=[0, 10, 20, 30, 40],
+                        labels=['Low', 'Medium', 'High', 'Very High'])
+
+print(&quot;\n📊 AFTER - Categorized:&quot;)
+print(&quot;\nNumber Line with Categories:&quot;)
+print(&quot;0────10────20────30────40&quot;)
+print(&quot; Low  Medium High VeryHigh&quot;)
+
+# Show which numbers fall into which category
+for cat in ['Low', 'Medium', 'High', 'Very High']:
+    values_in_cat = df[df['category'] == cat]['values'].tolist()
+    print(f&quot;\n{cat:12}: {values_in_cat}&quot;)
+
+# Frequency count
+print(&quot;\n📈 Frequency Count:&quot;)
+print(df['category'].value_counts().sort_index())</textarea><div class="cell-toolbar"><span class="cell-label">Edit the values, rerun, and inspect the resulting table.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-qcut"><h2>Quantile groups with qcut</h2><p class="lead">qcut targets similar numbers of observations, not equal interval widths. Repeated scores can create unequal counts or duplicate edges. Labels are assigned from lowest interval to highest, regardless of row order.</p><div class="op-tag op-load">📚 EXAMPLE 3: Ranking Students by Test Performance</div><div class="pyodide-cell"><textarea aria-label="📚 EXAMPLE 3: Ranking Students by Test Performance code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+import numpy as np
+# 📚 EXAMPLE 3: Ranking Students by Test Performance
+print(&quot;=&quot;*60)
+print(&quot;EXAMPLE 3: Student Rankings Using Quartiles&quot;)
+print(&quot;=&quot;*60)
+
+# Sample data: test scores
+np.random.seed(42)
+scores = np.random.randint(60, 100, size=20)
+students = [f&quot;Student_{i+1}&quot; for i in range(20)]
+
+df_scores = pd.DataFrame({
+    'Student': students,
+    'Score': scores
+})
+
+# Sort by score for better visualization
+df_scores = df_scores.sort_values('Score', ascending=False).reset_index(drop=True)
+
+print(&quot;\n📊 Student Scores (Sorted):&quot;)
+print(df_scores.head(10))
+
+# Use qcut to divide into quartiles (4 equal groups)
+df_scores['Quartile'] = pd.qcut(df_scores['Score'],
+                                 q=4,
+                                 labels=['Q4 (Bottom)', 'Q3', 'Q2', 'Q1 (Top)'])
+
+print(&quot;\n✅ After Adding Quartile Rankings:&quot;)
+print(df_scores)
+
+# Count students in each quartile
+print(&quot;\n📈 Students per Quartile:&quot;)
+quartile_counts = df_scores['Quartile'].value_counts()
+print(quartile_counts)
+
+print(&quot;\n💡 Notice: Quantiles target similar counts; ties may produce unequal groups.&quot;)
+
+# Show score ranges for each quartile
+print(&quot;\n📊 Score Ranges per Quartile:&quot;)
+for quartile in ['Q1 (Top)', 'Q2', 'Q3', 'Q4 (Bottom)']:
+    scores_in_q = df_scores[df_scores['Quartile'] == quartile]['Score']
+    print(f&quot;  {quartile:15}: {scores_in_q.min()}-{scores_in_q.max()}&quot;)</textarea><div class="cell-toolbar"><span class="cell-label">Edit the values, rerun, and inspect the resulting table.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">📚 EXAMPLE 4: Video Game Leaderboard</div><div class="pyodide-cell"><textarea aria-label="📚 EXAMPLE 4: Video Game Leaderboard code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+import numpy as np
+# 📚 EXAMPLE 4: Video Game Leaderboard
+print(&quot;=&quot;*60)
+print(&quot;EXAMPLE 4: Game Leaderboard Tiers&quot;)
+print(&quot;=&quot;*60)
+
+# Sample data: player scores in a video game
+np.random.seed(123)
+game_scores = np.random.randint(100, 10000, size=16)
+players = [f&quot;Player_{i+1}&quot; for i in range(16)]
+
+df_game = pd.DataFrame({
+    'Player': players,
+    'Points': game_scores
+})
+
+df_game = df_game.sort_values('Points', ascending=False).reset_index(drop=True)
+
+print(&quot;\n🎮 Player Scores:&quot;)
+print(df_game)
+
+# Divide into tiers: Bronze, Silver, Gold, Platinum
+df_game['Tier'] = pd.qcut(df_game['Points'],
+                          q=4,
+                          labels=['🥉 Bronze', '🥈 Silver', '🥇 Gold', '💎 Platinum'])
+
+print(&quot;\n✅ After Adding Tiers:&quot;)
+print(df_game)
+
+# Tier summary
+print(&quot;\n🏆 Tier Distribution:&quot;)
+print(df_game['Tier'].value_counts())
+
+print(&quot;\n💡 These data give four players per tier; ties can change that.&quot;)</textarea><div class="cell-toolbar"><span class="cell-label">Edit the values, rerun, and inspect the resulting table.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">🎨 COMPARISON: pd.cut() vs pd.qcut()</div><div class="pyodide-cell"><textarea aria-label="🎨 COMPARISON: pd.cut() vs pd.qcut() code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+import numpy as np
+# 🎨 COMPARISON: pd.cut() vs pd.qcut()
+print(&quot;=&quot;*60)
+print(&quot;VISUAL COMPARISON: cut() vs qcut()&quot;)
+print(&quot;=&quot;*60)
+
+# Same data for both
+data = [2, 5, 8, 10, 15, 18, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65]
+df_compare = pd.DataFrame({'values': data})
+
+print(f&quot;\n📊 Original Data ({len(data)} values): {data}&quot;)
+
+# Using pd.cut() - equal width bins
+df_compare['cut'] = pd.cut(df_compare['values'],
+                           bins=4,
+                           labels=['Group1', 'Group2', 'Group3', 'Group4'])
+
+# Using pd.qcut() - equal counts
+df_compare['qcut'] = pd.qcut(df_compare['values'],
+                             q=4,
+                             labels=['Quartile1', 'Quartile2', 'Quartile3', 'Quartile4'])
+
+print(&quot;\n📊 Comparison:&quot;)
+print(df_compare)
+
+print(&quot;\n📈 pd.cut() - Equal Width Bins:&quot;)
+cut_counts = df_compare['cut'].value_counts().sort_index()
+for group, count in cut_counts.items():
+    bar = '█' * count
+    print(f&quot;  {group}: {bar} ({count} values)&quot;)
+
+print(&quot;\n📈 pd.qcut() - Equal Counts:&quot;)
+qcut_counts = df_compare['qcut'].value_counts().sort_index()
+for quartile, count in qcut_counts.items():
+    bar = '█' * count
+    print(f&quot;  {quartile}: {bar} ({count} values)&quot;)
+
+print(&quot;\n💡 Key Difference:&quot;)
+print(&quot;  • pd.cut():  Groups may have DIFFERENT counts&quot;)
+print(&quot;  • pd.qcut(): Groups target similar counts; ties can produce unequal counts or duplicate edges&quot;)</textarea><div class="cell-toolbar"><span class="cell-label">Edit the values, rerun, and inspect the resulting table.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-apply"><h2>Custom row and value calculations</h2><p class="lead">DataFrame.apply defaults to columns (axis=0); axis=1 passes rows. Series.apply passes individual values in these examples. Simple arithmetic often has a clearer vectorized equivalent.</p><div class="op-tag op-load">📚 EXAMPLE 5: Calculating Final Grades with Weighted Scores</div><div class="pyodide-cell"><textarea aria-label="📚 EXAMPLE 5: Calculating Final Grades with Weighted Scores code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+import numpy as np
+# 📚 EXAMPLE 5: Calculating Final Grades with Weighted Scores
+print(&quot;=&quot;*60)
+print(&quot;EXAMPLE 5: Grade Calculator with apply()&quot;)
+print(&quot;=&quot;*60)
+
+# Sample data: student grades
+df_grades = pd.DataFrame({
+    'Name': ['Alice', 'Bob', 'Charlie', 'Diana', 'Ethan'],
+    'Homework': [85, 92, 78, 95, 88],
+    'Midterm': [88, 85, 90, 92, 86],
+    'Final': [90, 88, 85, 94, 91]
+})
+
+print(&quot;\n📊 Student Grades:&quot;)
+print(df_grades)
+
+# Define a function to calculate weighted average
+# Homework: 30%, Midterm: 30%, Final: 40%
+def calculate_final_grade(row):
+    homework_weight = 0.30
+    midterm_weight = 0.30
+    final_weight = 0.40
+
+    final_grade = (row['Homework'] * homework_weight +
+                   row['Midterm'] * midterm_weight +
+                   row['Final'] * final_weight)
+    return round(final_grade, 2)
+
+# Apply the function to each row
+df_grades['Final_Grade'] = df_grades.apply(calculate_final_grade, axis=1)
+
+print(&quot;\n✅ After Calculating Final Grades:&quot;)
+print(&quot;Formula: (Homework × 30%) + (Midterm × 30%) + (Final × 40%)&quot;)
+print(df_grades)
+
+# Add letter grades using cut
+df_grades['Letter'] = pd.cut(df_grades['Final_Grade'],
+                             bins=[0, 60, 70, 80, 90, 101],
+                             labels=['F', 'D', 'C', 'B', 'A'],
+                             right=False, include_lowest=True)
+
+print(&quot;\n🎓 Final Report:&quot;)
+print(df_grades[['Name', 'Final_Grade', 'Letter']])</textarea><div class="cell-toolbar"><span class="cell-label">Edit the values, rerun, and inspect the resulting table.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">📚 EXAMPLE 6: Temperature Converter</div><div class="pyodide-cell"><textarea aria-label="📚 EXAMPLE 6: Temperature Converter code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+import numpy as np
+# 📚 EXAMPLE 6: Temperature Converter
+print(&quot;=&quot;*60)
+print(&quot;EXAMPLE 6: Temperature Converter (°F → °C)&quot;)
+print(&quot;=&quot;*60)
+
+# Sample data: temperatures in different cities
+cities_data = {
+    'City': ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix'],
+    'Temp_F': [75, 82, 68, 88, 95]
+}
+
+df_temps = pd.DataFrame(cities_data)
+
+print(&quot;\n🌡️ Temperatures in Fahrenheit:&quot;)
+print(df_temps)
+
+# Define conversion function
+def fahrenheit_to_celsius(temp_f):
+    &quot;&quot;&quot;Convert Fahrenheit to Celsius&quot;&quot;&quot;
+    temp_c = (temp_f - 32) * 5/9
+    return round(temp_c, 1)
+
+# Apply to the Temp_F column
+df_temps['Temp_C'] = df_temps['Temp_F'].apply(fahrenheit_to_celsius)
+
+print(&quot;\n✅ After Conversion:&quot;)
+print(&quot;Formula: (°F - 32) × 5/9 = °C&quot;)
+print(df_temps)
+
+# Add weather description based on Celsius
+def weather_description(temp_c):
+    if temp_c &lt; 10:
+        return &quot;🥶 Cold&quot;
+    elif temp_c &lt; 20:
+        return &quot;😊 Cool&quot;
+    elif temp_c &lt; 30:
+        return &quot;☀️ Warm&quot;
+    else:
+        return &quot;🔥 Hot&quot;
+
+df_temps['Weather'] = df_temps['Temp_C'].apply(weather_description)
+
+print(&quot;\n🌤️ With Weather Description:&quot;)
+print(df_temps)</textarea><div class="cell-toolbar"><span class="cell-label">Edit the values, rerun, and inspect the resulting table.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">📚 EXAMPLE 7: Salary Bonus Calculator</div><div class="pyodide-cell"><textarea aria-label="📚 EXAMPLE 7: Salary Bonus Calculator code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+import numpy as np
+# 📚 EXAMPLE 7: Salary Bonus Calculator
+print(&quot;=&quot;*60)
+print(&quot;EXAMPLE 7: Performance Bonus Calculator&quot;)
+print(&quot;=&quot;*60)
+
+# Employee data
+employees = pd.DataFrame({
+    'Name': ['Alice', 'Bob', 'Charlie', 'Diana', 'Ethan', 'Fiona'],
+    'Salary': [50000, 60000, 45000, 70000, 55000, 65000],
+    'Performance_Score': [92, 78, 88, 95, 82, 90]
+})
+
+print(&quot;\n💼 Employee Data:&quot;)
+print(employees)
+
+# Bonus calculation rules:
+# Score &gt;= 90: 10% bonus
+# Score &gt;= 80: 5% bonus
+# Score &lt; 80: 2% bonus
+
+def calculate_bonus(row):
+    &quot;&quot;&quot;Calculate bonus based on performance score&quot;&quot;&quot;
+    score = row['Performance_Score']
+    salary = row['Salary']
+
+    if score &gt;= 90:
+        bonus_rate = 0.10
+    elif score &gt;= 80:
+        bonus_rate = 0.05
+    else:
+        bonus_rate = 0.02
+
+    bonus = salary * bonus_rate
+    return round(bonus, 2)
+
+# Apply bonus calculation
+employees['Bonus'] = employees.apply(calculate_bonus, axis=1)
+employees['Total_Compensation'] = employees['Salary'] + employees['Bonus']
+
+print(&quot;\n✅ After Calculating Bonuses:&quot;)
+print(&quot;Bonus Rules:&quot;)
+print(&quot;  • Score ≥ 90: 10% bonus&quot;)
+print(&quot;  • Score ≥ 80: 5% bonus&quot;)
+print(&quot;  • Score &lt; 80: 2% bonus&quot;)
+print(employees)
+
+print(f&quot;\n💰 Total Bonuses Paid: ${employees['Bonus'].sum():,.2f}&quot;)</textarea><div class="cell-toolbar"><span class="cell-label">Edit the values, rerun, and inspect the resulting table.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-transform"><h2>Group statistics aligned to rows</h2><p class="lead">These GroupBy.transform examples return one value per original row. A class mean or region total is broadcast to every member. A repeated group total is different from a running total; zero denominators require handling.</p><div class="op-tag op-load">📚 EXAMPLE 8: Normalizing Test Scores by Class</div><div class="pyodide-cell"><textarea aria-label="📚 EXAMPLE 8: Normalizing Test Scores by Class code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+import numpy as np
+# 📚 EXAMPLE 8: Normalizing Test Scores by Class
+print(&quot;=&quot;*60)
+print(&quot;EXAMPLE 8: Score Normalization with transform()&quot;)
+print(&quot;=&quot;*60)
+
+# Student scores from different classes
+students_multi = pd.DataFrame({
+    'Name': ['Alice', 'Bob', 'Charlie', 'Diana', 'Ethan', 'Fiona', 'George', 'Hannah'],
+    'Class': ['A', 'A', 'A', 'A', 'B', 'B', 'B', 'B'],
+    'Score': [85, 90, 78, 95, 70, 88, 92, 75]
+})
+
+print(&quot;\n📊 Original Scores:&quot;)
+print(students_multi)
+
+# Calculate each student's score as percentage of class average
+def normalize_to_average(group):
+    &quot;&quot;&quot;Express each score as percentage of group average&quot;&quot;&quot;
+    avg = group.mean()
+    return (group / avg) * 100
+
+# Group by class and transform
+students_multi['Normalized_Score'] = students_multi.groupby('Class')['Score'].transform(normalize_to_average)
+students_multi['Normalized_Score'] = students_multi['Normalized_Score'].round(1)
+
+print(&quot;\n✅ After Normalization (% of class average):&quot;)
+print(students_multi)
+
+# Show class averages
+print(&quot;\n📈 Class Statistics:&quot;)
+class_stats = students_multi.groupby('Class')['Score'].agg(['mean', 'min', 'max'])
+print(class_stats)
+
+print(&quot;\n💡 Notice:&quot;)
+print(&quot;  • Normalized_Score &gt; 100: Above class average&quot;)
+print(&quot;  • Normalized_Score = 100: At class average&quot;)
+print(&quot;  • Normalized_Score &lt; 100: Below class average&quot;)</textarea><div class="cell-toolbar"><span class="cell-label">Edit the values, rerun, and inspect the resulting table.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">📚 EXAMPLE 9: Adding Group Totals</div><div class="pyodide-cell"><textarea aria-label="📚 EXAMPLE 9: Adding Group Totals code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+import numpy as np
+# 📚 EXAMPLE 9: Adding Group Totals
+print(&quot;=&quot;*60)
+print(&quot;EXAMPLE 9: Sales with Group Totals&quot;)
+print(&quot;=&quot;*60)
+
+# Sales data by region
+sales_data = pd.DataFrame({
+    'Region': ['North', 'North', 'South', 'South', 'East', 'East', 'West', 'West'],
+    'Store': ['A', 'B', 'A', 'B', 'A', 'B', 'A', 'B'],
+    'Sales': [5000, 7000, 6000, 8000, 5500, 6500, 7500, 8500]
+})
+
+print(&quot;\n💰 Sales Data:&quot;)
+print(sales_data)
+
+# Add region total to each row
+sales_data['Region_Total'] = sales_data.groupby('Region')['Sales'].transform('sum')
+
+# Calculate percentage of region total
+sales_data['Pct_of_Region'] = (sales_data['Sales'] / sales_data['Region_Total'] * 100).round(1)
+
+print(&quot;\n✅ With Region Totals:&quot;)
+print(sales_data)
+
+print(&quot;\n📊 Summary by Region:&quot;)
+for region in sales_data['Region'].unique():
+    region_data = sales_data[sales_data['Region'] == region]
+    total = region_data['Region_Total'].iloc[0]
+    print(f&quot;  {region}: ${total:,} total&quot;)</textarea><div class="cell-toolbar"><span class="cell-label">Edit the values, rerun, and inspect the resulting table.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-filter"><h2>Keep or remove entire groups</h2><p class="lead">GroupBy.filter evaluates a condition for each group and keeps all rows of qualifying groups. DataFrame.filter is a different method that selects row or column labels.</p><div class="op-tag op-load">📚 EXAMPLE 10: Filtering Classes by Size</div><div class="pyodide-cell"><textarea aria-label="📚 EXAMPLE 10: Filtering Classes by Size code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+import numpy as np
+# 📚 EXAMPLE 10: Filtering Classes by Size
+print(&quot;=&quot;*60)
+print(&quot;EXAMPLE 10: Keep Only Large Classes&quot;)
+print(&quot;=&quot;*60)
+
+# Student enrollment data
+enrollment = pd.DataFrame({
+    'Student': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'],
+    'Class': ['Math', 'Math', 'Science', 'Science', 'History',
+              'Math', 'Science', 'Art', 'Art', 'History'],
+    'Grade': [85, 90, 78, 92, 88, 95, 87, 82, 79, 91]
+})
+
+print(&quot;\n📚 All Students:&quot;)
+print(enrollment)
+
+print(&quot;\n📊 Class Sizes:&quot;)
+class_sizes = enrollment['Class'].value_counts()
+print(class_sizes)
+
+# Keep only classes with at least 3 students
+large_classes = enrollment.groupby('Class').filter(lambda x: len(x) &gt;= 3)
+
+print(&quot;\n✅ After Filtering (classes with ≥ 3 students):&quot;)
+print(large_classes)
+
+print(&quot;\n💡 Notice:&quot;)
+print(&quot;  • Math: 3 students → KEPT&quot;)
+print(&quot;  • Science: 3 students → KEPT&quot;)
+print(&quot;  • History: 2 students → REMOVED&quot;)
+print(&quot;  • Art: 2 students → REMOVED&quot;)</textarea><div class="cell-toolbar"><span class="cell-label">Edit the values, rerun, and inspect the resulting table.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-melt"><h2>Wide data becomes long data</h2><p class="lead">id_vars remain identifiers; value_vars chooses measurements; var_name names the measurement-label column; value_name names the value column. melt preserves missing measurement rows by default.</p><div class="op-tag op-load">📚 EXAMPLE 11: Student Grades from Wide to Long</div><div class="pyodide-cell"><textarea aria-label="📚 EXAMPLE 11: Student Grades from Wide to Long code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+import numpy as np
+# 📚 EXAMPLE 11: Student Grades from Wide to Long
+print(&quot;=&quot;*60)
+print(&quot;EXAMPLE 11: Melting Grade Data&quot;)
+print(&quot;=&quot;*60)
+
+# Wide format: Each subject is a column
+grades_wide = pd.DataFrame({
+    'Name': ['Alice', 'Bob', 'Charlie', 'Diana'],
+    'Math': [85, 90, 78, 92],
+    'Science': [88, 92, 82, 95],
+    'English': [89, 85, 88, 91],
+    'History': [87, 88, 90, 94]
+})
+
+print(&quot;\n📊 WIDE FORMAT (Before):&quot;)
+print(&quot;Each subject is a separate column&quot;)
+print(grades_wide)
+
+# Melt into long format
+grades_long = pd.melt(
+    grades_wide,
+    id_vars=['Name'],           # Column to keep as-is
+    var_name='Subject',         # Name for the new &quot;variable&quot; column
+    value_name='Score'          # Name for the new &quot;value&quot; column
+)
+
+print(&quot;\n📊 LONG FORMAT (After melt):&quot;)
+print(&quot;Each row is one student-subject combination&quot;)
+print(grades_long)
+
+print(f&quot;\n💡 Comparison:&quot;)
+print(f&quot;  Wide format:  {len(grades_wide)} rows × {len(grades_wide.columns)} columns&quot;)
+print(f&quot;  Long format:  {len(grades_long)} rows × {len(grades_long.columns)} columns&quot;)
+
+# Now easier to analyze by subject
+print(&quot;\n📈 Average Score per Subject (easy with long format):&quot;)
+subject_avg = grades_long.groupby('Subject')['Score'].mean().round(1)
+print(subject_avg)</textarea><div class="cell-toolbar"><span class="cell-label">Edit the values, rerun, and inspect the resulting table.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">📚 EXAMPLE 12: Monthly Sales Data</div><div class="pyodide-cell"><textarea aria-label="📚 EXAMPLE 12: Monthly Sales Data code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+import numpy as np
+# 📚 EXAMPLE 12: Monthly Sales Data
+print(&quot;=&quot;*60)
+print(&quot;EXAMPLE 12: Monthly Sales Analysis&quot;)
+print(&quot;=&quot;*60)
+
+# Sales data in wide format
+sales_wide = pd.DataFrame({
+    'Product': ['Widget', 'Gadget', 'Gizmo'],
+    'Jan': [100, 150, 120],
+    'Feb': [120, 160, 110],
+    'Mar': [110, 170, 130]
+})
+
+print(&quot;\n📊 WIDE FORMAT:&quot;)
+print(sales_wide)
+
+# Melt to long format
+sales_long = pd.melt(
+    sales_wide,
+    id_vars=['Product'],
+    var_name='Month',
+    value_name='Sales'
+)
+
+print(&quot;\n📊 LONG FORMAT:&quot;)
+print(sales_long)
+
+# Easy analysis in long format
+print(&quot;\n📈 Analysis (easier with long format):&quot;)
+print(&quot;\nTotal Sales by Product:&quot;)
+print(sales_long.groupby('Product')['Sales'].sum())
+
+print(&quot;\nTotal Sales by Month:&quot;)
+print(sales_long.groupby('Month')['Sales'].sum())
+
+print(&quot;\nBest performing product-month:&quot;)
+best = sales_long.loc[sales_long['Sales'].idxmax()]
+print(f&quot;  {best['Product']} in {best['Month']}: {best['Sales']} units&quot;)</textarea><div class="cell-toolbar"><span class="cell-label">Edit the values, rerun, and inspect the resulting table.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-stack"><h2>Move column labels into the index</h2><p class="lead">For ordinary columns, stack creates a Series with a hierarchical index. Setting Name as index is useful, but stack does not require it. unstack moves an index level back into columns. Missing-value behavior differs across pandas stack implementations.</p><div class="op-tag op-load">📚 EXAMPLE 13: Stacking Grade Data</div><div class="pyodide-cell"><textarea aria-label="📚 EXAMPLE 13: Stacking Grade Data code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+import numpy as np
+# 📚 EXAMPLE 13: Stacking Grade Data
+print(&quot;=&quot;*60)
+print(&quot;EXAMPLE 13: Understanding stack()&quot;)
+print(&quot;=&quot;*60)
+
+# Create sample data
+df_stack = pd.DataFrame({
+    'Name': ['Alice', 'Bob', 'Charlie'],
+    'Math': [85, 90, 78],
+    'Science': [88, 92, 82],
+    'English': [89, 85, 88]
+})
+
+print(&quot;\n📊 ORIGINAL (Wide):&quot;)
+print(df_stack)
+
+# Set Name as index first (useful for named index labels)
+df_indexed = df_stack.set_index('Name')
+
+print(&quot;\n📊 After Setting Index:&quot;)
+print(df_indexed)
+
+# Stack the data
+stacked = df_indexed.stack()
+
+print(&quot;\n📊 STACKED (Multi-level Index):&quot;)
+print(stacked)
+print(f&quot;\nType: {type(stacked)}&quot;)
+print(f&quot;Shape: {stacked.shape}&quot;)
+
+# Convert back to DataFrame
+stacked_df = stacked.reset_index()
+stacked_df.columns = ['Name', 'Subject', 'Score']
+
+print(&quot;\n📊 Converted to DataFrame:&quot;)
+print(stacked_df)
+
+print(&quot;\n💡 This looks like melt(), but the process was different!&quot;)</textarea><div class="cell-toolbar"><span class="cell-label">Edit the values, rerun, and inspect the resulting table.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">📚 EXAMPLE 14: Quarterly Performance Data</div><div class="pyodide-cell"><textarea aria-label="📚 EXAMPLE 14: Quarterly Performance Data code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+import numpy as np
+# 📚 EXAMPLE 14: Quarterly Performance Data
+print(&quot;=&quot;*60)
+print(&quot;EXAMPLE 14: Quarterly Sales with stack()&quot;)
+print(&quot;=&quot;*60)
+
+# Quarterly data
+quarterly = pd.DataFrame({
+    'Region': ['North', 'South', 'East', 'West'],
+    'Q1': [10000, 12000, 11000, 13000],
+    'Q2': [11000, 13000, 12000, 14000],
+    'Q3': [12000, 14000, 13000, 15000],
+    'Q4': [13000, 15000, 14000, 16000]
+})
+
+print(&quot;\n📊 ORIGINAL:&quot;)
+print(quarterly)
+
+# Stack with Region as index
+stacked_quarterly = quarterly.set_index('Region').stack()
+
+print(&quot;\n📊 STACKED:&quot;)
+print(stacked_quarterly)
+
+# Access specific values
+print(&quot;\n🔍 Accessing Values:&quot;)
+print(f&quot;North, Q1: ${stacked_quarterly['North']['Q1']:,}&quot;)
+print(f&quot;South, Q4: ${stacked_quarterly['South']['Q4']:,}&quot;)
+
+# Convert to regular DataFrame
+final_df = stacked_quarterly.reset_index()
+final_df.columns = ['Region', 'Quarter', 'Sales']
+
+print(&quot;\n📊 Final DataFrame:&quot;)
+print(final_df)</textarea><div class="cell-toolbar"><span class="cell-label">Edit the values, rerun, and inspect the resulting table.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-crosstab"><h2>Count and summarize category combinations</h2><p class="lead">Default crosstab counts occurrences. Supply values and aggfunc to summarize amounts. margins=True adds totals. normalize='all' divides by the grand total; 'index' normalizes rows; 'columns' normalizes columns.</p><div class="op-tag op-load">📚 EXAMPLE 15: Student Preferences Survey</div><div class="pyodide-cell"><textarea aria-label="📚 EXAMPLE 15: Student Preferences Survey code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+import numpy as np
+# 📚 EXAMPLE 15: Student Preferences Survey
+print(&quot;=&quot;*60)
+print(&quot;EXAMPLE 15: Student Activity Preferences&quot;)
+print(&quot;=&quot;*60)
+
+# Survey data: Gender and activity preference
+survey = pd.DataFrame({
+    'Gender': ['Male', 'Female', 'Female', 'Male', 'Male', 'Female',
+               'Male', 'Female', 'Male', 'Female', 'Male', 'Female',
+               'Female', 'Male', 'Female', 'Male'],
+    'Activity': ['Sports', 'Music', 'Music', 'Sports', 'Art', 'Sports',
+                'Music', 'Music', 'Sports', 'Art', 'Art', 'Sports',
+                'Music', 'Music', 'Sports', 'Art']
+})
+
+print(&quot;\n📊 Raw Survey Data:&quot;)
+print(survey.head(10))
+
+# Create crosstab
+ct = pd.crosstab(survey['Gender'], survey['Activity'])
+
+print(&quot;\n📊 CROSSTAB: Gender × Activity&quot;)
+print(ct)
+
+print(&quot;\n📈 Reading the Table:&quot;)
+print(f&quot;  • {ct.loc['Female', 'Music']} females prefer Music&quot;)
+print(f&quot;  • {ct.loc['Male', 'Sports']} males prefer Sports&quot;)
+print(f&quot;  • {ct.loc['Female', 'Sports']} females prefer Sports&quot;)
+
+# Add totals
+ct_with_margins = pd.crosstab(survey['Gender'], survey['Activity'], margins=True)
+
+print(&quot;\n📊 WITH TOTALS:&quot;)
+print(ct_with_margins)
+
+# Calculate percentages
+ct_pct = pd.crosstab(survey['Gender'], survey['Activity'], normalize='all') * 100
+print(&quot;\n📊 AS PERCENTAGES (% of total):&quot;)
+print(ct_pct.round(1))</textarea><div class="cell-toolbar"><span class="cell-label">Edit the values, rerun, and inspect the resulting table.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">📚 EXAMPLE 16: Sales Analysis by Region and Product</div><div class="pyodide-cell"><textarea aria-label="📚 EXAMPLE 16: Sales Analysis by Region and Product code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+import numpy as np
+# 📚 EXAMPLE 16: Sales Analysis by Region and Product
+print(&quot;=&quot;*60)
+print(&quot;EXAMPLE 16: Product Sales by Region&quot;)
+print(&quot;=&quot;*60)
+
+# Sales transaction data
+sales_transactions = pd.DataFrame({
+    'Region': ['North', 'South', 'East', 'West', 'North', 'South',
+               'East', 'West', 'North', 'South', 'East', 'West',
+               'North', 'South', 'East', 'West', 'North', 'South'],
+    'Product': ['Widget', 'Widget', 'Gadget', 'Gadget', 'Gizmo', 'Widget',
+               'Widget', 'Gizmo', 'Gadget', 'Gadget', 'Gizmo', 'Widget',
+               'Gizmo', 'Gizmo', 'Widget', 'Gadget', 'Widget', 'Gadget'],
+    'Amount': [100, 150, 200, 180, 120, 160, 140, 190, 110, 170,
+              130, 200, 140, 150, 160, 180, 120, 190]
+})
+
+print(&quot;\n💰 Sales Transactions:&quot;)
+print(sales_transactions.head(10))
+
+# Frequency crosstab (count of transactions)
+ct_freq = pd.crosstab(sales_transactions['Region'],
+                      sales_transactions['Product'])
+
+print(&quot;\n📊 TRANSACTION COUNT: Region × Product&quot;)
+print(ct_freq)
+
+# Crosstab with values (sum of amounts)
+ct_sales = pd.crosstab(
+    sales_transactions['Region'],
+    sales_transactions['Product'],
+    values=sales_transactions['Amount'],
+    aggfunc='sum'
+)
+
+print(&quot;\n💰 TOTAL SALES AMOUNT: Region × Product&quot;)
+print(ct_sales)
+
+# With margins (totals)
+ct_sales_total = pd.crosstab(
+    sales_transactions['Region'],
+    sales_transactions['Product'],
+    values=sales_transactions['Amount'],
+    aggfunc='sum',
+    margins=True,
+    margins_name='Total'
+)
+
+print(&quot;\n💰 WITH TOTALS:&quot;)
+print(ct_sales_total)
+
+# Find best performers
+print(&quot;\n🏆 Analysis:&quot;)
+print(f&quot;  Best region: {ct_sales.sum(axis=1).idxmax()} (${ct_sales.sum(axis=1).max():,.0f})&quot;)
+print(f&quot;  Best product: {ct_sales.sum(axis=0).idxmax()} (${ct_sales.sum(axis=0).max():,.0f})&quot;)</textarea><div class="cell-toolbar"><span class="cell-label">Edit the values, rerun, and inspect the resulting table.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">📚 EXAMPLE 17: Multi-Level Crosstab</div><div class="pyodide-cell"><textarea aria-label="📚 EXAMPLE 17: Multi-Level Crosstab code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+import numpy as np
+# 📚 EXAMPLE 17: Multi-Level Crosstab
+print(&quot;=&quot;*60)
+print(&quot;EXAMPLE 17: Advanced Crosstab with Multiple Categories&quot;)
+print(&quot;=&quot;*60)
+
+# Student grade data
+students = pd.DataFrame({
+    'Gender': ['M', 'F', 'M', 'F', 'M', 'F', 'M', 'F', 'M', 'F', 'M', 'F'],
+    'Class': ['A', 'A', 'B', 'B', 'A', 'A', 'B', 'B', 'A', 'A', 'B', 'B'],
+    'Grade': ['A', 'A', 'B', 'A', 'B', 'C', 'A', 'B', 'C', 'A', 'B', 'C']
+})
+
+print(&quot;\n📚 Student Data:&quot;)
+print(students)
+
+# Multi-index crosstab
+ct_multi = pd.crosstab(
+    [students['Class'], students['Gender']],  # Row indices
+    students['Grade']                         # Column index
+)
+
+print(&quot;\n📊 Multi-Level Crosstab: (Class, Gender) × Grade&quot;)
+print(ct_multi)
+
+print(&quot;\n💡 Reading Multi-Level Tables:&quot;)
+print(&quot;  First level: Class (A or B)&quot;)
+print(&quot;  Second level: Gender (F or M)&quot;)
+print(&quot;  Columns: Grade received (A, B, or C)&quot;)</textarea><div class="cell-toolbar"><span class="cell-label">Edit the values, rerun, and inspect the resulting table.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-practice"><h2>Combine the techniques</h2><p class="lead">Try the notebook's three exercises: categorize 15 scores and cross-tabulate grades; bin sales and calculate regional shares; melt subject scores and summarize pass/fail. Work in the scratch cell before opening the sample solutions.</p><div class="op-tag op-load">Practice scratch cell</div><div class="pyodide-cell"><textarea aria-label="Practice scratch cell code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+import numpy as np
+# Write your solution for one of the three exercises here.</textarea><div class="cell-toolbar"><span class="cell-label">Passing is 70 or more; fixed grade boundaries should include 90 in A.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><details><summary>Grade categorization solution</summary><div class="op-tag op-load">Grade categorization solution</div><div class="pyodide-cell"><textarea aria-label="Grade categorization solution code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+import numpy as np
+rng = np.random.default_rng(42)
+practice_grades = pd.DataFrame({&quot;Student&quot;: [f&quot;S{i+1}&quot; for i in range(15)],
+    &quot;Score&quot;: rng.integers(60,101,15), &quot;Gender&quot;: [&quot;F&quot;,&quot;M&quot;,&quot;F&quot;] * 5})
+practice_grades[&quot;Letter&quot;] = pd.cut(practice_grades[&quot;Score&quot;],
+    bins=[0,60,70,80,90,101], labels=[&quot;F&quot;,&quot;D&quot;,&quot;C&quot;,&quot;B&quot;,&quot;A&quot;], right=False)
+print(practice_grades)
+print(pd.crosstab(practice_grades[&quot;Gender&quot;], practice_grades[&quot;Letter&quot;]))</textarea><div class="cell-toolbar"><span class="cell-label">One reproducible solution; compare with your own.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></details><details><summary>Sales analysis solution</summary><div class="op-tag op-load">Sales analysis solution</div><div class="pyodide-cell"><textarea aria-label="Sales analysis solution code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+practice_sales = pd.DataFrame({
+    &quot;Region&quot;: [&quot;North&quot;,&quot;South&quot;,&quot;East&quot;,&quot;West&quot;] * 3,
+    &quot;Product&quot;: [&quot;A&quot;,&quot;B&quot;,&quot;C&quot;] * 4,
+    &quot;Sales&quot;: [100,200,300,400,500,600,700,800,900,1000,1100,1200]})
+practice_sales[&quot;Quartile&quot;] = pd.qcut(practice_sales[&quot;Sales&quot;],4,labels=[&quot;Q1&quot;,&quot;Q2&quot;,&quot;Q3&quot;,&quot;Q4&quot;])
+total = practice_sales.groupby(&quot;Region&quot;)[&quot;Sales&quot;].transform(&quot;sum&quot;)
+practice_sales[&quot;Region_Pct&quot;] = practice_sales[&quot;Sales&quot;] / total.where(total.ne(0)) * 100
+print(practice_sales)
+print(pd.crosstab(practice_sales[&quot;Region&quot;],practice_sales[&quot;Product&quot;],
+    values=practice_sales[&quot;Sales&quot;],aggfunc=&quot;sum&quot;).fillna(0))</textarea><div class="cell-toolbar"><span class="cell-label">One reproducible solution; compare with your own.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></details><details><summary>Reshape and classify solution</summary><div class="op-tag op-load">Reshape and classify solution</div><div class="pyodide-cell"><textarea aria-label="Reshape and classify solution code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+practice_wide = pd.DataFrame({&quot;Name&quot;:[&quot;Alice&quot;,&quot;Bob&quot;,&quot;Charlie&quot;],
+    &quot;Math&quot;:[85,65,78],&quot;Science&quot;:[88,92,62],&quot;English&quot;:[89,68,88]})
+practice_long = practice_wide.melt(id_vars=&quot;Name&quot;,var_name=&quot;Subject&quot;,value_name=&quot;Score&quot;)
+practice_long[&quot;Result&quot;] = practice_long[&quot;Score&quot;].apply(lambda x: &quot;Pass&quot; if x &gt;= 70 else &quot;Fail&quot;)
+print(practice_long)
+print(pd.crosstab(practice_long[&quot;Subject&quot;],practice_long[&quot;Result&quot;]))</textarea><div class="cell-toolbar"><span class="cell-label">One reproducible solution; compare with your own.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></details></div><div class="tab-content" id="tab-quiz">
+
+      <div class="quiz-screen active" id="quizStart">
+        <div class="quiz-start">
+          <h2>📝 Advanced Pandas Quiz</h2>
+          <p class="lead">20 questions on all eight tools, boundary cases, output shapes, and interpreting summaries.</p>
+          <div class="badges">
+            <span class="badge">📝 20 questions</span>
+            <span class="badge">🎯 No time limit</span>
+            <span class="badge">📸 Screenshot your score</span>
+          </div>
+          <button class="start-btn" onclick="startQuiz()">🚀 Start Quiz</button>
+        </div>
+      </div>
+
+      <div class="quiz-screen" id="quizQuestion">
+        <div class="quiz-progress"><div class="quiz-progress-fill" id="progressFill"></div></div>
+        <div class="q-number" id="qNumber">Question 1 of 20</div>
+        <div class="q-text" id="qText"></div>
+        <div class="q-code" id="qCode" style="display:none;"></div>
+        <div class="answers" id="answers"></div>
+        <div class="feedback" id="feedback" aria-live="polite"></div>
+        <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
+      </div>
+
+      <div class="quiz-screen" id="quizResult">
+        <div class="result-screen">
+          <h2>🎉 Quiz Complete!</h2>
+          <div class="score-display" id="scoreDisplay">0/20</div>
+          <div class="score-msg" id="scoreMsg"></div>
+          <button class="restart-btn" onclick="restartQuiz()">🔄 Try Again</button>
+          <div class="submit-box">
+            📸 <b>Submission:</b> Take a screenshot of this results screen showing your score, and submit it through your instructor’s designated course platform.
+          </div>
+        </div>
+      </div>
+
+    </div>
+</div></div>
+<script>
+  // ---------- Tab switching ----------
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ---------- Pyodide setup ----------
+  let pyodideReady = false;
+  let pyodide = null;
+  let outputBuffer = [];
+
+  async function initPyodide() {
+    const statusEl = document.getElementById('pyodideStatus');
+    try {
+      pyodide = await loadPyodide();
+      statusEl.textContent = '📦 Loading pandas + numpy...';
+      await pyodide.loadPackage(['pandas', 'numpy']);
+
+      pyodide.setStdout({ batched: (msg) => { outputBuffer.push(msg + "\n"); } });
+      pyodideReady = true;
+      statusEl.textContent = '✅ Python engine ready — click ▶ Run on any code cell!';
+      statusEl.classList.add('ready');
+      setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
+    } catch (err) {
+      statusEl.textContent = '⚠️ Could not load the Python engine. Check your internet connection and reload the page.';
+    }
+  }
+  initPyodide();
+
+  let running = false;
+  async function runCell(button) {
+    if (running) return;
+    const cell = button.closest('.pyodide-cell');
+    const code = cell.querySelector('.code-input').value;
+    const output = cell.querySelector('.output');
+
+    if (!pyodideReady) {
+      output.textContent = 'Python engine is still loading — please wait a few seconds and try again.';
+      output.className = 'output show error';
+      return;
+    }
+
+    running = true;
+    document.querySelectorAll(".run-btn").forEach(b => b.disabled = true);
+    button.textContent = 'Running...';
+    outputBuffer = [];
+
+    try {
+      await pyodide.runPythonAsync(code);
+      output.textContent = outputBuffer.join('') || '(no output — code ran successfully)';
+      output.className = 'output show';
+    } catch (err) {
+      output.textContent = 'Error:\n' + err.message.split('\n').slice(-4).join('\n');
+      output.className = 'output show error';
+    }
+    running = false;
+    document.querySelectorAll(".run-btn").forEach(b => b.disabled = false);
+    button.textContent = '▶ Run';
+  }
+
+  // ---------- Quiz ----------
+  const questions = [
+  {
+    "q": "Which tool is best for fixed letter-grade thresholds?",
+    "options": [
+      "pd.qcut",
+      "pd.cut",
+      "stack",
+      "melt"
+    ],
+    "correct": 1,
+    "explain": "cut accepts explicitly chosen score boundaries."
+  },
+  {
+    "q": "With default right-closed bins [0,10,20], where is 10 placed?",
+    "options": [
+      "(0,10]",
+      "(10,20]",
+      "Both",
+      "Neither"
+    ],
+    "correct": 0,
+    "explain": "Default cut intervals include their right endpoint."
+  },
+  {
+    "q": "How many labels are needed for six bin edges?",
+    "options": [
+      "4",
+      "6",
+      "7",
+      "5"
+    ],
+    "correct": 3,
+    "explain": "Six edges define five intervals, requiring five labels."
+  },
+  {
+    "q": "What happens to 45 with explicit cut edges [0,10,20,30,40]?",
+    "options": [
+      "It enters the highest bin",
+      "It becomes 40",
+      "It is missing (NaN)",
+      "It enters the lowest bin"
+    ],
+    "correct": 2,
+    "explain": "Values outside all explicit intervals are unassigned."
+  },
+  {
+    "q": "What does qcut primarily target?",
+    "options": [
+      "Equal bin widths",
+      "Similar observation counts per bin",
+      "Equal sums per bin",
+      "Alphabetical order"
+    ],
+    "correct": 1,
+    "explain": "Quantile boundaries target approximately equal counts, with ties imposing limits."
+  },
+  {
+    "q": "What can repeated quantile boundaries cause in qcut?",
+    "options": [
+      "A duplicate-bin-edge error",
+      "Automatic unique student names",
+      "Guaranteed equal counts",
+      "Automatic sorting of rows"
+    ],
+    "correct": 0,
+    "explain": "Repeated values can make quantile edges non-unique; duplicates='drop' may reduce the number of bins."
+  },
+  {
+    "q": "In DataFrame.apply(func, axis=1), what does func receive by default?",
+    "options": [
+      "The whole DataFrame",
+      "Each column Series",
+      "Each row Series",
+      "Each scalar cell"
+    ],
+    "correct": 2,
+    "explain": "axis=1 applies func to rows represented as Series."
+  },
+  {
+    "q": "For Homework=80, Midterm=90, Final=100, what is 30%/30%/40% weighted grade?",
+    "options": [
+      "90",
+      "91",
+      "92",
+      "93"
+    ],
+    "correct": 1,
+    "explain": "80×0.3+90×0.3+100×0.4 = 24+27+40 = 91."
+  },
+  {
+    "q": "What is (68−32)×5/9 in Celsius?",
+    "options": [
+      "10",
+      "15",
+      "20",
+      "25"
+    ],
+    "correct": 2,
+    "explain": "36×5/9 = 20 degrees Celsius."
+  },
+  {
+    "q": "With performance 90 and salary 60000, what bonus follows the notebook's rules?",
+    "options": [
+      "1200",
+      "3000",
+      "5400",
+      "6000"
+    ],
+    "correct": 3,
+    "explain": "A performance score of at least 90 receives 10%; 60000×0.10=6000."
+  },
+  {
+    "q": "What does groupby('Class')['Score'].transform('mean') return?",
+    "options": [
+      "One row per class",
+      "A class mean aligned to each student row",
+      "One scalar for all classes",
+      "Only the maximum-score rows"
+    ],
+    "correct": 1,
+    "explain": "transform broadcasts each class mean back to its corresponding rows."
+  },
+  {
+    "q": "A student's score is 90 and the class mean is 75. What is score/mean×100?",
+    "options": [
+      "75",
+      "90",
+      "100",
+      "120"
+    ],
+    "correct": 3,
+    "explain": "90/75×100=120, meaning the score is 120% of its class mean."
+  },
+  {
+    "q": "What does transform('sum') on regional sales produce?",
+    "options": [
+      "A repeated region total per row",
+      "A cumulative running total",
+      "Only one region total row",
+      "A sorted region list"
+    ],
+    "correct": 0,
+    "explain": "It broadcasts the whole group's sum to every member; cumsum creates running totals."
+  },
+  {
+    "q": "A class has 3 students. Does filter(lambda g: len(g)>=3) keep it?",
+    "options": [
+      "It keeps only the top student",
+      "It removes the class",
+      "It keeps all three students",
+      "It keeps only two students"
+    ],
+    "correct": 2,
+    "explain": "GroupBy.filter keeps whole groups satisfying the predicate."
+  },
+  {
+    "q": "How does GroupBy.filter differ from DataFrame.filter?",
+    "options": [
+      "Both always filter group sizes",
+      "DataFrame.filter selects labels; GroupBy.filter evaluates groups",
+      "Both always select rows by numeric values",
+      "Neither returns a DataFrame"
+    ],
+    "correct": 1,
+    "explain": "DataFrame.filter uses labels such as items or regex; GroupBy.filter applies a group predicate."
+  },
+  {
+    "q": "Which melt parameter preserves Name as an identifier column?",
+    "options": [
+      "value_name",
+      "var_name",
+      "id_vars",
+      "aggfunc"
+    ],
+    "correct": 2,
+    "explain": "id_vars are retained and repeated for each melted measurement."
+  },
+  {
+    "q": "Four students have four subject columns. Melting those subjects creates how many rows?",
+    "options": [
+      "4",
+      "8",
+      "12",
+      "16"
+    ],
+    "correct": 3,
+    "explain": "There is one row per student/subject pair: 4×4=16."
+  },
+  {
+    "q": "For ordinary single-level columns, what does DataFrame.stack() usually create?",
+    "options": [
+      "A Series with a MultiIndex",
+      "A list of column names",
+      "A scalar mean",
+      "A frequency table"
+    ],
+    "correct": 0,
+    "explain": "stack moves column labels into an added index level; ordinary columns yield a Series."
+  },
+  {
+    "q": "What does pd.crosstab(gender, activity) calculate by default?",
+    "options": [
+      "Mean salary",
+      "Frequency of each combination",
+      "Cumulative activity totals",
+      "Quantile boundaries"
+    ],
+    "correct": 1,
+    "explain": "Without values and aggfunc, crosstab counts occurrences of the category combinations."
+  },
+  {
+    "q": "What does normalize='all' do in a crosstab?",
+    "options": [
+      "Makes each row sum to one",
+      "Makes each column sum to one",
+      "Divides counts by the grand total",
+      "Adds a totals row"
+    ],
+    "correct": 2,
+    "explain": "Every cell is divided by the table's grand total; multiply by 100 for percentages."
+  }
+];
+
+  let current = 0;
+  let score = 0;
+  let answered = false;
+
+  function showScreen(id) {
+    document.querySelectorAll('.quiz-screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function startQuiz() {
+    current = 0;
+    score = 0;
+    showScreen('quizQuestion');
+    showQuestion();
+  }
+
+  function showQuestion() {
+    answered = false;
+    const item = questions[current];
+    document.getElementById('progressFill').style.width = (current / questions.length * 100) + '%';
+    document.getElementById('qNumber').textContent = `Question ${current + 1} of ${questions.length}`;
+    document.getElementById('qText').textContent = item.q;
+
+    const codeEl = document.getElementById('qCode');
+    if (item.code) { codeEl.style.display = 'block'; codeEl.textContent = item.code; }
+    else { codeEl.style.display = 'none'; }
+
+    const answersDiv = document.getElementById('answers');
+    answersDiv.innerHTML = '';
+    item.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'answer-btn';
+      btn.textContent = opt;
+      btn.onclick = () => selectAnswer(i);
+      answersDiv.appendChild(btn);
+    });
+
+    document.getElementById('feedback').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'none';
+  }
+
+  function selectAnswer(i) {
+    if (answered) return;
+    answered = true;
+    const item = questions[current];
+    const buttons = document.querySelectorAll('.answer-btn');
+    buttons.forEach(b => b.disabled = true);
+
+    const feedback = document.getElementById('feedback');
+    if (i === item.correct) {
+      score++;
+      buttons[i].classList.add('correct');
+      feedback.className = 'feedback correct';
+      feedback.textContent = 'Correct! ' + item.explain;
+    } else {
+      buttons[i].classList.add('incorrect');
+      buttons[item.correct].classList.add('correct');
+      feedback.className = 'feedback incorrect';
+      feedback.textContent = 'Not quite. Correct answer: ' + item.options[item.correct] + '. ' + item.explain;
+    }
+    feedback.style.display = 'block';
+    document.getElementById('nextBtn').style.display = 'inline-block';
+  }
+
+  function nextQuestion() {
+    if (!answered) return;
+    current++;
+    if (current >= questions.length) { showResults(); }
+    else { showQuestion(); }
+  }
+
+  function showResults() {
+    document.getElementById('progressFill').style.width = '100%';
+    showScreen('quizResult');
+    document.getElementById('scoreDisplay').textContent = `${score}/${questions.length}`;
+    let msg;
+    if (score / questions.length >= 0.9) msg = "Outstanding! You can summarize and reshape grouped data! 🏆";
+    else if (score / questions.length >= 0.7) msg = "Great job! Solid grasp of the fundamentals. 🎯";
+    else if (score / questions.length >= 0.5) msg = "Good start — revisit the tabs and try again! 📚";
+    else msg = "No worries — go back through the cut, qcut, apply, transform, filter, melt, stack, and crosstab tabs, then retake it! 💪";
+    document.getElementById('scoreMsg').textContent = msg;
+  }
+
+  function restartQuiz() { showScreen('quizStart'); }
+</script>
+</body>
+</html>
+
