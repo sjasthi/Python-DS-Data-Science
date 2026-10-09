@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pandas — Reading and Writing Data Playbook and Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<style>
+  :root {
+    --bg: #12181f;
+    --panel: #1a232d;
+    --panel-2: #212c38;
+    --border: #2c3947;
+    --text: #e7edf3;
+    --text-dim: #9fb0c0;
+    --teal: #2dd4bf;
+    --amber: #f5b942;
+    --orange: #ff8a4c;
+    --red: #ff6b6b;
+    --green: #4ade80;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px 14px;
+    display: flex;
+    justify-content: center;
+  }
+  .wrap { width: 100%; max-width: 920px; }
+
+  .brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--panel-2);
+    border: 1px solid var(--teal);
+    color: var(--teal);
+    font-weight: 800;
+    font-size: 0.85rem;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .brand-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); }
+
+  header {
+    text-align: center;
+    padding: 24px 20px 20px;
+    background: linear-gradient(135deg, #1b3b3a 0%, #17222c 100%);
+    border: 1px solid var(--border);
+    border-radius: 18px 18px 0 0;
+  }
+  header h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.8rem;
+    color: var(--teal);
+  }
+  header p { color: var(--text-dim); margin-top: 8px; }
+
+  #pyodideStatus {
+    text-align: center;
+    padding: 10px;
+    background: var(--panel-2);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    color: var(--amber);
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  #pyodideStatus.ready { color: var(--green); }
+
+  .tabs {
+    display: flex;
+    background: var(--panel-2);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  .tab-btn {
+    flex: 1;
+    min-width: 110px;
+    padding: 15px 8px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  .tab-btn.active { color: var(--teal); border-bottom-color: var(--teal); background: var(--panel); }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 18px 18px;
+    padding: 28px 26px 32px;
+    min-height: 420px;
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .tab-content h2 { font-family: 'Fredoka One', cursive; color: var(--amber); font-size: 1.4rem; margin-bottom: 6px; }
+  .tab-content .lead { color: var(--text-dim); margin-bottom: 18px; }
+  .op-tag {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin: 18px 0 8px;
+  }
+  .op-create { background: rgba(45,212,191,0.15); color: var(--teal); }
+  .op-read   { background: rgba(245,185,66,0.15); color: var(--amber); }
+  .op-update { background: rgba(255,138,76,0.15); color: var(--orange); }
+  .op-delete { background: rgba(255,107,107,0.15); color: var(--red); }
+  .op-setup     { background: rgba(159,176,192,0.15); color: var(--text-dim); }
+  .op-load      { background: rgba(45,212,191,0.15); color: var(--teal); }
+  .op-size      { background: rgba(96,165,250,0.15); color: #60a5fa; }
+  .op-structure { background: rgba(245,185,66,0.15); color: var(--amber); }
+  .op-missing   { background: rgba(255,107,107,0.15); color: var(--red); }
+  .op-stats     { background: rgba(192,132,252,0.15); color: #c084fc; }
+
+  /* Pyodide code cells */
+  .pyodide-cell {
+    background: #0d1319;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--teal);
+    border-radius: 10px;
+    margin: 10px 0 20px;
+    overflow: hidden;
+  }
+  .code-input {
+    width: 100%;
+    background: transparent;
+    color: #d4e8e2;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.92rem;
+    border: none;
+    resize: vertical;
+    padding: 14px 16px;
+    line-height: 1.5;
+    min-height: 40px;
+  }
+  .code-input:focus { outline: none; background: rgba(45,212,191,0.04); }
+  .cell-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 14px;
+    background: var(--panel-2);
+    border-top: 1px solid var(--border);
+  }
+  .run-btn {
+    background: var(--teal);
+    color: #062824;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 16px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .run-btn:hover { background: #24b6a4; }
+  .run-btn:disabled { opacity: 0.5; cursor: wait; }
+  .cell-label { color: var(--text-dim); font-size: 0.8rem; }
+  .output {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88rem;
+    color: #c3e8ff;
+    padding: 12px 16px;
+    white-space: pre;
+    overflow-x: auto;
+    border-top: 1px dashed var(--border);
+    min-height: 20px;
+    display: none;
+  }
+  .output.show { display: block; }
+  .output.error { color: var(--red); }
+
+  .nav-hint { text-align:center; margin-top: 22px; color: var(--text-dim); font-size: 0.92rem; }
+  .nav-hint b { color: var(--amber); }
+
+  /* Quiz */
+  .quiz-progress { width: 100%; height: 8px; background: var(--panel-2); border-radius: 4px; overflow: hidden; margin-bottom: 22px; }
+  .quiz-progress-fill { height: 100%; background: var(--teal); width: 0%; transition: width .4s ease; }
+  .q-number { display: inline-block; background: var(--panel-2); border: 1px solid var(--border); color: var(--amber); padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; margin-bottom: 16px; }
+  .q-text { font-size: 1.2rem; margin-bottom: 18px; line-height: 1.4; }
+  .q-code { background: #0d1319; border-left: 4px solid var(--teal); border-radius: 10px; padding: 14px 18px; font-family: 'JetBrains Mono', monospace; font-size: 1.02rem; margin-bottom: 18px; white-space: pre; overflow-x: auto; }
+  .answers { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 12px; }
+  .answer-btn { background: var(--panel-2); border: 1px solid var(--border); color: var(--text); padding: 14px 16px; border-radius: 12px; font-size: 0.98rem; font-weight: 700; cursor: pointer; text-align: left; font-family: 'JetBrains Mono', monospace; }
+  .answer-btn:hover { border-color: var(--teal); transform: translateY(-2px); }
+  .answer-btn.correct { background: rgba(74,222,128,0.18); border-color: var(--green); color: var(--green); }
+  .answer-btn.incorrect { background: rgba(255,107,107,0.18); border-color: var(--red); color: var(--red); }
+  .answer-btn[disabled] { cursor: default; transform: none; }
+  .feedback { margin-top: 18px; padding: 14px 16px; border-radius: 12px; font-size: 0.95rem; display: none; line-height: 1.5; }
+  .feedback.correct { display:block; background: rgba(74,222,128,0.12); border: 1px solid var(--green); color: #cdf7dc; }
+  .feedback.incorrect { display:block; background: rgba(255,107,107,0.12); border: 1px solid var(--red); color: #ffd9d9; }
+  .next-btn, .start-btn, .restart-btn { margin-top: 20px; background: var(--teal); color: #062824; border: none; padding: 13px 28px; border-radius: 24px; font-weight: 800; font-size: 1rem; cursor: pointer; display: none; }
+  .start-btn, .restart-btn { display: inline-block; }
+  .next-btn:hover, .start-btn:hover, .restart-btn:hover { background: #24b6a4; }
+  .quiz-screen { display:none; }
+  .quiz-screen.active { display:block; }
+  .quiz-start { text-align:center; }
+  .badges { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin: 16px 0 20px; }
+  .badge { background: var(--panel-2); border: 1px solid var(--border); padding: 8px 14px; border-radius: 18px; font-size: 0.86rem; color: var(--text-dim); }
+  .result-screen { text-align: center; }
+  .score-display { font-family: 'Fredoka One', cursive; font-size: 2.8rem; color: var(--teal); margin: 14px 0; }
+  .score-msg { color: var(--text-dim); font-size: 1.05rem; margin-bottom: 18px; }
+  .submit-box { background: rgba(245,185,66,0.1); border: 1px solid var(--amber); border-radius: 12px; padding: 16px 18px; margin-top: 20px; color: #ffe4b0; font-size: 0.95rem; text-align: left; }
+  .submit-box b { color: var(--amber); }
+
+  @media (max-width: 620px) {
+    header h1 { font-size: 1.4rem; }
+    .panel { padding: 20px 14px 26px; }
+    .tab-btn { font-size: 0.8rem; padding: 12px 4px; }
+  }
+
+  .tab-btn { min-width: 100px; }
+</style>
+</head>
+<body><div class="wrap"><div class="brand-badge"><span class="dot"></span> Learn and Help · Python for Data Science</div><header><h1>🐼 Reading &amp; Writing Data</h1><p>12 formats · Student records · Round trips · Validation</p><p><a style="color:var(--teal)" href="https://colab.research.google.com/github/sjasthi/Python-DS-Data-Science/blob/main/pandas/9_pandas_reading_n_writing_to_different_data_types.ipynb" target="_blank" rel="noopener">Open notebook in Colab</a></p></header><div id="pyodideStatus">Loading Python and file-format libraries… quiz available while loading.</div><div class="tabs"><button class="tab-btn active" data-tab="setup">🚀 Setup</button><button class="tab-btn " data-tab="tables">📋 CSV & Excel</button><button class="tab-btn " data-tab="structured">🧩 JSON XML YAML</button><button class="tab-btn " data-tab="htmltext">🌐 HTML & text</button><button class="tab-btn " data-tab="binarysql">🗄️ Pickle & SQL</button><button class="tab-btn " data-tab="documents">📄 PDF DOCX RTF</button><button class="tab-btn " data-tab="practice">✍️ Practice</button><button class="tab-btn" data-tab="quiz">📝 Quiz</button></div><div class="panel"><div class="tab-content active" id="tab-setup"><h2>Objects → records → DataFrame</h2><p class="lead">Use the notebook's Student collection to explore serialization and round trips. Every browser example writes and reads its own data, so tabs can run in any order once Python is ready. Files live in the page's temporary Python filesystem and disappear on reload. The quiz works independently of Python.</p><div class="op-tag op-load">Prepare the student collection</div><div class="pyodide-cell"><textarea aria-label="Prepare the student collection code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+import io, csv, json, pickle, sqlite3
+import xml.etree.ElementTree as ET
+from html.parser import HTMLParser
+class Student:
+    def __init__(self, name, email, marks):
+        self.name, self.email, self.marks = name, email, marks
+    def to_dict(self):
+        return {&quot;name&quot;: self.name, &quot;email&quot;: self.email, &quot;marks&quot;: self.marks}
+    def __str__(self):
+        return f&quot;Name: {self.name}, Email: {self.email}, Marks: {self.marks}&quot;
+students = [Student(&quot;John Doe&quot;,&quot;john.doe@example.com&quot;,85),
+            Student(&quot;Jane Smith&quot;,&quot;jane.smith@example.com&quot;,90),
+            Student(&quot;Sam Wilson&quot;,&quot;sam.wilson@example.com&quot;,88),
+            Student(&quot;Alice Johnson&quot;,&quot;alice.johnson@example.com&quot;,92),
+            Student(&quot;Bob Brown&quot;,&quot;bob.brown@example.com&quot;,75),
+            Student(&quot;Chris Evans&quot;,&quot;chris.evans@example.com&quot;,89),
+            Student(&quot;Diana Prince&quot;,&quot;diana.prince@example.com&quot;,95),
+            Student(&quot;Peter Parker&quot;,&quot;peter.parker@example.com&quot;,87),
+            Student(&quot;Bruce Wayne&quot;,&quot;bruce.wayne@example.com&quot;,93),
+            Student(&quot;Clark Kent&quot;,&quot;clark.kent@example.com&quot;,91)]
+records = [s.to_dict() for s in students]
+df = pd.DataFrame(records)
+print(df)</textarea><div class="cell-toolbar"><span class="cell-label">The schema is name, email, marks throughout. These are example records.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Rebuild objects and append a record</div><div class="pyodide-cell"><textarea aria-label="Rebuild objects and append a record code" class="code-input" spellcheck="false" rows="5">rebuilt = [Student(**row) for row in df.to_dict(orient=&quot;records&quot;)]
+updated = pd.concat([df, pd.DataFrame([{&quot;name&quot;:&quot;New Student&quot;,&quot;email&quot;:&quot;new@example.com&quot;,&quot;marks&quot;:80}])],ignore_index=True)
+print(rebuilt[0])
+print(updated.tail(2))</textarea><div class="cell-toolbar"><span class="cell-label">Keep original students unchanged; creating new dictionaries is more portable than serializing custom objects.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-tables"><h2>Delimited text and workbooks</h2><p class="lead">CSV stores rows as text; quoting handles commas and newlines. Excel workbooks include sheets and richer cell types. Pandas supports both, while the notebook also demonstrates csv and openpyxl directly.</p><div class="op-tag op-load">CSV round trip</div><div class="pyodide-cell"><textarea aria-label="CSV round trip code" class="code-input" spellcheck="false" rows="6">df.to_csv(&quot;students.csv&quot;,index=False)
+loaded = pd.read_csv(&quot;students.csv&quot;)
+print(loaded.head())
+print(&quot;Equal:&quot;,loaded.equals(df))
+print(open(&quot;students.csv&quot;,encoding=&quot;utf-8&quot;).read()[:180])</textarea><div class="cell-toolbar"><span class="cell-label">index=False omits the DataFrame index from the file.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">CSV module and numeric conversion</div><div class="pyodide-cell"><textarea aria-label="CSV module and numeric conversion code" class="code-input" spellcheck="false" rows="9">buffer = io.StringIO()
+writer = csv.writer(buffer)
+writer.writerow([&quot;name&quot;,&quot;email&quot;,&quot;marks&quot;])
+writer.writerows((s.name,s.email,s.marks) for s in students)
+buffer.seek(0)
+rows = list(csv.DictReader(buffer))
+objects = [Student(row[&quot;name&quot;],row[&quot;email&quot;],int(row[&quot;marks&quot;])) for row in rows]
+print(objects[0])</textarea><div class="cell-toolbar"><span class="cell-label">csv reads fields as strings; explicitly convert marks to int. Use newline='' when opening real CSV files for writing.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Excel round trip</div><div class="pyodide-cell"><textarea aria-label="Excel round trip code" class="code-input" spellcheck="false" rows="5">df.to_excel(&quot;students.xlsx&quot;,sheet_name=&quot;Students&quot;,index=False,engine=&quot;openpyxl&quot;)
+loaded_excel = pd.read_excel(&quot;students.xlsx&quot;,sheet_name=&quot;Students&quot;,engine=&quot;openpyxl&quot;)
+print(loaded_excel)
+print(&quot;Equal:&quot;,loaded_excel.equals(df))</textarea><div class="cell-toolbar"><span class="cell-label">An Excel engine such as openpyxl is required; the playbook loads it automatically.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">CSV → add student → Excel</div><div class="pyodide-cell"><textarea aria-label="CSV → add student → Excel code" class="code-input" spellcheck="false" rows="6">df.to_csv(&quot;source_students.csv&quot;,index=False)
+converted = pd.read_csv(&quot;source_students.csv&quot;)
+converted.loc[len(converted)] = [&quot;New Student&quot;,&quot;new@example.com&quot;,80]
+converted.to_excel(&quot;csv_to_excel.xlsx&quot;,index=False,engine=&quot;openpyxl&quot;)
+print(pd.read_excel(&quot;csv_to_excel.xlsx&quot;,engine=&quot;openpyxl&quot;).tail())</textarea><div class="cell-toolbar"><span class="cell-label">This completes the notebook's final workflow: read, build a DataFrame, add a student, then export.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-structured"><h2>Structured interchange formats</h2><p class="lead">JSON represents arrays and objects; XML uses nested elements; YAML uses readable mappings and lists. Convert Student objects to dictionaries first. Readers do not automatically validate your intended schema.</p><div class="op-tag op-load">JSON round trip</div><div class="pyodide-cell"><textarea aria-label="JSON round trip code" class="code-input" spellcheck="false" rows="7">with open(&quot;students.json&quot;,&quot;w&quot;,encoding=&quot;utf-8&quot;) as f:
+    json.dump(records,f,indent=2)
+with open(&quot;students.json&quot;,encoding=&quot;utf-8&quot;) as f:
+    loaded_records = json.load(f)
+print(Student(**loaded_records[0]))
+print(pd.read_json(&quot;students.json&quot;,orient=&quot;records&quot;).head())</textarea><div class="cell-toolbar"><span class="cell-label">json.dump writes to a file; json.dumps returns a string. Plain custom Student objects need explicit conversion.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">XML round trip</div><div class="pyodide-cell"><textarea aria-label="XML round trip code" class="code-input" spellcheck="false" rows="11">root = ET.Element(&quot;students&quot;)
+for record in records:
+    child = ET.SubElement(root,&quot;student&quot;)
+    for key,value in record.items():
+        ET.SubElement(child,key).text = str(value)
+ET.ElementTree(root).write(&quot;students.xml&quot;,encoding=&quot;utf-8&quot;,xml_declaration=True)
+xml_rows = [{e.tag:e.text for e in child} for child in ET.parse(&quot;students.xml&quot;).getroot()]
+for row in xml_rows:
+    row[&quot;marks&quot;] = int(row[&quot;marks&quot;])
+print(pd.DataFrame(xml_rows).head())</textarea><div class="cell-toolbar"><span class="cell-label">ElementTree escapes XML special characters. Element text is read as strings, so marks needs conversion.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">YAML round trip</div><div class="pyodide-cell"><textarea aria-label="YAML round trip code" class="code-input" spellcheck="false" rows="8">import yaml
+with open(&quot;students.yaml&quot;,&quot;w&quot;,encoding=&quot;utf-8&quot;) as f:
+    yaml.safe_dump(records,f,sort_keys=False)
+with open(&quot;students.yaml&quot;,encoding=&quot;utf-8&quot;) as f:
+    yaml_rows = yaml.safe_load(f)
+print(pd.DataFrame(yaml_rows).head())
+print(&quot;Equal:&quot;,yaml_rows == records)</textarea><div class="cell-toolbar"><span class="cell-label">Use safe_load for ordinary records; the stray variable from the notebook is removed.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-htmltext"><h2>Tables and human-readable text</h2><p class="lead">HTML encodes a table for display. Escaping protects text containing characters such as &lt; and &amp;. Plain text is easy to read but custom delimiter parsing is fragile; tab-separated data is more explicit.</p><div class="op-tag op-load">HTML table and parser</div><div class="pyodide-cell"><textarea aria-label="HTML table and parser code" class="code-input" spellcheck="false" rows="14">table_html = df.to_html(index=False,escape=True)
+with open(&quot;students.html&quot;,&quot;w&quot;,encoding=&quot;utf-8&quot;) as f:
+    f.write(table_html)
+class TableReader(HTMLParser):
+    def __init__(self):
+        super().__init__(); self.rows=[]; self.row=[]; self.inside=False; self.text=&quot;&quot;
+    def handle_starttag(self,tag,attrs):
+        if tag==&quot;tr&quot;: self.row=[]
+        if tag==&quot;td&quot;: self.inside=True; self.text=&quot;&quot;
+    def handle_data(self,data):
+        if self.inside: self.text+=data
+    def handle_endtag(self,tag):
+        if tag==&quot;td&quot;: self.row.append(self.text.strip()); self.inside=False
+        if tag==&quot;tr&quot; and self.row: self.rows.append(self.row)
+parser = TableReader(); parser.feed(table_html)
+html_df = pd.DataFrame(parser.rows,columns=df.columns)
+html_df[&quot;marks&quot;] = html_df[&quot;marks&quot;].astype(int)
+print(html_df.head())</textarea><div class="cell-toolbar"><span class="cell-label">This stdlib reader handles our generated simple table, not arbitrary web tables. pandas.read_html returns a list of tables and needs an HTML parser dependency.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Plain text and TSV</div><div class="pyodide-cell"><textarea aria-label="Plain text and TSV code" class="code-input" spellcheck="false" rows="6">with open(&quot;students.txt&quot;,&quot;w&quot;,encoding=&quot;utf-8&quot;) as f:
+    for student in students: f.write(str(student)+&quot;\n&quot;)
+print(open(&quot;students.txt&quot;,encoding=&quot;utf-8&quot;).read().splitlines()[0])
+df.to_csv(&quot;students.tsv&quot;,sep=&quot;\t&quot;,index=False)
+print(pd.read_csv(&quot;students.tsv&quot;,sep=&quot;\t&quot;).head())</textarea><div class="cell-toolbar"><span class="cell-label">Splitting display text by ', ' fails if names contain that delimiter. Prefer a defined tabular format for round trips.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-binarysql"><h2>Python serialization and a database</h2><p class="lead">Pickle can serialize Python-specific objects but is not a portable interchange format. SQL stores records in typed tables. Use parameters for insertion; do not construct SQL by concatenating student display strings.</p><div class="op-tag op-load">Trusted pickle round trip</div><div class="pyodide-cell"><textarea aria-label="Trusted pickle round trip code" class="code-input" spellcheck="false" rows="5">with open(&quot;students.pkl&quot;,&quot;wb&quot;) as f: pickle.dump(df,f)
+with open(&quot;students.pkl&quot;,&quot;rb&quot;) as f: trusted = pickle.load(f)
+print(trusted.head())
+print(&quot;Equal:&quot;,trusted.equals(df))</textarea><div class="cell-toolbar"><span class="cell-label">Only load pickle files you trust: deserialization can execute code. This example reads the file it just created.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Parameterized database insert</div><div class="pyodide-cell"><textarea aria-label="Parameterized database insert code" class="code-input" spellcheck="false" rows="7">with sqlite3.connect(&quot;:memory:&quot;) as connection:
+    connection.execute(&quot;CREATE TABLE students (name TEXT, email TEXT, marks INTEGER)&quot;)
+    connection.executemany(&quot;INSERT INTO students (name,email,marks) VALUES (?,?,?)&quot;,
+        [(s.name,s.email,s.marks) for s in students])
+    sql_df = pd.read_sql_query(&quot;SELECT name,email,marks FROM students WHERE marks &gt;= ?&quot;,connection,params=(90,))
+    print(sql_df)</textarea><div class="cell-toolbar"><span class="cell-label">SQLite is used for a runnable local example; the notebook targets MySQL. Placeholder syntax varies by database driver.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Pandas SQL round trip</div><div class="pyodide-cell"><textarea aria-label="Pandas SQL round trip code" class="code-input" spellcheck="false" rows="6">with sqlite3.connect(&quot;:memory:&quot;) as connection:
+    df.to_sql(&quot;students&quot;,connection,index=False,if_exists=&quot;replace&quot;)
+    restored = pd.read_sql_query(&quot;SELECT * FROM students&quot;,connection)
+    print(restored.head())
+    print(&quot;Equal:&quot;,restored.equals(df))</textarea><div class="cell-toolbar"><span class="cell-label">if_exists='replace' replaces an existing table. Use a dedicated table and choose append only when intended.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-documents"><h2>Document formats and extraction</h2><p class="lead">PDF, DOCX, and RTF emphasize document layout or formatting. The samples below run in Colab/local Python with the listed dependencies; they are not browser Run cells. Text extraction is template-specific, and a PDF is not inherently a structured data table.</p><h3>PDF — reportlab and pdfplumber</h3><pre style="white-space:pre-wrap;overflow-wrap:anywhere;background:#0d1319;padding:14px;margin:12px 0;border-radius:8px"># Colab: %pip install reportlab pdfplumber
+from reportlab.pdfgen import canvas
+import pdfplumber
+pdf = canvas.Canvas(&quot;students.pdf&quot;)
+pdf.drawString(50,800,&quot;Student Information&quot;)
+for i,s in enumerate(students):
+    pdf.drawString(50,775-i*20,str(s))
+pdf.save()
+with pdfplumber.open(&quot;students.pdf&quot;) as document:
+    text = &quot;\n&quot;.join(page.extract_text() or &quot;&quot; for page in document.pages)
+print(text)
+# This extracts text, not validated Student objects.</pre><h3>DOCX — python-docx</h3><pre style="white-space:pre-wrap;overflow-wrap:anywhere;background:#0d1319;padding:14px;margin:12px 0;border-radius:8px"># Colab: %pip install python-docx
+from docx import Document
+document = Document()
+document.add_heading(&quot;Student Information&quot;,level=1)
+table = document.add_table(rows=1, cols=3)
+for cell,heading in zip(table.rows[0].cells,[&quot;name&quot;,&quot;email&quot;,&quot;marks&quot;]):
+    cell.text = heading
+for s in students:
+    for cell,value in zip(table.add_row().cells,[s.name,s.email,s.marks]):
+        cell.text = str(value)
+document.save(&quot;students.docx&quot;)
+loaded = Document(&quot;students.docx&quot;)
+rows = [[c.text for c in row.cells] for row in loaded.tables[0].rows]
+docx_df = pd.DataFrame(rows[1:],columns=rows[0])
+docx_df[&quot;marks&quot;] = docx_df[&quot;marks&quot;].astype(int)
+print(docx_df)</pre><h3>RTF — escaped text and striprtf</h3><pre style="white-space:pre-wrap;overflow-wrap:anywhere;background:#0d1319;padding:14px;margin:12px 0;border-radius:8px"># Colab: %pip install striprtf
+from striprtf.striprtf import rtf_to_text
+def rtf_escape(text):
+    result = &quot;&quot;
+    for ch in text:
+        if ch in &quot;\\{}&quot;: result += &quot;\\&quot; + ch
+        elif ch == &quot;\n&quot;: result += &quot;\\par &quot;
+        elif ord(ch) &lt; 128: result += ch
+        else:
+            for i in range(0,len(ch.encode(&quot;utf-16-le&quot;)),2):
+                n = int.from_bytes(ch.encode(&quot;utf-16-le&quot;)[i:i+2],&quot;little&quot;)
+                result += &quot;\\u&quot; + str(n if n &lt; 32768 else n-65536) + &quot;?&quot;
+    return result
+content = &quot;{\\rtf1\\ansi\\uc1 &quot; + &quot;\\par &quot;.join(rtf_escape(str(s)) for s in students) + &quot;}&quot;
+with open(&quot;students.rtf&quot;,&quot;w&quot;,encoding=&quot;ascii&quot;) as f: f.write(content)
+print(rtf_to_text(content))
+# Extracted display text still needs schema-aware parsing.</pre></div><div class="tab-content " id="tab-practice"><h2>Validate round trips</h2><p class="lead">File extensions alone do not guarantee contents or schema. Confirm column names, row counts, data types, and missing values after import. Inputs can also come from users, generated values, APIs, web tables, and databases; each source needs validation.</p><div class="op-tag op-load">Check the imported schema</div><div class="pyodide-cell"><textarea aria-label="Check the imported schema code" class="code-input" spellcheck="false" rows="8">df.to_csv(&quot;validate.csv&quot;,index=False)
+validated = pd.read_csv(&quot;validate.csv&quot;)
+assert list(validated.columns)==[&quot;name&quot;,&quot;email&quot;,&quot;marks&quot;]
+assert len(validated)==10
+assert pd.api.types.is_integer_dtype(validated[&quot;marks&quot;])
+assert validated[&quot;marks&quot;].between(0,100).all()
+print(&quot;Schema, count, marks type, and range checks passed.&quot;)</textarea><div class="cell-toolbar"><span class="cell-label">Define checks that match the real data contract.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Challenge</div><div class="pyodide-cell"><textarea aria-label="Challenge code" class="code-input" spellcheck="false" rows="4"># Save students as JSON records, reload into a DataFrame,
+# keep marks &gt;= 90, and export those rows to Excel without an index.
+# Write your code here.</textarea><div class="cell-toolbar"><span class="cell-label">Use orient='records' and confirm the number of selected students.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><details><summary>Show challenge solution</summary><div class="op-tag op-load">Challenge solution</div><div class="pyodide-cell"><textarea aria-label="Challenge solution code" class="code-input" spellcheck="false" rows="7">df.to_json(&quot;challenge.json&quot;,orient=&quot;records&quot;,indent=2)
+challenge = pd.read_json(&quot;challenge.json&quot;,orient=&quot;records&quot;)
+high_marks = challenge.loc[challenge[&quot;marks&quot;]&gt;=90]
+high_marks.to_excel(&quot;high_marks.xlsx&quot;,index=False,engine=&quot;openpyxl&quot;)
+print(high_marks)
+print(&quot;Rows:&quot;,len(high_marks))</textarea><div class="cell-toolbar"><span class="cell-label">The original ten students include five with marks of at least 90.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></details></div><div class="tab-content" id="tab-quiz">
+
+      <div class="quiz-screen active" id="quizStart">
+        <div class="quiz-start">
+          <h2>📝 Reading &amp; Writing Quiz</h2>
+          <p class="lead">20 questions on format selection, serialization, round trips, database operations, and validation.</p>
+          <div class="badges">
+            <span class="badge">📝 20 questions</span>
+            <span class="badge">🎯 No time limit</span>
+            <span class="badge">📸 Screenshot your score</span>
+          </div>
+          <button class="start-btn" onclick="startQuiz()">🚀 Start Quiz</button>
+        </div>
+      </div>
+
+      <div class="quiz-screen" id="quizQuestion">
+        <div class="quiz-progress"><div class="quiz-progress-fill" id="progressFill"></div></div>
+        <div class="q-number" id="qNumber">Question 1 of 20</div>
+        <div class="q-text" id="qText"></div>
+        <div class="q-code" id="qCode" style="display:none;"></div>
+        <div class="answers" id="answers"></div>
+        <div class="feedback" id="feedback" aria-live="polite"></div>
+        <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
+      </div>
+
+      <div class="quiz-screen" id="quizResult">
+        <div class="result-screen">
+          <h2>🎉 Quiz Complete!</h2>
+          <div class="score-display" id="scoreDisplay">0/20</div>
+          <div class="score-msg" id="scoreMsg"></div>
+          <button class="restart-btn" onclick="restartQuiz()">🔄 Try Again</button>
+          <div class="submit-box">
+            📸 <b>Submission:</b> Take a screenshot of this results screen showing your score, and submit it through your instructor’s designated course platform.
+          </div>
+        </div>
+      </div>
+
+    </div>
+</div></div>
+<script>
+  // ---------- Tab switching ----------
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ---------- Pyodide setup ----------
+  let pyodideReady = false;
+  let pyodide = null;
+  let outputBuffer = [];
+
+  async function initPyodide() {
+    const statusEl = document.getElementById('pyodideStatus');
+    try {
+      pyodide = await loadPyodide();
+      statusEl.textContent = '📦 Loading pandas, Excel, YAML, and SQLite support...';
+      await pyodide.loadPackage(['pandas', 'numpy', 'openpyxl', 'pyyaml', 'sqlite3']);
+
+      pyodide.setStdout({ batched: (msg) => { outputBuffer.push(msg + "\n"); } });
+      await pyodide.runPythonAsync("import pandas as pd\nimport io, csv, json, pickle, sqlite3\nimport xml.etree.ElementTree as ET\nfrom html.parser import HTMLParser\nclass Student:\n    def __init__(self, name, email, marks):\n        self.name, self.email, self.marks = name, email, marks\n    def to_dict(self):\n        return {\"name\": self.name, \"email\": self.email, \"marks\": self.marks}\n    def __str__(self):\n        return f\"Name: {self.name}, Email: {self.email}, Marks: {self.marks}\"\nstudents = [Student(\"John Doe\",\"john.doe@example.com\",85),\n            Student(\"Jane Smith\",\"jane.smith@example.com\",90),\n            Student(\"Sam Wilson\",\"sam.wilson@example.com\",88),\n            Student(\"Alice Johnson\",\"alice.johnson@example.com\",92),\n            Student(\"Bob Brown\",\"bob.brown@example.com\",75),\n            Student(\"Chris Evans\",\"chris.evans@example.com\",89),\n            Student(\"Diana Prince\",\"diana.prince@example.com\",95),\n            Student(\"Peter Parker\",\"peter.parker@example.com\",87),\n            Student(\"Bruce Wayne\",\"bruce.wayne@example.com\",93),\n            Student(\"Clark Kent\",\"clark.kent@example.com\",91)]\nrecords = [s.to_dict() for s in students]\ndf = pd.DataFrame(records)");
+      pyodideReady = true;
+      statusEl.textContent = '✅ Python engine ready — click ▶ Run on any code cell!';
+      statusEl.classList.add('ready');
+      setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
+    } catch (err) {
+      statusEl.textContent = '⚠️ Could not load the Python engine. Check your internet connection and reload the page.';
+    }
+  }
+  initPyodide();
+
+  let running = false;
+  async function runCell(button) {
+    if (running) return;
+    const cell = button.closest('.pyodide-cell');
+    const code = cell.querySelector('.code-input').value;
+    const output = cell.querySelector('.output');
+
+    if (!pyodideReady) {
+      output.textContent = 'Python engine is still loading — please wait a few seconds and try again.';
+      output.className = 'output show error';
+      return;
+    }
+
+    running = true;
+    document.querySelectorAll(".run-btn").forEach(b => b.disabled = true);
+    button.textContent = 'Running...';
+    outputBuffer = [];
+
+    try {
+      await pyodide.runPythonAsync(code);
+      output.textContent = outputBuffer.join('') || '(no output — code ran successfully)';
+      output.className = 'output show';
+    } catch (err) {
+      output.textContent = 'Error:\n' + err.message.split('\n').slice(-4).join('\n');
+      output.className = 'output show error';
+    }
+    running = false;
+    document.querySelectorAll(".run-btn").forEach(b => b.disabled = false);
+    button.textContent = '▶ Run';
+  }
+
+  // ---------- Quiz ----------
+  const questions = [
+  {
+    "q": "Why convert Student objects to dictionaries before JSON export?",
+    "options": [
+      "JSON directly stores all Python classes",
+      "JSON supports records of basic values, not arbitrary class instances",
+      "JSON requires binary mode",
+      "JSON removes columns"
+    ],
+    "correct": 1,
+    "explain": "Object attributes are explicitly mapped to JSON-compatible records."
+  },
+  {
+    "q": "What does index=False do in to_csv?",
+    "options": [
+      "Omits the DataFrame index",
+      "Omits headers",
+      "Omits missing values",
+      "Omits the final row"
+    ],
+    "correct": 0,
+    "explain": "The index is not written as an extra column."
+  },
+  {
+    "q": "What handles commas within CSV fields?",
+    "options": [
+      "Sorting rows",
+      "Renaming fields",
+      "CSV quoting",
+      "Changing integer types"
+    ],
+    "correct": 2,
+    "explain": "CSV writers quote fields containing delimiters where needed."
+  },
+  {
+    "q": "What type does csv.reader normally return for field values?",
+    "options": [
+      "Integer",
+      "Float",
+      "Student",
+      "String"
+    ],
+    "correct": 3,
+    "explain": "The csv module reads text fields; convert marks explicitly."
+  },
+  {
+    "q": "Which pandas function reads CSV into a DataFrame?",
+    "options": [
+      "pd.to_csv",
+      "pd.read_csv",
+      "pd.load_csv",
+      "pd.csv_reader"
+    ],
+    "correct": 1,
+    "explain": "read_csv parses CSV input into a DataFrame."
+  },
+  {
+    "q": "Which library is an Excel engine used in this playbook?",
+    "options": [
+      "openpyxl",
+      "pickle",
+      "sqlite3",
+      "csv"
+    ],
+    "correct": 0,
+    "explain": "openpyxl reads and writes XLSX workbooks."
+  },
+  {
+    "q": "Which argument chooses an Excel worksheet when importing?",
+    "options": [
+      "orient",
+      "sep",
+      "sheet_name",
+      "aggfunc"
+    ],
+    "correct": 2,
+    "explain": "sheet_name selects the workbook sheet."
+  },
+  {
+    "q": "Which JSON orientation represents a list of row dictionaries?",
+    "options": [
+      "index",
+      "columns",
+      "split",
+      "records"
+    ],
+    "correct": 3,
+    "explain": "Records orientation stores one mapping per row."
+  },
+  {
+    "q": "Which returns JSON text rather than writing to a file?",
+    "options": [
+      "json.dump",
+      "json.dumps",
+      "json.load",
+      "json.loads"
+    ],
+    "correct": 1,
+    "explain": "dumps serializes to a string; dump writes to a file object."
+  },
+  {
+    "q": "XML element text for marks is '85'. How do you obtain an integer?",
+    "options": [
+      "int(text)",
+      "list(text)",
+      "str(text)",
+      "text.index()"
+    ],
+    "correct": 0,
+    "explain": "int converts the numeric text to an integer."
+  },
+  {
+    "q": "Which YAML reader is appropriate for basic records?",
+    "options": [
+      "yaml.exec",
+      "yaml.unsafe_load",
+      "yaml.safe_load",
+      "yaml.to_sql"
+    ],
+    "correct": 2,
+    "explain": "safe_load constructs ordinary supported data types without arbitrary Python object loading."
+  },
+  {
+    "q": "What does pd.read_html return?",
+    "options": [
+      "A single scalar",
+      "Always one DataFrame",
+      "A list of Student objects",
+      "A list of DataFrames"
+    ],
+    "correct": 3,
+    "explain": "HTML can contain multiple tables, so read_html returns a list."
+  },
+  {
+    "q": "Why escape '<' and '&' in HTML table cell text?",
+    "options": [
+      "To increase row counts",
+      "To preserve text rather than interpreting it as markup",
+      "To convert numbers to integers",
+      "To sort the table"
+    ],
+    "correct": 1,
+    "explain": "Escaping keeps cell content as text instead of HTML syntax."
+  },
+  {
+    "q": "What is the main risk of loading an untrusted pickle?",
+    "options": [
+      "It can execute code",
+      "It always creates empty rows",
+      "It always rounds marks",
+      "It only supports strings"
+    ],
+    "correct": 0,
+    "explain": "Pickle deserialization can run code, so only trusted input should be loaded."
+  },
+  {
+    "q": "Which mode writes a pickle file?",
+    "options": [
+      "'r'",
+      "'w'",
+      "'wb'",
+      "'rt'"
+    ],
+    "correct": 2,
+    "explain": "Pickle output is binary, requiring binary write mode."
+  },
+  {
+    "q": "Why use SQL query parameters for supplied values?",
+    "options": [
+      "They automatically build all tables",
+      "They guarantee every input is valid",
+      "They sort rows",
+      "They separate values from SQL syntax"
+    ],
+    "correct": 3,
+    "explain": "Parameters bind values without interpreting their contents as query syntax."
+  },
+  {
+    "q": "Which pandas function reads a SQL query result?",
+    "options": [
+      "pd.write_sql",
+      "pd.read_sql_query",
+      "pd.query_file",
+      "pd.from_pickle"
+    ],
+    "correct": 1,
+    "explain": "read_sql_query executes the query through a connection and returns a DataFrame."
+  },
+  {
+    "q": "What does if_exists='replace' do in to_sql?",
+    "options": [
+      "Replaces an existing table",
+      "Only appends one row",
+      "Rejects every existing table",
+      "Renames every column"
+    ],
+    "correct": 0,
+    "explain": "Replace drops the existing table and creates it from the exported data."
+  },
+  {
+    "q": "Why are PDF text-extraction results not automatically trustworthy tables?",
+    "options": [
+      "PDF always uses JSON",
+      "PDF cannot contain names",
+      "Layout and reading order do not guarantee schema",
+      "PDF stores only integers"
+    ],
+    "correct": 2,
+    "explain": "Extracted text requires validation and often layout-specific parsing."
+  },
+  {
+    "q": "Which is a meaningful validation after importing students?",
+    "options": [
+      "Only checking the filename extension",
+      "Only counting bytes",
+      "Only checking table color",
+      "Checking columns, row counts, and marks types/range"
+    ],
+    "correct": 3,
+    "explain": "These checks assess whether the imported data meets the intended schema."
+  }
+];
+
+  let current = 0;
+  let score = 0;
+  let answered = false;
+
+  function showScreen(id) {
+    document.querySelectorAll('.quiz-screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function startQuiz() {
+    current = 0;
+    score = 0;
+    showScreen('quizQuestion');
+    showQuestion();
+  }
+
+  function showQuestion() {
+    answered = false;
+    const item = questions[current];
+    document.getElementById('progressFill').style.width = (current / questions.length * 100) + '%';
+    document.getElementById('qNumber').textContent = `Question ${current + 1} of ${questions.length}`;
+    document.getElementById('qText').textContent = item.q;
+
+    const codeEl = document.getElementById('qCode');
+    if (item.code) { codeEl.style.display = 'block'; codeEl.textContent = item.code; }
+    else { codeEl.style.display = 'none'; }
+
+    const answersDiv = document.getElementById('answers');
+    answersDiv.innerHTML = '';
+    item.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'answer-btn';
+      btn.textContent = opt;
+      btn.onclick = () => selectAnswer(i);
+      answersDiv.appendChild(btn);
+    });
+
+    document.getElementById('feedback').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'none';
+  }
+
+  function selectAnswer(i) {
+    if (answered) return;
+    answered = true;
+    const item = questions[current];
+    const buttons = document.querySelectorAll('.answer-btn');
+    buttons.forEach(b => b.disabled = true);
+
+    const feedback = document.getElementById('feedback');
+    if (i === item.correct) {
+      score++;
+      buttons[i].classList.add('correct');
+      feedback.className = 'feedback correct';
+      feedback.textContent = 'Correct! ' + item.explain;
+    } else {
+      buttons[i].classList.add('incorrect');
+      buttons[item.correct].classList.add('correct');
+      feedback.className = 'feedback incorrect';
+      feedback.textContent = 'Not quite. Correct answer: ' + item.options[item.correct] + '. ' + item.explain;
+    }
+    feedback.style.display = 'block';
+    document.getElementById('nextBtn').style.display = 'inline-block';
+  }
+
+  function nextQuestion() {
+    if (!answered) return;
+    current++;
+    if (current >= questions.length) { showResults(); }
+    else { showQuestion(); }
+  }
+
+  function showResults() {
+    document.getElementById('progressFill').style.width = '100%';
+    showScreen('quizResult');
+    document.getElementById('scoreDisplay').textContent = `${score}/${questions.length}`;
+    let msg;
+    if (score / questions.length >= 0.9) msg = "Outstanding! You can read, validate, and export student data! 🏆";
+    else if (score / questions.length >= 0.7) msg = "Great job! Solid grasp of the fundamentals. 🎯";
+    else if (score / questions.length >= 0.5) msg = "Good start — revisit the tabs and try again! 📚";
+    else msg = "No worries — go back through the Setup, CSV & Excel, JSON XML YAML, HTML & text, Pickle & SQL, and Documents tabs, then retake it! 💪";
+    document.getElementById('scoreMsg').textContent = msg;
+  }
+
+  function restartQuiz() { showScreen('quizStart'); }
+</script>
+</body>
+</html>
+
