@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pandas — Time Series Playbook and Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<style>
+  :root {
+    --bg: #12181f;
+    --panel: #1a232d;
+    --panel-2: #212c38;
+    --border: #2c3947;
+    --text: #e7edf3;
+    --text-dim: #9fb0c0;
+    --teal: #2dd4bf;
+    --amber: #f5b942;
+    --orange: #ff8a4c;
+    --red: #ff6b6b;
+    --green: #4ade80;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px 14px;
+    display: flex;
+    justify-content: center;
+  }
+  .wrap { width: 100%; max-width: 920px; }
+
+  .brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--panel-2);
+    border: 1px solid var(--teal);
+    color: var(--teal);
+    font-weight: 800;
+    font-size: 0.85rem;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .brand-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); }
+
+  header {
+    text-align: center;
+    padding: 24px 20px 20px;
+    background: linear-gradient(135deg, #1b3b3a 0%, #17222c 100%);
+    border: 1px solid var(--border);
+    border-radius: 18px 18px 0 0;
+  }
+  header h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.8rem;
+    color: var(--teal);
+  }
+  header p { color: var(--text-dim); margin-top: 8px; }
+
+  #pyodideStatus {
+    text-align: center;
+    padding: 10px;
+    background: var(--panel-2);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    color: var(--amber);
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  #pyodideStatus.ready { color: var(--green); }
+
+  .tabs {
+    display: flex;
+    background: var(--panel-2);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  .tab-btn {
+    flex: 1;
+    min-width: 110px;
+    padding: 15px 8px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  .tab-btn.active { color: var(--teal); border-bottom-color: var(--teal); background: var(--panel); }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 18px 18px;
+    padding: 28px 26px 32px;
+    min-height: 420px;
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .tab-content h2 { font-family: 'Fredoka One', cursive; color: var(--amber); font-size: 1.4rem; margin-bottom: 6px; }
+  .tab-content .lead { color: var(--text-dim); margin-bottom: 18px; }
+  .op-tag {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin: 18px 0 8px;
+  }
+  .op-create { background: rgba(45,212,191,0.15); color: var(--teal); }
+  .op-read   { background: rgba(245,185,66,0.15); color: var(--amber); }
+  .op-update { background: rgba(255,138,76,0.15); color: var(--orange); }
+  .op-delete { background: rgba(255,107,107,0.15); color: var(--red); }
+  .op-setup     { background: rgba(159,176,192,0.15); color: var(--text-dim); }
+  .op-load      { background: rgba(45,212,191,0.15); color: var(--teal); }
+  .op-size      { background: rgba(96,165,250,0.15); color: #60a5fa; }
+  .op-structure { background: rgba(245,185,66,0.15); color: var(--amber); }
+  .op-missing   { background: rgba(255,107,107,0.15); color: var(--red); }
+  .op-stats     { background: rgba(192,132,252,0.15); color: #c084fc; }
+
+  /* Pyodide code cells */
+  .pyodide-cell {
+    background: #0d1319;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--teal);
+    border-radius: 10px;
+    margin: 10px 0 20px;
+    overflow: hidden;
+  }
+  .code-input {
+    width: 100%;
+    background: transparent;
+    color: #d4e8e2;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.92rem;
+    border: none;
+    resize: vertical;
+    padding: 14px 16px;
+    line-height: 1.5;
+    min-height: 40px;
+  }
+  .code-input:focus { outline: none; background: rgba(45,212,191,0.04); }
+  .cell-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 14px;
+    background: var(--panel-2);
+    border-top: 1px solid var(--border);
+  }
+  .run-btn {
+    background: var(--teal);
+    color: #062824;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 16px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .run-btn:hover { background: #24b6a4; }
+  .run-btn:disabled { opacity: 0.5; cursor: wait; }
+  .cell-label { color: var(--text-dim); font-size: 0.8rem; }
+  .output {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88rem;
+    color: #c3e8ff;
+    padding: 12px 16px;
+    white-space: pre;
+    overflow-x: auto;
+    border-top: 1px dashed var(--border);
+    min-height: 20px;
+    display: none;
+  }
+  .output.show { display: block; }
+  .output.error { color: var(--red); }
+
+  .nav-hint { text-align:center; margin-top: 22px; color: var(--text-dim); font-size: 0.92rem; }
+  .nav-hint b { color: var(--amber); }
+
+  /* Quiz */
+  .quiz-progress { width: 100%; height: 8px; background: var(--panel-2); border-radius: 4px; overflow: hidden; margin-bottom: 22px; }
+  .quiz-progress-fill { height: 100%; background: var(--teal); width: 0%; transition: width .4s ease; }
+  .q-number { display: inline-block; background: var(--panel-2); border: 1px solid var(--border); color: var(--amber); padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; margin-bottom: 16px; }
+  .q-text { font-size: 1.2rem; margin-bottom: 18px; line-height: 1.4; }
+  .q-code { background: #0d1319; border-left: 4px solid var(--teal); border-radius: 10px; padding: 14px 18px; font-family: 'JetBrains Mono', monospace; font-size: 1.02rem; margin-bottom: 18px; white-space: pre; overflow-x: auto; }
+  .answers { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 12px; }
+  .answer-btn { background: var(--panel-2); border: 1px solid var(--border); color: var(--text); padding: 14px 16px; border-radius: 12px; font-size: 0.98rem; font-weight: 700; cursor: pointer; text-align: left; font-family: 'JetBrains Mono', monospace; }
+  .answer-btn:hover { border-color: var(--teal); transform: translateY(-2px); }
+  .answer-btn.correct { background: rgba(74,222,128,0.18); border-color: var(--green); color: var(--green); }
+  .answer-btn.incorrect { background: rgba(255,107,107,0.18); border-color: var(--red); color: var(--red); }
+  .answer-btn[disabled] { cursor: default; transform: none; }
+  .feedback { margin-top: 18px; padding: 14px 16px; border-radius: 12px; font-size: 0.95rem; display: none; line-height: 1.5; }
+  .feedback.correct { display:block; background: rgba(74,222,128,0.12); border: 1px solid var(--green); color: #cdf7dc; }
+  .feedback.incorrect { display:block; background: rgba(255,107,107,0.12); border: 1px solid var(--red); color: #ffd9d9; }
+  .next-btn, .start-btn, .restart-btn { margin-top: 20px; background: var(--teal); color: #062824; border: none; padding: 13px 28px; border-radius: 24px; font-weight: 800; font-size: 1rem; cursor: pointer; display: none; }
+  .start-btn, .restart-btn { display: inline-block; }
+  .next-btn:hover, .start-btn:hover, .restart-btn:hover { background: #24b6a4; }
+  .quiz-screen { display:none; }
+  .quiz-screen.active { display:block; }
+  .quiz-start { text-align:center; }
+  .badges { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin: 16px 0 20px; }
+  .badge { background: var(--panel-2); border: 1px solid var(--border); padding: 8px 14px; border-radius: 18px; font-size: 0.86rem; color: var(--text-dim); }
+  .result-screen { text-align: center; }
+  .score-display { font-family: 'Fredoka One', cursive; font-size: 2.8rem; color: var(--teal); margin: 14px 0; }
+  .score-msg { color: var(--text-dim); font-size: 1.05rem; margin-bottom: 18px; }
+  .submit-box { background: rgba(245,185,66,0.1); border: 1px solid var(--amber); border-radius: 12px; padding: 16px 18px; margin-top: 20px; color: #ffe4b0; font-size: 0.95rem; text-align: left; }
+  .submit-box b { color: var(--amber); }
+
+  @media (max-width: 620px) {
+    header h1 { font-size: 1.4rem; }
+    .panel { padding: 20px 14px 26px; }
+    .tab-btn { font-size: 0.8rem; padding: 12px 4px; }
+  }
+
+  .tab-btn { min-width: 100px; }
+</style>
+</head>
+<body><div class="wrap"><div class="brand-badge"><span class="dot"></span> Learn and Help · Python for Data Science</div><header><h1>🐼 Pandas Time Series</h1><p>Dates · Indexing · Resampling · Rolling windows · Lagging</p><p><a style="color:var(--teal)" href="https://colab.research.google.com/github/sjasthi/Python-DS-Data-Science/blob/main/pandas/10_pandas_time_series_data.ipynb" target="_blank" rel="noopener">Open notebook in Colab</a></p></header><div id="pyodideStatus">Starting Python engine… lessons and quiz are available while it loads.</div><div class="tabs"><button class="tab-btn active" data-tab="setup">🚀 Setup</button><button class="tab-btn " data-tab="dates">📅 Dates</button><button class="tab-btn " data-tab="select">🔎 Select</button><button class="tab-btn " data-tab="resample">🗓️ Resample</button><button class="tab-btn " data-tab="rolling">🔄 Rolling</button><button class="tab-btn " data-tab="lag">⏮️ Lag & diff</button><button class="tab-btn" data-tab="quiz">📝 Quiz</button></div><div class="panel"><div class="tab-content active" id="tab-setup"><h2>100 daily observations</h2><p class="lead">Time series pair observations with time. This notebook creates 100 daily values beginning January 1, 2024. The playbook uses a fixed random seed for reproducibility. Data is prepared automatically; cells share df, and this setup restores it.</p><div class="op-tag op-load">Create the time series</div><div class="pyodide-cell"><textarea aria-label="Create the time series code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+import numpy as np
+rng = np.random.default_rng(42)
+date_rng = pd.date_range(start=&quot;2024-01-01&quot;, periods=100, freq=&quot;D&quot;)
+df = pd.DataFrame({&quot;date&quot;: date_rng, &quot;value&quot;: rng.standard_normal(100)})
+df[&quot;date&quot;] = pd.to_datetime(df[&quot;date&quot;])
+df[&quot;year&quot;] = df[&quot;date&quot;].dt.year
+df[&quot;month&quot;] = df[&quot;date&quot;].dt.month
+df[&quot;day&quot;] = df[&quot;date&quot;].dt.day
+df[&quot;weekday&quot;] = df[&quot;date&quot;].dt.weekday
+df = df.set_index(&quot;date&quot;).sort_index()
+print(df.head())
+print(&quot;Rows:&quot;,len(df))
+print(&quot;Last date:&quot;,df.index[-1])</textarea><div class="cell-toolbar"><span class="cell-label">A daily series of 100 dates ends on April 9, 2024. Internet is needed to load the Python engine.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">A tiny predictable series</div><div class="pyodide-cell"><textarea aria-label="A tiny predictable series code" class="code-input" spellcheck="false" rows="3">tiny = pd.Series([10,20,30,40,50], index=pd.date_range(&quot;2024-01-01&quot;,periods=5,freq=&quot;D&quot;))
+print(tiny)</textarea><div class="cell-toolbar"><span class="cell-label">Use small known numbers to predict rolling, shift, and diff results.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-dates"><h2>Datetime conversion and calendar fields</h2><p class="lead">pd.to_datetime converts date-like values. A datetime Series exposes .dt fields; a DatetimeIndex exposes fields directly. Weekday codes run from Monday=0 to Sunday=6.</p><div class="op-tag op-load">Extract calendar fields</div><div class="pyodide-cell"><textarea aria-label="Extract calendar fields code" class="code-input" spellcheck="false" rows="4">dates = pd.Series(pd.date_range(&quot;2024-01-01&quot;,periods=4,freq=&quot;D&quot;))
+print(pd.DataFrame({&quot;date&quot;:dates,&quot;year&quot;:dates.dt.year,&quot;month&quot;:dates.dt.month,
+    &quot;day&quot;:dates.dt.day,&quot;weekday&quot;:dates.dt.weekday}))</textarea><div class="cell-toolbar"><span class="cell-label">January 1, 2024 was Monday, so its weekday is 0.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Handle an invalid date</div><div class="pyodide-cell"><textarea aria-label="Handle an invalid date code" class="code-input" spellcheck="false" rows="5">raw = pd.Series([&quot;2024-01-01&quot;,&quot;not a date&quot;,&quot;2024-02-29&quot;])
+parsed = pd.to_datetime(raw,errors=&quot;coerce&quot;)
+print(parsed)
+print(&quot;Invalid or missing:&quot;,parsed.isna().sum())</textarea><div class="cell-toolbar"><span class="cell-label">errors='coerce' converts invalid strings to NaT. 2024 is a leap year.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Check the datetime index</div><div class="pyodide-cell"><textarea aria-label="Check the datetime index code" class="code-input" spellcheck="false" rows="5">print(type(df.index).__name__)
+print(&quot;Sorted:&quot;,df.index.is_monotonic_increasing)
+print(&quot;Unique:&quot;,df.index.is_unique)
+print(df.index[:3])</textarea><div class="cell-toolbar"><span class="cell-label">set_index moves date into the index; sorting supports chronological operations. Avoid setting the same date column twice after it has been removed.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-select"><h2>Select dates and ranges</h2><p class="lead">With the sorted DatetimeIndex, a partial month string selects all rows in that month. Label-based range slicing includes both endpoints. An exact unique timestamp selects one row.</p><div class="op-tag op-load">A month and a day</div><div class="pyodide-cell"><textarea aria-label="A month and a day code" class="code-input" spellcheck="false" rows="6">january = df.loc[&quot;2024-01&quot;]
+one_day = df.loc[&quot;2024-01-15&quot;]
+print(&quot;January rows:&quot;,len(january))
+print(january.head())
+print(&quot;One day:\n&quot;,one_day)</textarea><div class="cell-toolbar"><span class="cell-label">January has 31 observations. Here the day selection is a row Series, not a one-row DataFrame.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Inclusive range and one-row table</div><div class="pyodide-cell"><textarea aria-label="Inclusive range and one-row table code" class="code-input" spellcheck="false" rows="3">print(df.loc[&quot;2024-01-10&quot;:&quot;2024-01-15&quot;, [&quot;value&quot;]])
+print(df.loc[[pd.Timestamp(&quot;2024-01-15&quot;)]])</textarea><div class="cell-toolbar"><span class="cell-label">The range includes six daily rows. A list of timestamps preserves a DataFrame.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-resample"><h2>Weekly aggregation</h2><p class="lead">resample partitions observations into time bins; mean reduces each bin to a summary. Select the value column so calendar codes are not averaged. 'W' means weeks ending Sunday by default.</p><div class="op-tag op-load">Weekly means</div><div class="pyodide-cell"><textarea aria-label="Weekly means code" class="code-input" spellcheck="false" rows="5">weekly = df[&quot;value&quot;].resample(&quot;W&quot;).mean()
+print(&quot;Daily rows:&quot;,len(df))
+print(&quot;Weekly bins:&quot;,len(weekly))
+print(weekly.head())</textarea><div class="cell-toolbar"><span class="cell-label">Weekly bins are labeled by Sunday. The final bin is partial because the series ends on Tuesday, April 9.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Inspect bin sizes</div><div class="pyodide-cell"><textarea aria-label="Inspect bin sizes code" class="code-input" spellcheck="false" rows="2">print(df[&quot;value&quot;].resample(&quot;W&quot;).agg([&quot;count&quot;,&quot;mean&quot;,&quot;min&quot;,&quot;max&quot;]).tail())</textarea><div class="cell-toolbar"><span class="cell-label">The final bin has two observations (April 8 and 9), though its label is April 14.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Resampling versus rolling</div><div class="pyodide-cell"><textarea aria-label="Resampling versus rolling code" class="code-input" spellcheck="false" rows="3">print(&quot;One result per weekly bin:\n&quot;,df[&quot;value&quot;].resample(&quot;W&quot;).mean().head())
+print(&quot;One position per original row:\n&quot;,df[&quot;value&quot;].rolling(7).mean().head(10))</textarea><div class="cell-toolbar"><span class="cell-label">Resampling creates calendar-bin summaries; rolling creates moving overlapping windows.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-rolling"><h2>Trailing rolling windows</h2><p class="lead">rolling(window=7) uses seven observations. With this regular daily dataset that corresponds to seven days; irregular timestamps would differ. By default seven valid observations are needed for the mean.</p><div class="op-tag op-load">Seven-observation moving mean</div><div class="pyodide-cell"><textarea aria-label="Seven-observation moving mean code" class="code-input" spellcheck="false" rows="3">df[&quot;rolling_mean&quot;] = df[&quot;value&quot;].rolling(window=7).mean()
+print(df[[&quot;value&quot;,&quot;rolling_mean&quot;]].head(10))</textarea><div class="cell-toolbar"><span class="cell-label">The first six rolling means are NaN. The seventh uses the first seven values.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Minimum observations and time windows</div><div class="pyodide-cell"><textarea aria-label="Minimum observations and time windows code" class="code-input" spellcheck="false" rows="5">demo = pd.Series([10,20,30,40,50], index=pd.date_range(&quot;2024-01-01&quot;,periods=5))
+print(demo.rolling(3).mean())
+print(demo.rolling(3,min_periods=1).mean())
+print(demo.rolling(&quot;3D&quot;).mean())</textarea><div class="cell-toolbar"><span class="cell-label">Integer windows default min_periods to window size; time-offset windows default to 1. '3D' uses elapsed time, not a fixed number of rows.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-lag"><h2>Previous observations and changes</h2><p class="lead">shift(1) moves values down one row while keeping the index labels; diff() subtracts the previous value. Both create a missing first value. A positional lag need not represent a day in irregular data.</p><div class="op-tag op-load">Lag and difference</div><div class="pyodide-cell"><textarea aria-label="Lag and difference code" class="code-input" spellcheck="false" rows="4">df[&quot;lagged_value&quot;] = df[&quot;value&quot;].shift(1)
+df[&quot;diff_value&quot;] = df[&quot;value&quot;].diff()
+print(df[[&quot;value&quot;,&quot;lagged_value&quot;,&quot;diff_value&quot;]].head(10))</textarea><div class="cell-toolbar"><span class="cell-label">diff equals current value minus previous value. Negative results indicate a decrease.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Predictable values and shifted timestamps</div><div class="pyodide-cell"><textarea aria-label="Predictable values and shifted timestamps code" class="code-input" spellcheck="false" rows="5">demo = pd.Series([10,20,30],index=pd.date_range(&quot;2024-01-01&quot;,periods=3))
+print(&quot;Value lag:\n&quot;,demo.shift(1))
+print(&quot;Difference:\n&quot;,demo.diff())
+print(&quot;Shift labels:\n&quot;,demo.shift(1,freq=&quot;D&quot;))</textarea><div class="cell-toolbar"><span class="cell-label">shift(1,freq='D') moves index labels by a day and keeps values attached; it is different from a positional lag.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Challenge</div><div class="pyodide-cell"><textarea aria-label="Challenge code" class="code-input" spellcheck="false" rows="5"># Select February 2024 values and report its observation count.
+# Calculate their weekly means.
+# On the full series, add a 3-observation rolling mean and a 2-row lag.
+# Write your code here.</textarea><div class="cell-toolbar"><span class="cell-label">2024 is a leap year. Decide whether a calculation should use only February or the full series.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><details><summary>Show challenge solution</summary><div class="op-tag op-load">Challenge solution</div><div class="pyodide-cell"><textarea aria-label="Challenge solution code" class="code-input" spellcheck="false" rows="7">february = df.loc[&quot;2024-02&quot;,&quot;value&quot;]
+print(&quot;February observations:&quot;,len(february))
+print(february.resample(&quot;W&quot;).mean())
+df[&quot;rolling_3&quot;] = df[&quot;value&quot;].rolling(3).mean()
+df[&quot;lag_2&quot;] = df[&quot;value&quot;].shift(2)
+print(df[[&quot;value&quot;,&quot;rolling_3&quot;,&quot;lag_2&quot;]].head())</textarea><div class="cell-toolbar"><span class="cell-label">February has 29 observations. Its weekly means use only February values, including partial boundary weeks.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></details></div><div class="tab-content" id="tab-quiz">
+
+      <div class="quiz-screen active" id="quizStart">
+        <div class="quiz-start">
+          <h2>📝 Time Series Quiz</h2>
+          <p class="lead">20 questions on date ranges, calendar fields, datetime selection, resampling, rolling means, shifts, and differences.</p>
+          <div class="badges">
+            <span class="badge">📝 20 questions</span>
+            <span class="badge">🎯 No time limit</span>
+            <span class="badge">📸 Screenshot your score</span>
+          </div>
+          <button class="start-btn" onclick="startQuiz()">🚀 Start Quiz</button>
+        </div>
+      </div>
+
+      <div class="quiz-screen" id="quizQuestion">
+        <div class="quiz-progress"><div class="quiz-progress-fill" id="progressFill"></div></div>
+        <div class="q-number" id="qNumber">Question 1 of 20</div>
+        <div class="q-text" id="qText"></div>
+        <div class="q-code" id="qCode" style="display:none;"></div>
+        <div class="answers" id="answers"></div>
+        <div class="feedback" id="feedback" aria-live="polite"></div>
+        <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
+      </div>
+
+      <div class="quiz-screen" id="quizResult">
+        <div class="result-screen">
+          <h2>🎉 Quiz Complete!</h2>
+          <div class="score-display" id="scoreDisplay">0/20</div>
+          <div class="score-msg" id="scoreMsg"></div>
+          <button class="restart-btn" onclick="restartQuiz()">🔄 Try Again</button>
+          <div class="submit-box">
+            📸 <b>Submission:</b> Take a screenshot of this results screen showing your score, and submit it through your instructor’s designated course platform.
+          </div>
+        </div>
+      </div>
+
+    </div>
+</div></div>
+<script>
+  // ---------- Tab switching ----------
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ---------- Pyodide setup ----------
+  let pyodideReady = false;
+  let pyodide = null;
+  let outputBuffer = [];
+
+  async function initPyodide() {
+    const statusEl = document.getElementById('pyodideStatus');
+    try {
+      pyodide = await loadPyodide();
+      statusEl.textContent = '📦 Loading pandas + numpy...';
+      await pyodide.loadPackage(['pandas', 'numpy']);
+
+      pyodide.setStdout({ batched: (msg) => { outputBuffer.push(msg + "\n"); } });
+      await pyodide.runPythonAsync("import pandas as pd\nimport numpy as np\nrng = np.random.default_rng(42)\ndate_rng = pd.date_range(start=\"2024-01-01\", periods=100, freq=\"D\")\ndf = pd.DataFrame({\"date\": date_rng, \"value\": rng.standard_normal(100)})\ndf[\"date\"] = pd.to_datetime(df[\"date\"])\ndf[\"year\"] = df[\"date\"].dt.year\ndf[\"month\"] = df[\"date\"].dt.month\ndf[\"day\"] = df[\"date\"].dt.day\ndf[\"weekday\"] = df[\"date\"].dt.weekday\ndf = df.set_index(\"date\").sort_index()");
+      pyodideReady = true;
+      statusEl.textContent = '✅ Python engine ready — click ▶ Run on any code cell!';
+      statusEl.classList.add('ready');
+      setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
+    } catch (err) {
+      statusEl.textContent = '⚠️ Could not load the Python engine. Check your internet connection and reload the page.';
+    }
+  }
+  initPyodide();
+
+  let running = false;
+  async function runCell(button) {
+    if (running) return;
+    const cell = button.closest('.pyodide-cell');
+    const code = cell.querySelector('.code-input').value;
+    const output = cell.querySelector('.output');
+
+    if (!pyodideReady) {
+      output.textContent = 'Python engine is still loading — please wait a few seconds and try again.';
+      output.className = 'output show error';
+      return;
+    }
+
+    running = true;
+    document.querySelectorAll(".run-btn").forEach(b => b.disabled = true);
+    button.textContent = 'Running...';
+    outputBuffer = [];
+
+    try {
+      await pyodide.runPythonAsync(code);
+      output.textContent = outputBuffer.join('') || '(no output — code ran successfully)';
+      output.className = 'output show';
+    } catch (err) {
+      output.textContent = 'Error:\n' + err.message.split('\n').slice(-4).join('\n');
+      output.className = 'output show error';
+    }
+    running = false;
+    document.querySelectorAll(".run-btn").forEach(b => b.disabled = false);
+    button.textContent = '▶ Run';
+  }
+
+  // ---------- Quiz ----------
+  const questions = [
+  {
+    "q": "What makes data a time series?",
+    "options": [
+      "Values associated with time",
+      "Only integer columns",
+      "Only alphabetical labels",
+      "A file containing no missing values"
+    ],
+    "correct": 0,
+    "explain": "Time series observations are associated with timestamps or time periods."
+  },
+  {
+    "q": "What does periods=100 specify in pd.date_range?",
+    "options": [
+      "100 months",
+      "100 generated timestamps",
+      "100 columns",
+      "100 missing values"
+    ],
+    "correct": 1,
+    "explain": "periods sets the number of timestamps generated."
+  },
+  {
+    "q": "What does freq='D' mean?",
+    "options": [
+      "Every decade",
+      "Every business day",
+      "Every calendar day",
+      "Every hour"
+    ],
+    "correct": 2,
+    "explain": "D specifies daily calendar frequency, including weekends."
+  },
+  {
+    "q": "100 daily dates start on January 1, 2024. What is the last date?",
+    "options": [
+      "April 8, 2024",
+      "April 9, 2024",
+      "April 10, 2024",
+      "April 14, 2024"
+    ],
+    "correct": 1,
+    "explain": "January, February, and March total 91 days in leap-year 2024; the remaining nine dates end on April 9."
+  },
+  {
+    "q": "Which converts a string Series to datetime values?",
+    "options": [
+      "pd.date_count",
+      "pd.to_datetime",
+      "pd.cut",
+      "pd.to_numeric"
+    ],
+    "correct": 1,
+    "explain": "to_datetime converts supported date-like values to datetime."
+  },
+  {
+    "q": "What does errors='coerce' do for an invalid date string?",
+    "options": [
+      "Converts it to today's date",
+      "Converts it to zero",
+      "Converts it to NaT",
+      "Removes the row"
+    ],
+    "correct": 2,
+    "explain": "Invalid input becomes the datetime missing value NaT; the row remains."
+  },
+  {
+    "q": "Which extracts months from a datetime Series s?",
+    "options": [
+      "s.month()",
+      "s.dt.month",
+      "s.index.month()",
+      "s.months"
+    ],
+    "correct": 1,
+    "explain": "The .dt accessor exposes datetime fields on a Series."
+  },
+  {
+    "q": "What is Monday's .dt.weekday code?",
+    "options": [
+      "0",
+      "1",
+      "6",
+      "7"
+    ],
+    "correct": 0,
+    "explain": "Weekday numbering starts at Monday=0 and ends at Sunday=6."
+  },
+  {
+    "q": "What does df.set_index('date') do by default?",
+    "options": [
+      "Moves date values into the index and removes the date column",
+      "Duplicates every date row",
+      "Changes all dates to strings",
+      "Sorts the values descending"
+    ],
+    "correct": 0,
+    "explain": "set_index uses the column as row labels and drops it from columns by default; it does not automatically sort."
+  },
+  {
+    "q": "How many January rows does df.loc['2024-01'] select from this complete daily dataset?",
+    "options": [
+      "28",
+      "29",
+      "30",
+      "31"
+    ],
+    "correct": 3,
+    "explain": "The partial month key selects all 31 January dates."
+  },
+  {
+    "q": "How many rows are selected from January 10 through January 15 using .loc on this daily series?",
+    "options": [
+      "4",
+      "5",
+      "6",
+      "7"
+    ],
+    "correct": 2,
+    "explain": "Both endpoints are included: January 10,11,12,13,14,15."
+  },
+  {
+    "q": "Which keeps an exact unique date selection as a DataFrame?",
+    "options": [
+      "df.loc['2024-01-15']",
+      "df.loc[[pd.Timestamp('2024-01-15')]]",
+      "df['2024-01-15']",
+      "df.index[14]"
+    ],
+    "correct": 1,
+    "explain": "A list of row labels preserves a two-dimensional DataFrame."
+  },
+  {
+    "q": "What is the default weekly endpoint for resample('W')?",
+    "options": [
+      "Monday",
+      "Wednesday",
+      "Friday",
+      "Sunday"
+    ],
+    "correct": 3,
+    "explain": "W defaults to W-SUN, with bins ending and labeled on Sunday."
+  },
+  {
+    "q": "What does df['value'].resample('W').mean() compute?",
+    "options": [
+      "A mean for each weekly calendar bin",
+      "A seven-observation mean at every row",
+      "A yearly total",
+      "A one-row lag"
+    ],
+    "correct": 0,
+    "explain": "resample aggregates values within disjoint weekly bins."
+  },
+  {
+    "q": "Why resample only value instead of all numeric columns here?",
+    "options": [
+      "Calendar fields cannot be numeric",
+      "It prevents dates from existing",
+      "Averaging calendar codes is usually not meaningful",
+      "Weekly means require strings"
+    ],
+    "correct": 2,
+    "explain": "year, month, day, and weekday are numeric codes but are not the measured signal."
+  },
+  {
+    "q": "For rolling(7).mean() on complete data, how many leading values are missing?",
+    "options": [
+      "0",
+      "1",
+      "6",
+      "7"
+    ],
+    "correct": 2,
+    "explain": "The first six positions have fewer than seven observations; the seventh has a complete window."
+  },
+  {
+    "q": "For [10,20,30,40], what is the first valid rolling(3) mean?",
+    "options": [
+      "10",
+      "20",
+      "30",
+      "40"
+    ],
+    "correct": 1,
+    "explain": "The first complete window is [10,20,30], with mean 20."
+  },
+  {
+    "q": "How does rolling(7) differ from rolling('7D') on irregular timestamps?",
+    "options": [
+      "Both always use exactly seven rows",
+      "The first uses seven observations; the second uses a seven-day interval",
+      "The first uses seven months",
+      "The second changes all dates"
+    ],
+    "correct": 1,
+    "explain": "Integer windows are observation-based; offset windows are time-based."
+  },
+  {
+    "q": "For s=[10,20,30], what are s.shift(1) values?",
+    "options": [
+      "[10,20,30]",
+      "[20,30,NaN]",
+      "[NaN,10,20]",
+      "[0,10,10]"
+    ],
+    "correct": 2,
+    "explain": "A positive positional shift moves values down one row and leaves a missing first entry."
+  },
+  {
+    "q": "For s=[10,25,20], what are s.diff() values?",
+    "options": [
+      "[NaN,15,-5]",
+      "[10,15,-5]",
+      "[NaN,25,20]",
+      "[NaN,2.5,0.8]"
+    ],
+    "correct": 0,
+    "explain": "Differences are 25−10=15 and 20−25=−5; the first has no previous value."
+  }
+];
+
+  let current = 0;
+  let score = 0;
+  let answered = false;
+
+  function showScreen(id) {
+    document.querySelectorAll('.quiz-screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function startQuiz() {
+    current = 0;
+    score = 0;
+    showScreen('quizQuestion');
+    showQuestion();
+  }
+
+  function showQuestion() {
+    answered = false;
+    const item = questions[current];
+    document.getElementById('progressFill').style.width = (current / questions.length * 100) + '%';
+    document.getElementById('qNumber').textContent = `Question ${current + 1} of ${questions.length}`;
+    document.getElementById('qText').textContent = item.q;
+
+    const codeEl = document.getElementById('qCode');
+    if (item.code) { codeEl.style.display = 'block'; codeEl.textContent = item.code; }
+    else { codeEl.style.display = 'none'; }
+
+    const answersDiv = document.getElementById('answers');
+    answersDiv.innerHTML = '';
+    item.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'answer-btn';
+      btn.textContent = opt;
+      btn.onclick = () => selectAnswer(i);
+      answersDiv.appendChild(btn);
+    });
+
+    document.getElementById('feedback').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'none';
+  }
+
+  function selectAnswer(i) {
+    if (answered) return;
+    answered = true;
+    const item = questions[current];
+    const buttons = document.querySelectorAll('.answer-btn');
+    buttons.forEach(b => b.disabled = true);
+
+    const feedback = document.getElementById('feedback');
+    if (i === item.correct) {
+      score++;
+      buttons[i].classList.add('correct');
+      feedback.className = 'feedback correct';
+      feedback.textContent = 'Correct! ' + item.explain;
+    } else {
+      buttons[i].classList.add('incorrect');
+      buttons[item.correct].classList.add('correct');
+      feedback.className = 'feedback incorrect';
+      feedback.textContent = 'Not quite. Correct answer: ' + item.options[item.correct] + '. ' + item.explain;
+    }
+    feedback.style.display = 'block';
+    document.getElementById('nextBtn').style.display = 'inline-block';
+  }
+
+  function nextQuestion() {
+    if (!answered) return;
+    current++;
+    if (current >= questions.length) { showResults(); }
+    else { showQuestion(); }
+  }
+
+  function showResults() {
+    document.getElementById('progressFill').style.width = '100%';
+    showScreen('quizResult');
+    document.getElementById('scoreDisplay').textContent = `${score}/${questions.length}`;
+    let msg;
+    if (score / questions.length >= 0.9) msg = "Outstanding! You can work with time series! 🏆";
+    else if (score / questions.length >= 0.7) msg = "Great job! Solid grasp of the fundamentals. 🎯";
+    else if (score / questions.length >= 0.5) msg = "Good start — revisit the tabs and try again! 📚";
+    else msg = "No worries — go back through the Setup, Dates, Select, Resample, Rolling, and Lag & diff tabs, then retake it! 💪";
+    document.getElementById('scoreMsg').textContent = msg;
+  }
+
+  function restartQuiz() { showScreen('quizStart'); }
+</script>
+</body>
+</html>
+
