@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pandas — Basic Visualizations Playbook and Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<style>
+  :root {
+    --bg: #12181f;
+    --panel: #1a232d;
+    --panel-2: #212c38;
+    --border: #2c3947;
+    --text: #e7edf3;
+    --text-dim: #9fb0c0;
+    --teal: #2dd4bf;
+    --amber: #f5b942;
+    --orange: #ff8a4c;
+    --red: #ff6b6b;
+    --green: #4ade80;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px 14px;
+    display: flex;
+    justify-content: center;
+  }
+  .wrap { width: 100%; max-width: 920px; }
+
+  .brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--panel-2);
+    border: 1px solid var(--teal);
+    color: var(--teal);
+    font-weight: 800;
+    font-size: 0.85rem;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .brand-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); }
+
+  header {
+    text-align: center;
+    padding: 24px 20px 20px;
+    background: linear-gradient(135deg, #1b3b3a 0%, #17222c 100%);
+    border: 1px solid var(--border);
+    border-radius: 18px 18px 0 0;
+  }
+  header h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.8rem;
+    color: var(--teal);
+  }
+  header p { color: var(--text-dim); margin-top: 8px; }
+
+  #pyodideStatus {
+    text-align: center;
+    padding: 10px;
+    background: var(--panel-2);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    color: var(--amber);
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  #pyodideStatus.ready { color: var(--green); }
+
+  .tabs {
+    display: flex;
+    background: var(--panel-2);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  .tab-btn {
+    flex: 1;
+    min-width: 110px;
+    padding: 15px 8px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  .tab-btn.active { color: var(--teal); border-bottom-color: var(--teal); background: var(--panel); }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 18px 18px;
+    padding: 28px 26px 32px;
+    min-height: 420px;
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .tab-content h2 { font-family: 'Fredoka One', cursive; color: var(--amber); font-size: 1.4rem; margin-bottom: 6px; }
+  .tab-content .lead { color: var(--text-dim); margin-bottom: 18px; }
+  .op-tag {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin: 18px 0 8px;
+  }
+  .op-create { background: rgba(45,212,191,0.15); color: var(--teal); }
+  .op-read   { background: rgba(245,185,66,0.15); color: var(--amber); }
+  .op-update { background: rgba(255,138,76,0.15); color: var(--orange); }
+  .op-delete { background: rgba(255,107,107,0.15); color: var(--red); }
+  .op-setup     { background: rgba(159,176,192,0.15); color: var(--text-dim); }
+  .op-load      { background: rgba(45,212,191,0.15); color: var(--teal); }
+  .op-size      { background: rgba(96,165,250,0.15); color: #60a5fa; }
+  .op-structure { background: rgba(245,185,66,0.15); color: var(--amber); }
+  .op-missing   { background: rgba(255,107,107,0.15); color: var(--red); }
+  .op-stats     { background: rgba(192,132,252,0.15); color: #c084fc; }
+
+  /* Pyodide code cells */
+  .pyodide-cell {
+    background: #0d1319;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--teal);
+    border-radius: 10px;
+    margin: 10px 0 20px;
+    overflow: hidden;
+  }
+  .code-input {
+    width: 100%;
+    background: transparent;
+    color: #d4e8e2;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.92rem;
+    border: none;
+    resize: vertical;
+    padding: 14px 16px;
+    line-height: 1.5;
+    min-height: 40px;
+  }
+  .code-input:focus { outline: none; background: rgba(45,212,191,0.04); }
+  .cell-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 14px;
+    background: var(--panel-2);
+    border-top: 1px solid var(--border);
+  }
+  .run-btn {
+    background: var(--teal);
+    color: #062824;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 16px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .run-btn:hover { background: #24b6a4; }
+  .run-btn:disabled { opacity: 0.5; cursor: wait; }
+  .cell-label { color: var(--text-dim); font-size: 0.8rem; }
+  .output {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88rem;
+    color: #c3e8ff;
+    padding: 12px 16px;
+    white-space: pre;
+    overflow-x: auto;
+    border-top: 1px dashed var(--border);
+    min-height: 20px;
+    display: none;
+  }
+  .output.show { display: block; }
+  .output.error { color: var(--red); }
+
+  .nav-hint { text-align:center; margin-top: 22px; color: var(--text-dim); font-size: 0.92rem; }
+  .nav-hint b { color: var(--amber); }
+
+  /* Quiz */
+  .quiz-progress { width: 100%; height: 8px; background: var(--panel-2); border-radius: 4px; overflow: hidden; margin-bottom: 22px; }
+  .quiz-progress-fill { height: 100%; background: var(--teal); width: 0%; transition: width .4s ease; }
+  .q-number { display: inline-block; background: var(--panel-2); border: 1px solid var(--border); color: var(--amber); padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; margin-bottom: 16px; }
+  .q-text { font-size: 1.2rem; margin-bottom: 18px; line-height: 1.4; }
+  .q-code { background: #0d1319; border-left: 4px solid var(--teal); border-radius: 10px; padding: 14px 18px; font-family: 'JetBrains Mono', monospace; font-size: 1.02rem; margin-bottom: 18px; white-space: pre; overflow-x: auto; }
+  .answers { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 12px; }
+  .answer-btn { background: var(--panel-2); border: 1px solid var(--border); color: var(--text); padding: 14px 16px; border-radius: 12px; font-size: 0.98rem; font-weight: 700; cursor: pointer; text-align: left; font-family: 'JetBrains Mono', monospace; }
+  .answer-btn:hover { border-color: var(--teal); transform: translateY(-2px); }
+  .answer-btn.correct { background: rgba(74,222,128,0.18); border-color: var(--green); color: var(--green); }
+  .answer-btn.incorrect { background: rgba(255,107,107,0.18); border-color: var(--red); color: var(--red); }
+  .answer-btn[disabled] { cursor: default; transform: none; }
+  .feedback { margin-top: 18px; padding: 14px 16px; border-radius: 12px; font-size: 0.95rem; display: none; line-height: 1.5; }
+  .feedback.correct { display:block; background: rgba(74,222,128,0.12); border: 1px solid var(--green); color: #cdf7dc; }
+  .feedback.incorrect { display:block; background: rgba(255,107,107,0.12); border: 1px solid var(--red); color: #ffd9d9; }
+  .next-btn, .start-btn, .restart-btn { margin-top: 20px; background: var(--teal); color: #062824; border: none; padding: 13px 28px; border-radius: 24px; font-weight: 800; font-size: 1rem; cursor: pointer; display: none; }
+  .start-btn, .restart-btn { display: inline-block; }
+  .next-btn:hover, .start-btn:hover, .restart-btn:hover { background: #24b6a4; }
+  .quiz-screen { display:none; }
+  .quiz-screen.active { display:block; }
+  .quiz-start { text-align:center; }
+  .badges { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin: 16px 0 20px; }
+  .badge { background: var(--panel-2); border: 1px solid var(--border); padding: 8px 14px; border-radius: 18px; font-size: 0.86rem; color: var(--text-dim); }
+  .result-screen { text-align: center; }
+  .score-display { font-family: 'Fredoka One', cursive; font-size: 2.8rem; color: var(--teal); margin: 14px 0; }
+  .score-msg { color: var(--text-dim); font-size: 1.05rem; margin-bottom: 18px; }
+  .submit-box { background: rgba(245,185,66,0.1); border: 1px solid var(--amber); border-radius: 12px; padding: 16px 18px; margin-top: 20px; color: #ffe4b0; font-size: 0.95rem; text-align: left; }
+  .submit-box b { color: var(--amber); }
+
+  @media (max-width: 620px) {
+    header h1 { font-size: 1.4rem; }
+    .panel { padding: 20px 14px 26px; }
+    .tab-btn { font-size: 0.8rem; padding: 12px 4px; }
+  }
+
+  .tab-btn { min-width: 100px; }
+</style>
+</head>
+<body><div class="wrap"><div class="brand-badge"><span class="dot"></span> Learn and Help · Python for Data Science</div><header><h1>🐼 Pandas Basic Visualizations</h1><p>Line · Bar · Histogram · Box · Area · Scatter</p><p><a style="color:var(--teal)" href="https://colab.research.google.com/github/sjasthi/Python-DS-Data-Science/blob/main/pandas/11_pandas_basic_visualizations.ipynb" target="_blank" rel="noopener">Open notebook in Colab</a></p></header><div id="pyodideStatus">Loading Python and plotting libraries… the quiz is available while they load.</div><div class="tabs"><button class="tab-btn active" data-tab="setup">🚀 Setup</button><button class="tab-btn " data-tab="compare">📈 Line & bar</button><button class="tab-btn " data-tab="distribution">📊 Hist & box</button><button class="tab-btn " data-tab="area">🏔️ Area</button><button class="tab-btn " data-tab="scatter">🔎 Scatter</button><button class="tab-btn " data-tab="style">🎨 Size & practice</button><button class="tab-btn" data-tab="quiz">📝 Quiz</button></div><div class="panel"><div class="tab-content active" id="tab-setup"><h2>Five numeric series across ten dates</h2><p class="lead">The notebook uses random sample data. A fixed seed makes this playbook reproducible. Data and plotting libraries load automatically. Cells share df; rerun setup to restore it. The Python engine requires internet access. Charts are displayed below their code cells.</p><div class="op-tag op-load">Create the sample data</div><div class="pyodide-cell"><textarea aria-label="Create the sample data code" class="code-input" spellcheck="false" rows="10">import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+rng = np.random.default_rng(42)
+df = pd.DataFrame({name:rng.integers(1,100,10) for name in &quot;ABCDE&quot;},
+    index=pd.date_range(&quot;2025-01-01&quot;,periods=10))
+pd.options.plotting.backend = &quot;matplotlib&quot;
+plt.rcParams[&quot;figure.figsize&quot;] = (10,5)
+print(df)</textarea><div class="cell-toolbar"><span class="cell-label">The dates are January 1–10, 2025. Values are synthetic, not real measurements.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Inspect one series</div><div class="pyodide-cell"><textarea aria-label="Inspect one series code" class="code-input" spellcheck="false" rows="3">print(df[&quot;A&quot;])
+print(df.describe())</textarea><div class="cell-toolbar"><span class="cell-label">DataFrame plots often display several columns; a Series plot displays one selected column.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-compare"><h2>Compare observations</h2><p class="lead">Line plots connect ordered observations, making them useful for time trends. Bar plots compare values at discrete positions. Neither automatically computes category frequencies.</p><div class="op-tag op-load">Line plot</div><div class="pyodide-cell"><textarea aria-label="Line plot code" class="code-input" spellcheck="false" rows="3">df.plot(kind=&quot;line&quot;,title=&quot;Five series over time&quot;,xlabel=&quot;Date&quot;,ylabel=&quot;Value&quot;)
+plt.show()</textarea><div class="cell-toolbar"><span class="cell-label">The index supplies the horizontal axis; each numeric column becomes a line.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Grouped bar plot</div><div class="pyodide-cell"><textarea aria-label="Grouped bar plot code" class="code-input" spellcheck="false" rows="4">df.plot(kind=&quot;bar&quot;,title=&quot;Values by date&quot;,xlabel=&quot;Date&quot;,ylabel=&quot;Value&quot;,rot=45)
+plt.tight_layout()
+plt.show()</textarea><div class="cell-toolbar"><span class="cell-label">Each date has five bars. Plotting raw numeric columns displays their values, not frequency counts.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Actual category frequency bars</div><div class="pyodide-cell"><textarea aria-label="Actual category frequency bars code" class="code-input" spellcheck="false" rows="4">categories = pd.Series([&quot;Blue&quot;,&quot;Red&quot;,&quot;Blue&quot;,&quot;Green&quot;,&quot;Red&quot;,&quot;Blue&quot;])
+categories.value_counts().plot.bar(title=&quot;Category frequencies&quot;,xlabel=&quot;Category&quot;,ylabel=&quot;Count&quot;,rot=0)
+plt.show()</textarea><div class="cell-toolbar"><span class="cell-label">Compute value_counts first when you want a frequency bar chart.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Series methods</div><div class="pyodide-cell"><textarea aria-label="Series methods code" class="code-input" spellcheck="false" rows="6">df[&quot;A&quot;].plot.line(title=&quot;Column A over time&quot;,xlabel=&quot;Date&quot;,ylabel=&quot;A&quot;)
+plt.show()
+df[&quot;A&quot;].plot.bar(title=&quot;Column A by date&quot;,xlabel=&quot;Date&quot;,ylabel=&quot;A&quot;,rot=45)
+plt.tight_layout()
+plt.show()</textarea><div class="cell-toolbar"><span class="cell-label">df.plot.line() is a convenient alternative to df.plot(kind='line').</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-distribution"><h2>Inspect numeric distributions</h2><p class="lead">Histograms count numeric observations in intervals; they do not preserve time order. Box plots summarize median, quartiles, spread, and potential outliers.</p><div class="op-tag op-load">Histogram</div><div class="pyodide-cell"><textarea aria-label="Histogram code" class="code-input" spellcheck="false" rows="5">df.plot(kind=&quot;hist&quot;,bins=5,alpha=.5,title=&quot;Distributions of five columns&quot;)
+plt.xlabel(&quot;Value&quot;)
+plt.ylabel(&quot;Frequency&quot;)
+plt.show()</textarea><div class="cell-toolbar"><span class="cell-label">Bin choices affect appearance. Overlapping histograms need transparency or separate panels.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Single-series histogram</div><div class="pyodide-cell"><textarea aria-label="Single-series histogram code" class="code-input" spellcheck="false" rows="5">df[&quot;A&quot;].plot.hist(bins=5,title=&quot;Distribution of A&quot;)
+plt.xlabel(&quot;A&quot;)
+plt.ylabel(&quot;Frequency&quot;)
+plt.show()</textarea><div class="cell-toolbar"><span class="cell-label">The counts across bins total ten observations for this complete Series.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Box plot</div><div class="pyodide-cell"><textarea aria-label="Box plot code" class="code-input" spellcheck="false" rows="3">df.plot(kind=&quot;box&quot;,title=&quot;Spread by column&quot;,ylabel=&quot;Value&quot;)
+plt.show()</textarea><div class="cell-toolbar"><span class="cell-label">The box spans Q1 to Q3; the line marks the median. Default whiskers extend to extreme observations within 1.5×IQR fences; plotted fliers are candidates for investigation.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-area"><h2>Filled and stacked areas</h2><p class="lead">Area plots fill the region under each series. DataFrame area plots are stacked by default, so the top boundary represents a sum. These positive synthetic values permit stacking, but an additive interpretation needs meaningful compatible units.</p><div class="op-tag op-load">Default stacked area</div><div class="pyodide-cell"><textarea aria-label="Default stacked area code" class="code-input" spellcheck="false" rows="3">df.plot(kind=&quot;area&quot;,title=&quot;Stacked areas&quot;,xlabel=&quot;Date&quot;,ylabel=&quot;Cumulative stack height&quot;)
+plt.show()</textarea><div class="cell-toolbar"><span class="cell-label">The height of the uppermost boundary is the sum of all five columns at that date.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Unstacked and single-series areas</div><div class="pyodide-cell"><textarea aria-label="Unstacked and single-series areas code" class="code-input" spellcheck="false" rows="5">df.plot.area(stacked=False,alpha=.35,title=&quot;Overlapping unstacked areas&quot;,xlabel=&quot;Date&quot;,ylabel=&quot;Value&quot;)
+plt.show()
+df[&quot;A&quot;].plot.area(title=&quot;Area for column A&quot;,xlabel=&quot;Date&quot;,ylabel=&quot;A&quot;)
+plt.show()</textarea><div class="cell-toolbar"><span class="cell-label">Unstacked areas overlap instead of accumulating. Series area plots show one measurement.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-scatter"><h2>Compare two numeric variables</h2><p class="lead">Scatter plots use one numeric column for x and another for y. Each point is one row, so this plot compares A with B rather than using dates as the horizontal axis. A pattern does not establish causation.</p><div class="op-tag op-load">A versus B</div><div class="pyodide-cell"><textarea aria-label="A versus B code" class="code-input" spellcheck="false" rows="3">df.plot(kind=&quot;scatter&quot;,x=&quot;A&quot;,y=&quot;B&quot;,title=&quot;A versus B&quot;)
+plt.show()</textarea><div class="cell-toolbar"><span class="cell-label">Specify x and y for a scatter plot. The two columns should represent measurements worth comparing.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Scatter method and point style</div><div class="pyodide-cell"><textarea aria-label="Scatter method and point style code" class="code-input" spellcheck="false" rows="3">df.plot.scatter(x=&quot;A&quot;,y=&quot;B&quot;,s=65,alpha=.7,color=&quot;teal&quot;,title=&quot;Styled scatter&quot;)
+plt.show()</textarea><div class="cell-toolbar"><span class="cell-label">s controls marker area and alpha controls transparency.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-style"><h2>Plot size, labels, and method shortcuts</h2><p class="lead">Pandas uses matplotlib here. figsize sets width and height in inches for an individual figure; rcParams changes defaults for later figures. Clear labels and appropriate chart selection matter more than decoration.</p><div class="op-tag op-load">Set a figure size</div><div class="pyodide-cell"><textarea aria-label="Set a figure size code" class="code-input" spellcheck="false" rows="4">df[&quot;A&quot;].plot.line(figsize=(12,6),title=&quot;A — wider figure&quot;,xlabel=&quot;Date&quot;,ylabel=&quot;A&quot;,grid=True)
+plt.tight_layout()
+plt.show()</textarea><div class="cell-toolbar"><span class="cell-label">figsize=(12,6) means 12 inches wide and 6 inches high; screen pixels depend on DPI.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Several plots in one cell</div><div class="pyodide-cell"><textarea aria-label="Several plots in one cell code" class="code-input" spellcheck="false" rows="5">df[&quot;A&quot;].plot.box(title=&quot;A — box summary&quot;)
+plt.show()
+df[&quot;A&quot;].plot.hist(bins=4,title=&quot;A — histogram&quot;)
+plt.show()</textarea><div class="cell-toolbar"><span class="cell-label">Every figure created in a cell appears below it. Each run starts with fresh figures.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Challenge</div><div class="pyodide-cell"><textarea aria-label="Challenge code" class="code-input" spellcheck="false" rows="5"># Make a line plot for C with labels.
+# Make a histogram of C with five bins.
+# Make a scatter plot comparing C and D.
+# Write your solution here.</textarea><div class="cell-toolbar"><span class="cell-label">Use a Series for the first two plots and the DataFrame for the scatter plot.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><details><summary>Show challenge solution</summary><div class="op-tag op-load">Challenge solution</div><div class="pyodide-cell"><textarea aria-label="Challenge solution code" class="code-input" spellcheck="false" rows="9">df[&quot;C&quot;].plot.line(title=&quot;C over time&quot;,xlabel=&quot;Date&quot;,ylabel=&quot;C&quot;)
+plt.show()
+df[&quot;C&quot;].plot.hist(bins=5,title=&quot;Distribution of C&quot;)
+plt.xlabel(&quot;C&quot;)
+plt.ylabel(&quot;Frequency&quot;)
+plt.show()
+df.plot.scatter(x=&quot;C&quot;,y=&quot;D&quot;,title=&quot;C versus D&quot;)
+plt.show()</textarea><div class="cell-toolbar"><span class="cell-label">These plots answer different questions: ordered changes, distribution, and association.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></details></div><div class="tab-content" id="tab-quiz">
+
+      <div class="quiz-screen active" id="quizStart">
+        <div class="quiz-start">
+          <h2>📝 Basic Visualizations Quiz</h2>
+          <p class="lead">20 questions on choosing charts, interpreting axes and summaries, and using pandas plot methods.</p>
+          <div class="badges">
+            <span class="badge">📝 20 questions</span>
+            <span class="badge">🎯 No time limit</span>
+            <span class="badge">📸 Screenshot your score</span>
+          </div>
+          <button class="start-btn" onclick="startQuiz()">🚀 Start Quiz</button>
+        </div>
+      </div>
+
+      <div class="quiz-screen" id="quizQuestion">
+        <div class="quiz-progress"><div class="quiz-progress-fill" id="progressFill"></div></div>
+        <div class="q-number" id="qNumber">Question 1 of 20</div>
+        <div class="q-text" id="qText"></div>
+        <div class="q-code" id="qCode" style="display:none;"></div>
+        <div class="answers" id="answers"></div>
+        <div class="feedback" id="feedback" aria-live="polite"></div>
+        <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
+      </div>
+
+      <div class="quiz-screen" id="quizResult">
+        <div class="result-screen">
+          <h2>🎉 Quiz Complete!</h2>
+          <div class="score-display" id="scoreDisplay">0/20</div>
+          <div class="score-msg" id="scoreMsg"></div>
+          <button class="restart-btn" onclick="restartQuiz()">🔄 Try Again</button>
+          <div class="submit-box">
+            📸 <b>Submission:</b> Take a screenshot of this results screen showing your score, and submit it through your instructor’s designated course platform.
+          </div>
+        </div>
+      </div>
+
+    </div>
+</div></div>
+<script>
+  // ---------- Tab switching ----------
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ---------- Pyodide setup ----------
+  let pyodideReady = false;
+  let pyodide = null;
+  let outputBuffer = [];
+
+  async function initPyodide() {
+    const statusEl = document.getElementById('pyodideStatus');
+    try {
+      pyodide = await loadPyodide();
+      statusEl.textContent = '📦 Loading pandas, NumPy, and matplotlib...';
+      await pyodide.loadPackage(['pandas', 'numpy', 'matplotlib']);
+
+      pyodide.setStdout({ batched: (msg) => { outputBuffer.push(msg + "\n"); } });
+      await pyodide.runPythonAsync("import matplotlib\nmatplotlib.use(\"agg\")\nimport io, base64, json\nimport pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\nrng = np.random.default_rng(42)\ndf = pd.DataFrame({name:rng.integers(1,100,10) for name in \"ABCDE\"},\n    index=pd.date_range(\"2025-01-01\",periods=10))\npd.options.plotting.backend = \"matplotlib\"\nplt.rcParams[\"figure.figsize\"] = (10,5)\n_shown_charts = []\ndef _capture_charts(*args, **kwargs):\n    for number in plt.get_fignums():\n        buffer = io.BytesIO()\n        plt.figure(number).savefig(buffer, format=\"png\", dpi=110, bbox_inches=\"tight\")\n        _shown_charts.append(base64.b64encode(buffer.getvalue()).decode(\"ascii\"))\n    plt.close(\"all\")\nplt.show = _capture_charts\ndef _export_charts():\n    _capture_charts()\n    result = json.dumps(_shown_charts)\n    _shown_charts.clear()\n    return result\n");
+      pyodideReady = true;
+      statusEl.textContent = '✅ Python engine ready — click ▶ Run on any code cell!';
+      statusEl.classList.add('ready');
+      setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
+    } catch (err) {
+      statusEl.textContent = '⚠️ Could not load the Python engine. Check your internet connection and reload the page.';
+    }
+  }
+  initPyodide();
+
+  let running = false;
+  async function runCell(button) {
+    if (running) return;
+    const cell = button.closest('.pyodide-cell');
+    const code = cell.querySelector('.code-input').value;
+    const output = cell.querySelector('.output');
+
+    if (!pyodideReady) {
+      output.textContent = 'Python engine is still loading — please wait a few seconds and try again.';
+      output.className = 'output show error';
+      return;
+    }
+
+    running = true;
+    document.querySelectorAll(".run-btn").forEach(b => b.disabled = true);
+    button.textContent = 'Running...';
+    outputBuffer = [];
+
+    try {
+      await pyodide.runPythonAsync('plt.close("all"); _shown_charts.clear()');
+      await pyodide.runPythonAsync(code);
+      const charts = JSON.parse(await pyodide.runPythonAsync('_export_charts()'));
+      output.textContent = outputBuffer.join('') || '(no output — code ran successfully)';
+      output.className = 'output show';
+      charts.forEach((data, i) => {
+        const img = document.createElement('img');
+        img.src = 'data:image/png;base64,' + data;
+        img.alt = cell.querySelector('textarea').getAttribute('aria-label') + ' — figure ' + (i + 1);
+        img.style.cssText = 'display:block;max-width:100%;height:auto;margin-top:12px;background:white;border-radius:6px';
+        output.appendChild(img);
+      });
+    } catch (err) {
+      output.textContent = 'Error:\n' + err.message.split('\n').slice(-4).join('\n');
+      output.className = 'output show error';
+    }
+    running = false;
+    document.querySelectorAll(".run-btn").forEach(b => b.disabled = false);
+    button.textContent = '▶ Run';
+  }
+
+  // ---------- Quiz ----------
+  const questions = [
+  {
+    "q": "Which plot is usually best for changes across ordered dates?",
+    "options": [
+      "Line",
+      "Box",
+      "Histogram",
+      "Frequency table"
+    ],
+    "correct": 0,
+    "explain": "A line plot connects observations in order and highlights change over time."
+  },
+  {
+    "q": "What normally provides the x-axis in df.plot.line()?",
+    "options": [
+      "The maximum value",
+      "The DataFrame index",
+      "The mean of each row",
+      "Only column A"
+    ],
+    "correct": 1,
+    "explain": "The index supplies horizontal coordinates unless other arguments override it."
+  },
+  {
+    "q": "In this notebook's DataFrame line plot, what do columns A–E become?",
+    "options": [
+      "Five bins",
+      "Five dates",
+      "Five separate lines",
+      "Five index levels"
+    ],
+    "correct": 2,
+    "explain": "Each numeric column is plotted as its own series."
+  },
+  {
+    "q": "What does df.plot.bar() show for the raw sample data?",
+    "options": [
+      "Automatically calculated category frequencies",
+      "Only the means",
+      "Only the missing-value counts",
+      "Column values at each index position"
+    ],
+    "correct": 3,
+    "explain": "Bar heights come from the actual values, not an automatically computed frequency table."
+  },
+  {
+    "q": "How do you plot counts of color categories in a Series s?",
+    "options": [
+      "s.value_counts().plot.bar()",
+      "s.plot.scatter()",
+      "s.mean().plot.bar()",
+      "s.index.plot.hist()"
+    ],
+    "correct": 0,
+    "explain": "value_counts computes category frequencies, which can then be plotted as bars."
+  },
+  {
+    "q": "What question does a histogram answer?",
+    "options": [
+      "Which timestamp came first?",
+      "How many values fall in each numeric interval?",
+      "Which labels are alphabetically first?",
+      "What is each row's exact position?"
+    ],
+    "correct": 1,
+    "explain": "Histograms count observations in numeric bins."
+  },
+  {
+    "q": "What does bins=5 control in a histogram?",
+    "options": [
+      "Five columns must exist",
+      "Five rows are selected",
+      "Five numeric intervals are used",
+      "Five dates are generated"
+    ],
+    "correct": 2,
+    "explain": "bins specifies the number of numeric intervals used to collect counts."
+  },
+  {
+    "q": "For the complete ten-value Series A, what is the sum of histogram bin counts?",
+    "options": [
+      "5",
+      "9",
+      "11",
+      "10"
+    ],
+    "correct": 3,
+    "explain": "Each of the ten observed values is counted in a bin."
+  },
+  {
+    "q": "What does the line inside a standard box plot mark?",
+    "options": [
+      "Median",
+      "Mean by definition",
+      "Maximum",
+      "Standard deviation"
+    ],
+    "correct": 0,
+    "explain": "The internal line marks the median."
+  },
+  {
+    "q": "What does the box span?",
+    "options": [
+      "Minimum to maximum",
+      "First quartile to third quartile",
+      "Mean minus SD to mean plus SD",
+      "Only the highest two values"
+    ],
+    "correct": 1,
+    "explain": "The box spans Q1 to Q3, whose difference is the IQR."
+  },
+  {
+    "q": "What does a box-plot flier mean?",
+    "options": [
+      "A proven data-entry error",
+      "A zero value",
+      "An observation beyond the default whisker range",
+      "A missing timestamp"
+    ],
+    "correct": 2,
+    "explain": "A flier lies beyond the whisker rule and merits investigation; it is not automatically an error."
+  },
+  {
+    "q": "How is a DataFrame area plot arranged by default?",
+    "options": [
+      "No fill",
+      "Always sorted by value",
+      "Only one column",
+      "Stacked"
+    ],
+    "correct": 3,
+    "explain": "DataFrame area plots stack the series by default."
+  },
+  {
+    "q": "In a positive stacked area plot, what does the top boundary represent?",
+    "options": [
+      "The sum of the plotted values at that position",
+      "Only the largest individual column",
+      "The median of all dates",
+      "The observation count"
+    ],
+    "correct": 0,
+    "explain": "The cumulative stack height adds all plotted series at each position."
+  },
+  {
+    "q": "How do you request overlapping unstacked areas?",
+    "options": [
+      "bins=False",
+      "stacked=False",
+      "index=False",
+      "normalize=False"
+    ],
+    "correct": 1,
+    "explain": "stacked=False makes series overlap instead of accumulate."
+  },
+  {
+    "q": "What must you specify for df.plot.scatter() in these examples?",
+    "options": [
+      "A weekly frequency",
+      "A categorical bin label",
+      "x and y column names",
+      "An aggregation function"
+    ],
+    "correct": 2,
+    "explain": "Scatter needs columns specifying the two numeric coordinates."
+  },
+  {
+    "q": "In the scatter plot with x='A' and y='B', what is one point?",
+    "options": [
+      "One complete column",
+      "One histogram bin",
+      "One mean",
+      "One row's A/B pair"
+    ],
+    "correct": 3,
+    "explain": "Each observation contributes its A value horizontally and B value vertically."
+  },
+  {
+    "q": "Does association in a scatter plot prove causation?",
+    "options": [
+      "No",
+      "Yes, always",
+      "Only if there are ten points",
+      "Only if markers are teal"
+    ],
+    "correct": 0,
+    "explain": "An association can arise for many reasons and does not establish a causal relationship."
+  },
+  {
+    "q": "What units does figsize=(12,6) use?",
+    "options": [
+      "Pixels",
+      "Inches",
+      "Centimeters",
+      "Points"
+    ],
+    "correct": 1,
+    "explain": "Matplotlib figure size is specified in inches; DPI determines pixel dimensions."
+  },
+  {
+    "q": "Which selects only Series A for a line plot?",
+    "options": [
+      "df.plot.line(x='A', y='B')",
+      "df.plot.box()",
+      "df['A'].plot.line()",
+      "df.plot.hist()"
+    ],
+    "correct": 2,
+    "explain": "Selecting df['A'] produces a single Series to plot."
+  },
+  {
+    "q": "Which is a shortcut equivalent to df.plot(kind='hist')?",
+    "options": [
+      "df.histogram()",
+      "df.plot(kind='distribution')",
+      "df.plot.box()",
+      "df.plot.hist()"
+    ],
+    "correct": 3,
+    "explain": "The plot accessor provides method forms including hist, line, bar, box, area, and scatter."
+  }
+];
+
+  let current = 0;
+  let score = 0;
+  let answered = false;
+
+  function showScreen(id) {
+    document.querySelectorAll('.quiz-screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function startQuiz() {
+    current = 0;
+    score = 0;
+    showScreen('quizQuestion');
+    showQuestion();
+  }
+
+  function showQuestion() {
+    answered = false;
+    const item = questions[current];
+    document.getElementById('progressFill').style.width = (current / questions.length * 100) + '%';
+    document.getElementById('qNumber').textContent = `Question ${current + 1} of ${questions.length}`;
+    document.getElementById('qText').textContent = item.q;
+
+    const codeEl = document.getElementById('qCode');
+    if (item.code) { codeEl.style.display = 'block'; codeEl.textContent = item.code; }
+    else { codeEl.style.display = 'none'; }
+
+    const answersDiv = document.getElementById('answers');
+    answersDiv.innerHTML = '';
+    item.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'answer-btn';
+      btn.textContent = opt;
+      btn.onclick = () => selectAnswer(i);
+      answersDiv.appendChild(btn);
+    });
+
+    document.getElementById('feedback').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'none';
+  }
+
+  function selectAnswer(i) {
+    if (answered) return;
+    answered = true;
+    const item = questions[current];
+    const buttons = document.querySelectorAll('.answer-btn');
+    buttons.forEach(b => b.disabled = true);
+
+    const feedback = document.getElementById('feedback');
+    if (i === item.correct) {
+      score++;
+      buttons[i].classList.add('correct');
+      feedback.className = 'feedback correct';
+      feedback.textContent = 'Correct! ' + item.explain;
+    } else {
+      buttons[i].classList.add('incorrect');
+      buttons[item.correct].classList.add('correct');
+      feedback.className = 'feedback incorrect';
+      feedback.textContent = 'Not quite. Correct answer: ' + item.options[item.correct] + '. ' + item.explain;
+    }
+    feedback.style.display = 'block';
+    document.getElementById('nextBtn').style.display = 'inline-block';
+  }
+
+  function nextQuestion() {
+    if (!answered) return;
+    current++;
+    if (current >= questions.length) { showResults(); }
+    else { showQuestion(); }
+  }
+
+  function showResults() {
+    document.getElementById('progressFill').style.width = '100%';
+    showScreen('quizResult');
+    document.getElementById('scoreDisplay').textContent = `${score}/${questions.length}`;
+    let msg;
+    if (score / questions.length >= 0.9) msg = "Outstanding! You can choose and interpret pandas charts! 🏆";
+    else if (score / questions.length >= 0.7) msg = "Great job! Solid grasp of the fundamentals. 🎯";
+    else if (score / questions.length >= 0.5) msg = "Good start — revisit the tabs and try again! 📚";
+    else msg = "No worries — go back through the Setup, Line & bar, Hist & box, Area, Scatter, and Size & practice tabs, then retake it! 💪";
+    document.getElementById('scoreMsg').textContent = msg;
+  }
+
+  function restartQuiz() { showScreen('quizStart'); }
+</script>
+</body>
+</html>
+
