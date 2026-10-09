@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pandas — Split-Apply-Combine, GroupBy and Pivots</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<style>
+  :root {
+    --bg: #12181f;
+    --panel: #1a232d;
+    --panel-2: #212c38;
+    --border: #2c3947;
+    --text: #e7edf3;
+    --text-dim: #9fb0c0;
+    --teal: #2dd4bf;
+    --amber: #f5b942;
+    --orange: #ff8a4c;
+    --red: #ff6b6b;
+    --green: #4ade80;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px 14px;
+    display: flex;
+    justify-content: center;
+  }
+  .wrap { width: 100%; max-width: 920px; }
+
+  .brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--panel-2);
+    border: 1px solid var(--teal);
+    color: var(--teal);
+    font-weight: 800;
+    font-size: 0.85rem;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .brand-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); }
+
+  header {
+    text-align: center;
+    padding: 24px 20px 20px;
+    background: linear-gradient(135deg, #1b3b3a 0%, #17222c 100%);
+    border: 1px solid var(--border);
+    border-radius: 18px 18px 0 0;
+  }
+  header h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.8rem;
+    color: var(--teal);
+  }
+  header p { color: var(--text-dim); margin-top: 8px; }
+
+  #pyodideStatus {
+    text-align: center;
+    padding: 10px;
+    background: var(--panel-2);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    color: var(--amber);
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  #pyodideStatus.ready { color: var(--green); }
+
+  .tabs {
+    display: flex;
+    background: var(--panel-2);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  .tab-btn {
+    flex: 1;
+    min-width: 110px;
+    padding: 15px 8px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  .tab-btn.active { color: var(--teal); border-bottom-color: var(--teal); background: var(--panel); }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 18px 18px;
+    padding: 28px 26px 32px;
+    min-height: 420px;
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .tab-content h2 { font-family: 'Fredoka One', cursive; color: var(--amber); font-size: 1.4rem; margin-bottom: 6px; }
+  .tab-content .lead { color: var(--text-dim); margin-bottom: 18px; }
+  .op-tag {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin: 18px 0 8px;
+  }
+  .op-create { background: rgba(45,212,191,0.15); color: var(--teal); }
+  .op-read   { background: rgba(245,185,66,0.15); color: var(--amber); }
+  .op-update { background: rgba(255,138,76,0.15); color: var(--orange); }
+  .op-delete { background: rgba(255,107,107,0.15); color: var(--red); }
+  .op-setup     { background: rgba(159,176,192,0.15); color: var(--text-dim); }
+  .op-load      { background: rgba(45,212,191,0.15); color: var(--teal); }
+  .op-size      { background: rgba(96,165,250,0.15); color: #60a5fa; }
+  .op-structure { background: rgba(245,185,66,0.15); color: var(--amber); }
+  .op-missing   { background: rgba(255,107,107,0.15); color: var(--red); }
+  .op-stats     { background: rgba(192,132,252,0.15); color: #c084fc; }
+
+  /* Pyodide code cells */
+  .pyodide-cell {
+    background: #0d1319;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--teal);
+    border-radius: 10px;
+    margin: 10px 0 20px;
+    overflow: hidden;
+  }
+  .code-input {
+    width: 100%;
+    background: transparent;
+    color: #d4e8e2;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.92rem;
+    border: none;
+    resize: vertical;
+    padding: 14px 16px;
+    line-height: 1.5;
+    min-height: 40px;
+  }
+  .code-input:focus { outline: none; background: rgba(45,212,191,0.04); }
+  .cell-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 14px;
+    background: var(--panel-2);
+    border-top: 1px solid var(--border);
+  }
+  .run-btn {
+    background: var(--teal);
+    color: #062824;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 16px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .run-btn:hover { background: #24b6a4; }
+  .run-btn:disabled { opacity: 0.5; cursor: wait; }
+  .cell-label { color: var(--text-dim); font-size: 0.8rem; }
+  .output {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88rem;
+    color: #c3e8ff;
+    padding: 12px 16px;
+    white-space: pre;
+    overflow-x: auto;
+    border-top: 1px dashed var(--border);
+    min-height: 20px;
+    display: none;
+  }
+  .output.show { display: block; }
+  .output.error { color: var(--red); }
+
+  .nav-hint { text-align:center; margin-top: 22px; color: var(--text-dim); font-size: 0.92rem; }
+  .nav-hint b { color: var(--amber); }
+
+  /* Quiz */
+  .quiz-progress { width: 100%; height: 8px; background: var(--panel-2); border-radius: 4px; overflow: hidden; margin-bottom: 22px; }
+  .quiz-progress-fill { height: 100%; background: var(--teal); width: 0%; transition: width .4s ease; }
+  .q-number { display: inline-block; background: var(--panel-2); border: 1px solid var(--border); color: var(--amber); padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; margin-bottom: 16px; }
+  .q-text { font-size: 1.2rem; margin-bottom: 18px; line-height: 1.4; }
+  .q-code { background: #0d1319; border-left: 4px solid var(--teal); border-radius: 10px; padding: 14px 18px; font-family: 'JetBrains Mono', monospace; font-size: 1.02rem; margin-bottom: 18px; white-space: pre; overflow-x: auto; }
+  .answers { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 12px; }
+  .answer-btn { background: var(--panel-2); border: 1px solid var(--border); color: var(--text); padding: 14px 16px; border-radius: 12px; font-size: 0.98rem; font-weight: 700; cursor: pointer; text-align: left; font-family: 'JetBrains Mono', monospace; }
+  .answer-btn:hover { border-color: var(--teal); transform: translateY(-2px); }
+  .answer-btn.correct { background: rgba(74,222,128,0.18); border-color: var(--green); color: var(--green); }
+  .answer-btn.incorrect { background: rgba(255,107,107,0.18); border-color: var(--red); color: var(--red); }
+  .answer-btn[disabled] { cursor: default; transform: none; }
+  .feedback { margin-top: 18px; padding: 14px 16px; border-radius: 12px; font-size: 0.95rem; display: none; line-height: 1.5; }
+  .feedback.correct { display:block; background: rgba(74,222,128,0.12); border: 1px solid var(--green); color: #cdf7dc; }
+  .feedback.incorrect { display:block; background: rgba(255,107,107,0.12); border: 1px solid var(--red); color: #ffd9d9; }
+  .next-btn, .start-btn, .restart-btn { margin-top: 20px; background: var(--teal); color: #062824; border: none; padding: 13px 28px; border-radius: 24px; font-weight: 800; font-size: 1rem; cursor: pointer; display: none; }
+  .start-btn, .restart-btn { display: inline-block; }
+  .next-btn:hover, .start-btn:hover, .restart-btn:hover { background: #24b6a4; }
+  .quiz-screen { display:none; }
+  .quiz-screen.active { display:block; }
+  .quiz-start { text-align:center; }
+  .badges { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin: 16px 0 20px; }
+  .badge { background: var(--panel-2); border: 1px solid var(--border); padding: 8px 14px; border-radius: 18px; font-size: 0.86rem; color: var(--text-dim); }
+  .result-screen { text-align: center; }
+  .score-display { font-family: 'Fredoka One', cursive; font-size: 2.8rem; color: var(--teal); margin: 14px 0; }
+  .score-msg { color: var(--text-dim); font-size: 1.05rem; margin-bottom: 18px; }
+  .submit-box { background: rgba(245,185,66,0.1); border: 1px solid var(--amber); border-radius: 12px; padding: 16px 18px; margin-top: 20px; color: #ffe4b0; font-size: 0.95rem; text-align: left; }
+  .submit-box b { color: var(--amber); }
+
+  @media (max-width: 620px) {
+    header h1 { font-size: 1.4rem; }
+    .panel { padding: 20px 14px 26px; }
+    .tab-btn { font-size: 0.8rem; padding: 12px 4px; }
+  }
+
+  .tab-btn { min-width: 100px; }
+</style>
+</head>
+<body><div class="wrap"><div class="brand-badge"><span class="dot"></span> Learn and Help · Python for Data Science</div><header><h1>🐼 Split-Apply-Combine, GroupBy &amp; Pivots</h1><p>Interactive playbook · Runnable examples · 20-question quiz</p><p><a style="color:var(--teal)" href="https://colab.research.google.com/github/sjasthi/Python-DS-Data-Science/blob/main/pandas/6_pandas_Split_Apply_Combine_groupby_pivots.ipynb" target="_blank" rel="noopener">Open notebook in Colab</a></p></header><div id="pyodideStatus">Starting Python engine… lessons and quiz are available while it loads.</div><div class="tabs"><button class="tab-btn active" data-tab="setup">🚢 Setup</button><button class="tab-btn " data-tab="groupby">📊 GroupBy</button><button class="tab-btn " data-tab="pivots">🗂️ Pivots</button><button class="tab-btn " data-tab="bins">📦 Binning</button><button class="tab-btn " data-tab="methods">🧮 Group methods</button><button class="tab-btn " data-tab="reshape">↔️ Reshape & practice</button><button class="tab-btn" data-tab="quiz">📝 Quiz</button></div><div class="panel"><div class="tab-content active" id="tab-setup"><h2>Split → Apply → Combine</h2><p class="lead">Split rows by a key, apply a calculation to each group, and combine the results. All datasets are prepared automatically; cells share variables. Run this setup to restore the examples. Python needs internet to load; Titanic falls back to a labeled 12-row sample if its CSV is unavailable.</p><div class="op-tag op-load">Prepare separate datasets</div><div class="pyodide-cell"><textarea aria-label="Prepare separate datasets code" class="code-input" spellcheck="false" rows="14">import pandas as pd
+employees = pd.DataFrame({
+    &quot;Department&quot;: [&quot;HR&quot;, &quot;HR&quot;, &quot;IT&quot;, &quot;IT&quot;, &quot;Finance&quot;, &quot;Finance&quot;],
+    &quot;Employee&quot;: [&quot;Alice&quot;, &quot;Bob&quot;, &quot;Charlie&quot;, &quot;David&quot;, &quot;Eve&quot;, &quot;Frank&quot;],
+    &quot;Salary&quot;: [60000, 62000, 75000, 78000, 80000, 82000],
+    &quot;Experience&quot;: [5, 7, 10, 12, 15, 18]
+})
+people = pd.DataFrame({
+    &quot;name&quot;: [&quot;Alice&quot;, &quot;Bob&quot;, &quot;Charlie&quot;, &quot;David&quot;, &quot;Emma&quot;, &quot;Frank&quot;, &quot;Grace&quot;, &quot;Hannah&quot;, &quot;Ian&quot;, &quot;Jack&quot;],
+    &quot;age&quot;: [22, 25, 47, 51, 35, 60, 42, 55, 28, 33],
+    &quot;salary&quot;: [3000, 3200, 5800, 6000, 4500, 7000, 5200, 6400, 3100, 4000]
+})
+people[&quot;age_group&quot;] = pd.cut(people[&quot;age&quot;], bins=[20,30,40,50,60,70],
+                           labels=[&quot;20s&quot;,&quot;30s&quot;,&quot;40s&quot;,&quot;50s&quot;,&quot;60s&quot;])
+df = load_csv(&quot;https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv&quot;)
+print(employees)
+print(&quot;Titanic rows:&quot;, len(df))</textarea><div class="cell-toolbar"><span class="cell-label">employees and people are separate from Titanic df, so lesson tabs do not overwrite each other.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">See the groups</div><div class="pyodide-cell"><textarea aria-label="See the groups code" class="code-input" spellcheck="false" rows="4">for department, group in employees.groupby(&quot;Department&quot;):
+    print(department)
+    print(group[[&quot;Employee&quot;, &quot;Salary&quot;]])</textarea><div class="cell-toolbar"><span class="cell-label">groupby creates a grouping object; a reduction such as mean triggers a summary.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">First grouped summary</div><div class="pyodide-cell"><textarea aria-label="First grouped summary code" class="code-input" spellcheck="false" rows="2">print(employees.groupby(&quot;Department&quot;)[&quot;Salary&quot;].mean())</textarea><div class="cell-toolbar"><span class="cell-label">HR: 61000; IT: 76500; Finance: 81000, using the first salary dataset in the notebook.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-groupby"><h2>Grouped aggregations</h2><p class="lead">Choose a grouping key, select a measurement, and choose the statistic. Multi-key grouping creates a hierarchy of group labels.</p><div class="op-tag op-load">Totals and multiple statistics</div><div class="pyodide-cell"><textarea aria-label="Totals and multiple statistics code" class="code-input" spellcheck="false" rows="3">print(employees.groupby(&quot;Department&quot;)[&quot;Salary&quot;].sum())
+print(employees.groupby(&quot;Department&quot;)[&quot;Salary&quot;].agg([&quot;mean&quot;, &quot;max&quot;, &quot;min&quot;, &quot;sum&quot;, &quot;count&quot;]))</textarea><div class="cell-toolbar"><span class="cell-label">count excludes missing salary values; size counts all rows in a group.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">A table with named summaries</div><div class="pyodide-cell"><textarea aria-label="A table with named summaries code" class="code-input" spellcheck="false" rows="6">print(employees.groupby(&quot;Department&quot;, as_index=False).agg(
+    mean_salary=(&quot;Salary&quot;, &quot;mean&quot;),
+    total_salary=(&quot;Salary&quot;, &quot;sum&quot;),
+    employees=(&quot;Employee&quot;, &quot;size&quot;)
+))</textarea><div class="cell-toolbar"><span class="cell-label">as_index=False keeps the grouping key as a regular column.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Titanic examples</div><div class="pyodide-cell"><textarea aria-label="Titanic examples code" class="code-input" spellcheck="false" rows="4">print(df.groupby(&quot;Embarked&quot;)[&quot;Fare&quot;].max())
+print(df.groupby(&quot;Survived&quot;)[&quot;Age&quot;].mean())
+print(df.groupby(&quot;Pclass&quot;).agg({&quot;Fare&quot;: &quot;mean&quot;, &quot;Age&quot;: &quot;mean&quot;}))</textarea><div class="cell-toolbar"><span class="cell-label">Numeric means skip missing measurements. Missing grouping keys are excluded by default.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Custom counts and missing keys</div><div class="pyodide-cell"><textarea aria-label="Custom counts and missing keys code" class="code-input" spellcheck="false" rows="3">print(df.groupby(&quot;Pclass&quot;)[&quot;Fare&quot;].agg(lambda x: (x &gt; 60).sum()))
+print(df.groupby(&quot;Embarked&quot;, dropna=False).size())</textarea><div class="cell-toolbar"><span class="cell-label">dropna=False retains rows whose grouping key is missing.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Nested grouping: count versus survival</div><div class="pyodide-cell"><textarea aria-label="Nested grouping: count versus survival code" class="code-input" spellcheck="false" rows="3">print(df.groupby([&quot;Pclass&quot;, &quot;Sex&quot;])[&quot;Survived&quot;].agg([&quot;count&quot;, &quot;sum&quot;, &quot;mean&quot;]))
+print(df.groupby([&quot;Sex&quot;, &quot;Pclass&quot;]).size())</textarea><div class="cell-toolbar"><span class="cell-label">For observed binary Survived: count = passengers with an outcome, sum = survivors, mean = survival fraction. Key order changes the index hierarchy.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-pivots"><h2>Pivot tables summarize and reshape</h2><p class="lead">index defines rows, columns defines columns, values chooses the measurement, and aggfunc chooses the summary. pivot_table defaults to mean.</p><div class="op-tag op-load">Department pivot</div><div class="pyodide-cell"><textarea aria-label="Department pivot code" class="code-input" spellcheck="false" rows="4">print(employees.pivot_table(values=&quot;Salary&quot;, index=&quot;Department&quot;, aggfunc=&quot;mean&quot;))
+print(employees.pivot_table(values=[&quot;Salary&quot;, &quot;Experience&quot;], index=&quot;Department&quot;,
+    aggfunc={&quot;Salary&quot;: &quot;mean&quot;, &quot;Experience&quot;: &quot;sum&quot;}))</textarea><div class="cell-toolbar"><span class="cell-label">Different value columns can use different aggregation functions.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Survival rates and passenger counts</div><div class="pyodide-cell"><textarea aria-label="Survival rates and passenger counts code" class="code-input" spellcheck="false" rows="3">print(df.pivot_table(values=&quot;Survived&quot;, index=&quot;Sex&quot;, columns=&quot;Pclass&quot;, aggfunc=&quot;mean&quot;))
+print(df.pivot_table(values=&quot;Survived&quot;, index=&quot;Sex&quot;, columns=&quot;Pclass&quot;, aggfunc=&quot;count&quot;, fill_value=0))</textarea><div class="cell-toolbar"><span class="cell-label">Keep missing mean cells as NaN: an absent group is not a 0% survival rate.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Boarding location and class</div><div class="pyodide-cell"><textarea aria-label="Boarding location and class code" class="code-input" spellcheck="false" rows="3">print(df.pivot_table(values=&quot;Sex&quot;, index=&quot;Embarked&quot;, columns=&quot;Pclass&quot;, aggfunc=&quot;count&quot;, fill_value=0))
+print(df.pivot_table(values=&quot;Survived&quot;, index=&quot;Embarked&quot;, columns=&quot;Pclass&quot;, aggfunc=&quot;sum&quot;, fill_value=0))</textarea><div class="cell-toolbar"><span class="cell-label">The first counts observed Sex values; the second sums binary survival flags. Missing Embarked keys are excluded.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Other measurements</div><div class="pyodide-cell"><textarea aria-label="Other measurements code" class="code-input" spellcheck="false" rows="4">print(df.pivot_table(values=&quot;Fare&quot;, index=&quot;Embarked&quot;, columns=&quot;Pclass&quot;, aggfunc=&quot;mean&quot;))
+print(df.pivot_table(values=&quot;Fare&quot;, index=&quot;Sex&quot;, columns=&quot;Pclass&quot;, aggfunc=&quot;max&quot;))
+print(df.pivot_table(values=&quot;SibSp&quot;, index=&quot;Sex&quot;, columns=&quot;Pclass&quot;, aggfunc=&quot;sum&quot;, fill_value=0))</textarea><div class="cell-toolbar"><span class="cell-label">Avoid filling absent fare averages with zero, which would imply free tickets.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Pivot versus pivot_table</div><div class="pyodide-cell"><textarea aria-label="Pivot versus pivot_table code" class="code-input" spellcheck="false" rows="4">tiny = pd.DataFrame({&quot;team&quot;:[&quot;A&quot;,&quot;A&quot;,&quot;B&quot;], &quot;year&quot;:[2026,2026,2026], &quot;value&quot;:[10,20,30]})
+print(tiny.pivot_table(index=&quot;team&quot;, columns=&quot;year&quot;, values=&quot;value&quot;, aggfunc=&quot;sum&quot;))
+# tiny.pivot(...) would fail: team A has duplicate team/year pairs.</textarea><div class="cell-toolbar"><span class="cell-label">pivot reshapes unique key pairs without aggregation; pivot_table can aggregate duplicates.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-bins"><h2>cut and qcut create grouping categories</h2><p class="lead">cut accepts explicit edges or a number of equal-width intervals. qcut uses quantiles to target approximately equal numbers of observations.</p><div class="op-tag op-load">Explicit cut boundaries</div><div class="pyodide-cell"><textarea aria-label="Explicit cut boundaries code" class="code-input" spellcheck="false" rows="5">values = pd.Series([0, 2, 10, 15, 20, 30, 39, 40])
+cut_bins = pd.cut(values, bins=[0,10,20,30,40], labels=[&quot;Low&quot;,&quot;Medium&quot;,&quot;High&quot;,&quot;Very High&quot;])
+print(pd.DataFrame({&quot;value&quot;: values, &quot;bin&quot;: cut_bins}))
+print(cut_bins.value_counts(sort=False))</textarea><div class="cell-toolbar"><span class="cell-label">Default intervals are right-closed: (0,10] includes 10 but excludes 0. Use include_lowest=True to include 0.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Quantile bins</div><div class="pyodide-cell"><textarea aria-label="Quantile bins code" class="code-input" spellcheck="false" rows="5">quantiles = pd.Series([2,24,32,5,8,10,15,18,20,25,30,35])
+qcut_bins = pd.qcut(quantiles, q=4, labels=[&quot;Q1&quot;,&quot;Q2&quot;,&quot;Q3&quot;,&quot;Q4&quot;])
+print(pd.DataFrame({&quot;value&quot;:quantiles, &quot;bin&quot;:qcut_bins}))
+print(qcut_bins.value_counts(sort=False))</textarea><div class="cell-toolbar"><span class="cell-label">Each quartile here contains three observations; interval widths need not match. Tied values can prevent distinct quantile edges.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Age categories</div><div class="pyodide-cell"><textarea aria-label="Age categories code" class="code-input" spellcheck="false" rows="3">print(people[[&quot;name&quot;,&quot;age&quot;,&quot;age_group&quot;]])
+print(people.groupby(&quot;age_group&quot;, observed=False).size())</textarea><div class="cell-toolbar"><span class="cell-label">These labels name intervals (20,30], (30,40], etc., not calendar decades: age 30 is in the first interval. observed=False includes unused categorical groups.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-methods"><h2>agg, apply, transform, and filter</h2><p class="lead">agg reduces groups; apply supports flexible custom results; transform returns values aligned with the selected input; filter keeps or removes whole groups.</p><div class="op-tag op-load">Custom apply with measurement columns</div><div class="pyodide-cell"><textarea aria-label="Custom apply with measurement columns code" class="code-input" spellcheck="false" rows="8">def salary_stats(group):
+    return pd.Series({
+        &quot;mean_salary&quot;: group[&quot;salary&quot;].mean(),
+        &quot;max_salary&quot;: group[&quot;salary&quot;].max(),
+        &quot;min_salary&quot;: group[&quot;salary&quot;].min()
+    })
+print(people.groupby(&quot;age_group&quot;, observed=False)[[&quot;salary&quot;]].apply(salary_stats))</textarea><div class="cell-toolbar"><span class="cell-label">Select measurement columns before apply for compatibility across pandas versions. Empty groups have NaN statistics; retain those rather than implying zero salary.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Equivalent built-in aggregation</div><div class="pyodide-cell"><textarea aria-label="Equivalent built-in aggregation code" class="code-input" spellcheck="false" rows="2">print(people.groupby(&quot;age_group&quot;, observed=False)[&quot;salary&quot;].agg([&quot;mean&quot;,&quot;max&quot;,&quot;min&quot;]))</textarea><div class="cell-toolbar"><span class="cell-label">Prefer built-in agg for standard reductions; it is simpler than a custom apply.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Transform: repeat each group mean</div><div class="pyodide-cell"><textarea aria-label="Transform: repeat each group mean code" class="code-input" spellcheck="false" rows="3">people[&quot;group_mean_salary&quot;] = people.groupby(&quot;age_group&quot;, observed=True)[&quot;salary&quot;].transform(&quot;mean&quot;)
+print(people[[&quot;name&quot;,&quot;salary&quot;,&quot;age_group&quot;,&quot;group_mean_salary&quot;]])</textarea><div class="cell-toolbar"><span class="cell-label">One group mean is repeated on each corresponding input row; the result aligns with people.index.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Safe min-max normalization</div><div class="pyodide-cell"><textarea aria-label="Safe min-max normalization code" class="code-input" spellcheck="false" rows="8">def normalize(x):
+    span = x.max() - x.min()
+    if pd.isna(span) or span == 0:
+        return x * 0  # Convention: observed constant values map to zero.
+    return (x - x.min()) / span
+people[&quot;normalized_salary&quot;] = people.groupby(&quot;age_group&quot;, observed=True)[&quot;salary&quot;].transform(normalize)
+print(people[[&quot;name&quot;,&quot;age_group&quot;,&quot;salary&quot;,&quot;normalized_salary&quot;]])</textarea><div class="cell-toolbar"><span class="cell-label">The raw formula divides by zero for constant groups. Here observed constant values map to 0; missing values stay missing.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Filter groups, not individual rows</div><div class="pyodide-cell"><textarea aria-label="Filter groups, not individual rows code" class="code-input" spellcheck="false" rows="4">kept = people.groupby(&quot;age_group&quot;, observed=True).filter(lambda g: (g[&quot;salary&quot;] &gt; 5000).any())
+print(kept[[&quot;name&quot;,&quot;age_group&quot;,&quot;salary&quot;]])
+print(&quot;Individual high earners:\n&quot;, people.loc[people[&quot;salary&quot;] &gt; 5000, [&quot;name&quot;,&quot;salary&quot;]])</textarea><div class="cell-toolbar"><span class="cell-label">filter keeps every row in a qualifying age group, including members earning 5000 or less.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-reshape"><h2>Melt and practice</h2><p class="lead">melt turns measurement columns into rows while retaining identifiers. Choose a grouped summary when you need fewer rows; transform when you need row-level comparisons.</p><div class="op-tag op-load">Wide to long</div><div class="pyodide-cell"><textarea aria-label="Wide to long code" class="code-input" spellcheck="false" rows="5">long_people = people.melt(id_vars=[&quot;name&quot;,&quot;age_group&quot;], value_vars=[&quot;age&quot;,&quot;salary&quot;],
+    var_name=&quot;Attribute&quot;, value_name=&quot;Value&quot;)
+print(long_people.head(12))
+print(&quot;Rows:&quot;, len(long_people))</textarea><div class="cell-toolbar"><span class="cell-label">Ten people × two measurements = twenty rows. Age and salary share a Value column but have different units.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Reshape back</div><div class="pyodide-cell"><textarea aria-label="Reshape back code" class="code-input" spellcheck="false" rows="3">wide_people = long_people.pivot(index=&quot;name&quot;, columns=&quot;Attribute&quot;, values=&quot;Value&quot;)
+print(wide_people)</textarea><div class="cell-toolbar"><span class="cell-label">Each name/Attribute pair is unique here, so pivot is sufficient.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Challenge</div><div class="pyodide-cell"><textarea aria-label="Challenge code" class="code-input" spellcheck="false" rows="4"># Build a table of survivor counts by Sex and Pclass.
+# Then add each person’s salary minus their age-group mean salary.
+# Write your code here.</textarea><div class="cell-toolbar"><span class="cell-label">Use sum for survivors and transform for a row-aligned group mean.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><details><summary>Show challenge solution</summary><div class="op-tag op-load">Challenge solution</div><div class="pyodide-cell"><textarea aria-label="Challenge solution code" class="code-input" spellcheck="false" rows="4">print(df.pivot_table(index=&quot;Sex&quot;, columns=&quot;Pclass&quot;, values=&quot;Survived&quot;, aggfunc=&quot;sum&quot;, fill_value=0))
+people[&quot;salary_gap&quot;] = people[&quot;salary&quot;] - people.groupby(&quot;age_group&quot;, observed=True)[&quot;salary&quot;].transform(&quot;mean&quot;)
+print(people[[&quot;name&quot;,&quot;age_group&quot;,&quot;salary&quot;,&quot;salary_gap&quot;]])</textarea><div class="cell-toolbar"><span class="cell-label">A positive gap means salary exceeds the observed mean of that person's age group.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></details></div><div class="tab-content" id="tab-quiz">
+
+      <div class="quiz-screen active" id="quizStart">
+        <div class="quiz-start">
+          <h2>📝 GroupBy &amp; Pivot Quiz</h2>
+          <p class="lead">20 questions on grouped summaries, pivot tables, bins, apply, transform, filter, and reshaping.</p>
+          <div class="badges">
+            <span class="badge">📝 20 questions</span>
+            <span class="badge">🎯 No time limit</span>
+            <span class="badge">📸 Screenshot your score</span>
+          </div>
+          <button class="start-btn" onclick="startQuiz()">🚀 Start Quiz</button>
+        </div>
+      </div>
+
+      <div class="quiz-screen" id="quizQuestion">
+        <div class="quiz-progress"><div class="quiz-progress-fill" id="progressFill"></div></div>
+        <div class="q-number" id="qNumber">Question 1 of 20</div>
+        <div class="q-text" id="qText"></div>
+        <div class="q-code" id="qCode" style="display:none;"></div>
+        <div class="answers" id="answers"></div>
+        <div class="feedback" id="feedback" aria-live="polite"></div>
+        <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
+      </div>
+
+      <div class="quiz-screen" id="quizResult">
+        <div class="result-screen">
+          <h2>🎉 Quiz Complete!</h2>
+          <div class="score-display" id="scoreDisplay">0/20</div>
+          <div class="score-msg" id="scoreMsg"></div>
+          <button class="restart-btn" onclick="restartQuiz()">🔄 Try Again</button>
+          <div class="submit-box">
+            📸 <b>Submission:</b> Take a screenshot of this results screen showing your score, and submit it through your instructor’s designated course platform.
+          </div>
+        </div>
+      </div>
+
+    </div>
+</div></div>
+<script>
+  // ---------- Tab switching ----------
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ---------- Pyodide setup ----------
+  let pyodideReady = false;
+  let pyodide = null;
+  let outputBuffer = [];
+
+  async function initPyodide() {
+    const statusEl = document.getElementById('pyodideStatus');
+    try {
+      pyodide = await loadPyodide();
+      statusEl.textContent = '📦 Loading pandas + numpy...';
+      await pyodide.loadPackage(['pandas', 'numpy']);
+
+      statusEl.textContent = '🚢 Preparing the Titanic dataset helper...';
+      await pyodide.runPythonAsync(`
+import io
+import pandas as pd
+pd.set_option("display.width", 200)
+pd.set_option("display.max_columns", 20)
+_TITANIC_SAMPLE = """PassengerId,Survived,Pclass,Name,Sex,Age,SibSp,Parch,Ticket,Fare,Cabin,Embarked
+1,0,3,"Braund, Mr. Owen Harris",male,22,1,0,A/5 21171,7.25,,S
+2,1,1,"Cumings, Mrs. John Bradley (Florence Briggs Thayer)",female,38,1,0,PC 17599,71.2833,C85,C
+3,1,3,"Heikkinen, Miss. Laina",female,26,0,0,STON/O2. 3101282,7.925,,S
+4,1,1,"Futrelle, Mrs. Jacques Heath (Lily May Peel)",female,35,1,0,113803,53.1,C123,S
+5,0,3,"Allen, Mr. William Henry",male,35,0,0,373450,8.05,,S
+6,0,3,"Moran, Mr. James",male,,0,0,330877,8.4583,,Q
+7,0,1,"McCarthy, Mr. Timothy J",male,54,0,0,17463,51.8625,E46,S
+8,0,3,"Palsson, Master. Gosta Leonard",male,2,3,1,349909,21.075,,S
+9,1,3,"Johnson, Mrs. Oscar W (Elisabeth Vilhelmina Berg)",female,27,0,2,347742,11.1333,,S
+10,1,2,"Nasser, Mrs. Nicholas (Adele Achem)",female,14,1,0,237736,30.0708,,C
+11,1,3,"Sandstrom, Miss. Marguerite Rut",female,4,1,1,PP 9549,16.7,G6,S
+12,1,1,"Bonnell, Miss. Elizabeth",female,58,0,0,113783,26.55,C103,S"""
+_cache = {}
+def load_csv(url):
+    """Browser-friendly stand-in for pd.read_csv(url). Falls back to a small sample when offline."""
+    if url not in _cache:
+        try:
+            from pyodide.http import open_url
+            _cache[url] = open_url(url).read()
+        except Exception:
+            print("(Could not reach GitHub - using a built-in 12-row sample of the Titanic data.)")
+            return pd.read_csv(io.StringIO(_TITANIC_SAMPLE))
+    return pd.read_csv(io.StringIO(_cache[url]))
+`);
+      pyodide.setStdout({ batched: (msg) => { outputBuffer.push(msg + "\n"); } });
+      await pyodide.runPythonAsync('df = load_csv("https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv"); fare = df["Fare"]');
+      await pyodide.runPythonAsync("import pandas as pd\nemployees = pd.DataFrame({\n    \"Department\": [\"HR\", \"HR\", \"IT\", \"IT\", \"Finance\", \"Finance\"],\n    \"Employee\": [\"Alice\", \"Bob\", \"Charlie\", \"David\", \"Eve\", \"Frank\"],\n    \"Salary\": [60000, 62000, 75000, 78000, 80000, 82000],\n    \"Experience\": [5, 7, 10, 12, 15, 18]\n})\npeople = pd.DataFrame({\n    \"name\": [\"Alice\", \"Bob\", \"Charlie\", \"David\", \"Emma\", \"Frank\", \"Grace\", \"Hannah\", \"Ian\", \"Jack\"],\n    \"age\": [22, 25, 47, 51, 35, 60, 42, 55, 28, 33],\n    \"salary\": [3000, 3200, 5800, 6000, 4500, 7000, 5200, 6400, 3100, 4000]\n})\npeople[\"age_group\"] = pd.cut(people[\"age\"], bins=[20,30,40,50,60,70],\n                           labels=[\"20s\",\"30s\",\"40s\",\"50s\",\"60s\"])");
+      pyodideReady = true;
+      statusEl.textContent = '✅ Python engine ready — click ▶ Run on any code cell!';
+      statusEl.classList.add('ready');
+      setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
+    } catch (err) {
+      statusEl.textContent = '⚠️ Could not load the Python engine. Check your internet connection and reload the page.';
+    }
+  }
+  initPyodide();
+
+  let running = false;
+  async function runCell(button) {
+    if (running) return;
+    const cell = button.closest('.pyodide-cell');
+    const code = cell.querySelector('.code-input').value;
+    const output = cell.querySelector('.output');
+
+    if (!pyodideReady) {
+      output.textContent = 'Python engine is still loading — please wait a few seconds and try again.';
+      output.className = 'output show error';
+      return;
+    }
+
+    running = true;
+    document.querySelectorAll(".run-btn").forEach(b => b.disabled = true);
+    button.textContent = 'Running...';
+    outputBuffer = [];
+
+    try {
+      await pyodide.runPythonAsync(code);
+      output.textContent = outputBuffer.join('') || '(no output — code ran successfully)';
+      output.className = 'output show';
+    } catch (err) {
+      output.textContent = 'Error:\n' + err.message.split('\n').slice(-4).join('\n');
+      output.className = 'output show error';
+    }
+    running = false;
+    document.querySelectorAll(".run-btn").forEach(b => b.disabled = false);
+    button.textContent = '▶ Run';
+  }
+
+  // ---------- Quiz ----------
+  const questions = [
+  {
+    "q": "Which describes split-apply-combine?",
+    "options": [
+      "Split by a key, calculate per group, combine results",
+      "Split columns, delete duplicates, sort rows",
+      "Split strings, join text, save CSV",
+      "Split missing values, fill all cells, transpose"
+    ],
+    "correct": 0,
+    "explain": "Rows are partitioned by keys, a function operates on each group, and results are combined."
+  },
+  {
+    "q": "HR salaries are 60000 and 62000. What is their grouped mean?",
+    "options": [
+      "60000",
+      "61000",
+      "62000",
+      "122000"
+    ],
+    "correct": 1,
+    "explain": "(60000+62000)/2 = 61000."
+  },
+  {
+    "q": "IT salaries are 75000 and 78000. What is their grouped sum?",
+    "options": [
+      "75000",
+      "76500",
+      "78000",
+      "153000"
+    ],
+    "correct": 3,
+    "explain": "75000+78000 = 153000."
+  },
+  {
+    "q": "Which calculates several salary summaries per department?",
+    "options": [
+      "employees.groupby('Department')['Salary'].agg(['mean','max'])",
+      "employees.groupby('Department')['Salary'].unique('mean')",
+      "employees.groupby('Salary')['Department'].mean()",
+      "employees.pivot(index='Salary', values='Department')"
+    ],
+    "correct": 0,
+    "explain": "agg accepts multiple reduction functions on the selected group measurement."
+  },
+  {
+    "q": "A group contains 4 rows; one Salary is missing. What do size() and Salary.count() return?",
+    "options": [
+      "3 and 3",
+      "4 and 4",
+      "4 and 3",
+      "3 and 4"
+    ],
+    "correct": 2,
+    "explain": "size counts rows; count counts non-missing measurement values."
+  },
+  {
+    "q": "What does as_index=False do for a grouped aggregation?",
+    "options": [
+      "Drops all group keys",
+      "Keeps group keys as regular columns",
+      "Disables aggregation",
+      "Sorts salaries descending"
+    ],
+    "correct": 1,
+    "explain": "Grouping columns appear as ordinary columns rather than index levels."
+  },
+  {
+    "q": "How do you retain rows with missing grouping keys?",
+    "options": [
+      "groupby('Embarked', dropna=False)",
+      "groupby('Embarked', numeric_only=True)",
+      "groupby('Embarked', dropna=True)",
+      "groupby('Embarked').dropna()"
+    ],
+    "correct": 0,
+    "explain": "dropna=False includes a group for missing keys."
+  },
+  {
+    "q": "What does grouping by ['Pclass','Sex'] typically produce in a summary with default as_index?",
+    "options": [
+      "A single scalar",
+      "Only a Sex column",
+      "A two-level MultiIndex",
+      "The unchanged input"
+    ],
+    "correct": 2,
+    "explain": "The two grouping keys form two index levels."
+  },
+  {
+    "q": "For Survived values [1,0,1,0], which gives the number of survivors?",
+    "options": [
+      "count() = 4",
+      "sum() = 2",
+      "mean() = 0.5",
+      "size() = 4"
+    ],
+    "correct": 1,
+    "explain": "Binary ones identify survivors, so their sum counts survivors."
+  },
+  {
+    "q": "What does the mean of observed 0/1 Survived values represent?",
+    "options": [
+      "Passenger count",
+      "Total fare",
+      "Survival fraction",
+      "Missing age percentage"
+    ],
+    "correct": 2,
+    "explain": "The mean is the number of ones divided by the number of observed outcomes."
+  },
+  {
+    "q": "What is pivot_table's default aggfunc?",
+    "options": [
+      "sum",
+      "count",
+      "max",
+      "mean"
+    ],
+    "correct": 3,
+    "explain": "pivot_table defaults to mean unless aggfunc is supplied."
+  },
+  {
+    "q": "In a pivot table, which parameter creates the output row labels?",
+    "options": [
+      "index",
+      "columns",
+      "values",
+      "fill_value"
+    ],
+    "correct": 0,
+    "explain": "index supplies grouping keys for pivot rows."
+  },
+  {
+    "q": "Why retain NaN for an absent group's mean fare?",
+    "options": [
+      "NaN proves every fare was zero",
+      "An absent group has no observed average",
+      "Mean cannot handle numbers",
+      "NaN means the highest fare"
+    ],
+    "correct": 1,
+    "explain": "No observed average is different from an observed average of zero."
+  },
+  {
+    "q": "How does pivot differ from pivot_table?",
+    "options": [
+      "pivot always sums duplicates",
+      "pivot_table cannot aggregate",
+      "pivot requires unique index/column pairs",
+      "pivot always returns one row"
+    ],
+    "correct": 2,
+    "explain": "pivot reshapes without aggregation and rejects duplicate key pairs."
+  },
+  {
+    "q": "With bins=[0,10,20] and default pd.cut settings, where does 10 belong?",
+    "options": [
+      "(0,10]",
+      "(10,20]",
+      "Both intervals",
+      "Neither interval"
+    ],
+    "correct": 0,
+    "explain": "Default intervals are right-closed, so 10 is included in (0,10]."
+  },
+  {
+    "q": "What does qcut target when creating bins?",
+    "options": [
+      "Equal interval widths",
+      "Alphabetically sorted values",
+      "Approximately equal observation counts",
+      "Exactly equal sums"
+    ],
+    "correct": 2,
+    "explain": "Quantile boundaries target similar numbers of observations; tied values can complicate this."
+  },
+  {
+    "q": "For a categorical grouper, what does observed=False allow?",
+    "options": [
+      "Only groups containing rows",
+      "Unused categories in summaries",
+      "Only missing groups",
+      "Automatic row duplication"
+    ],
+    "correct": 1,
+    "explain": "Unused categorical levels can appear, making empty-group behavior visible."
+  },
+  {
+    "q": "Which returns group means aligned with every selected input row?",
+    "options": [
+      "agg('mean')",
+      "transform('mean')",
+      "filter(lambda g: True)",
+      "size()"
+    ],
+    "correct": 1,
+    "explain": "transform broadcasts group means back to the corresponding rows."
+  },
+  {
+    "q": "A group has salaries [4000,6000]. What does filter(lambda g: (g['salary'] > 5000).any()) retain?",
+    "options": [
+      "Only the 6000 row",
+      "Only the 4000 row",
+      "Neither row",
+      "Both rows"
+    ],
+    "correct": 3,
+    "explain": "One member satisfies the condition, so filter retains the entire group."
+  },
+  {
+    "q": "Ten people are melted using two value_vars. How many output rows result?",
+    "options": [
+      "5",
+      "10",
+      "20",
+      "100"
+    ],
+    "correct": 2,
+    "explain": "melt creates one row per person per selected measurement: 10×2=20."
+  }
+];
+
+  let current = 0;
+  let score = 0;
+  let answered = false;
+
+  function showScreen(id) {
+    document.querySelectorAll('.quiz-screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function startQuiz() {
+    current = 0;
+    score = 0;
+    showScreen('quizQuestion');
+    showQuestion();
+  }
+
+  function showQuestion() {
+    answered = false;
+    const item = questions[current];
+    document.getElementById('progressFill').style.width = (current / questions.length * 100) + '%';
+    document.getElementById('qNumber').textContent = `Question ${current + 1} of ${questions.length}`;
+    document.getElementById('qText').textContent = item.q;
+
+    const codeEl = document.getElementById('qCode');
+    if (item.code) { codeEl.style.display = 'block'; codeEl.textContent = item.code; }
+    else { codeEl.style.display = 'none'; }
+
+    const answersDiv = document.getElementById('answers');
+    answersDiv.innerHTML = '';
+    item.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'answer-btn';
+      btn.textContent = opt;
+      btn.onclick = () => selectAnswer(i);
+      answersDiv.appendChild(btn);
+    });
+
+    document.getElementById('feedback').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'none';
+  }
+
+  function selectAnswer(i) {
+    if (answered) return;
+    answered = true;
+    const item = questions[current];
+    const buttons = document.querySelectorAll('.answer-btn');
+    buttons.forEach(b => b.disabled = true);
+
+    const feedback = document.getElementById('feedback');
+    if (i === item.correct) {
+      score++;
+      buttons[i].classList.add('correct');
+      feedback.className = 'feedback correct';
+      feedback.textContent = 'Correct! ' + item.explain;
+    } else {
+      buttons[i].classList.add('incorrect');
+      buttons[item.correct].classList.add('correct');
+      feedback.className = 'feedback incorrect';
+      feedback.textContent = 'Not quite. Correct answer: ' + item.options[item.correct] + '. ' + item.explain;
+    }
+    feedback.style.display = 'block';
+    document.getElementById('nextBtn').style.display = 'inline-block';
+  }
+
+  function nextQuestion() {
+    if (!answered) return;
+    current++;
+    if (current >= questions.length) { showResults(); }
+    else { showQuestion(); }
+  }
+
+  function showResults() {
+    document.getElementById('progressFill').style.width = '100%';
+    showScreen('quizResult');
+    document.getElementById('scoreDisplay').textContent = `${score}/${questions.length}`;
+    let msg;
+    if (score / questions.length >= 0.9) msg = "Outstanding! You can summarize and reshape grouped data! 🏆";
+    else if (score / questions.length >= 0.7) msg = "Great job! Solid grasp of the fundamentals. 🎯";
+    else if (score / questions.length >= 0.5) msg = "Good start — revisit the tabs and try again! 📚";
+    else msg = "No worries — go back through the GroupBy, Pivots, Binning, Group methods, and Reshape tabs, then retake it! 💪";
+    document.getElementById('scoreMsg').textContent = msg;
+  }
+
+  function restartQuiz() { showScreen('quizStart'); }
+</script>
+</body>
+</html>
+
