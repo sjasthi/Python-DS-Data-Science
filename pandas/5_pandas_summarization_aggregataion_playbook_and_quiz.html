@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pandas — Summarization and Aggregation Playbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<style>
+  :root {
+    --bg: #12181f;
+    --panel: #1a232d;
+    --panel-2: #212c38;
+    --border: #2c3947;
+    --text: #e7edf3;
+    --text-dim: #9fb0c0;
+    --teal: #2dd4bf;
+    --amber: #f5b942;
+    --orange: #ff8a4c;
+    --red: #ff6b6b;
+    --green: #4ade80;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px 14px;
+    display: flex;
+    justify-content: center;
+  }
+  .wrap { width: 100%; max-width: 920px; }
+
+  .brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--panel-2);
+    border: 1px solid var(--teal);
+    color: var(--teal);
+    font-weight: 800;
+    font-size: 0.85rem;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .brand-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); }
+
+  header {
+    text-align: center;
+    padding: 24px 20px 20px;
+    background: linear-gradient(135deg, #1b3b3a 0%, #17222c 100%);
+    border: 1px solid var(--border);
+    border-radius: 18px 18px 0 0;
+  }
+  header h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.8rem;
+    color: var(--teal);
+  }
+  header p { color: var(--text-dim); margin-top: 8px; }
+
+  #pyodideStatus {
+    text-align: center;
+    padding: 10px;
+    background: var(--panel-2);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    color: var(--amber);
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  #pyodideStatus.ready { color: var(--green); }
+
+  .tabs {
+    display: flex;
+    background: var(--panel-2);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  .tab-btn {
+    flex: 1;
+    min-width: 110px;
+    padding: 15px 8px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  .tab-btn.active { color: var(--teal); border-bottom-color: var(--teal); background: var(--panel); }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 18px 18px;
+    padding: 28px 26px 32px;
+    min-height: 420px;
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .tab-content h2 { font-family: 'Fredoka One', cursive; color: var(--amber); font-size: 1.4rem; margin-bottom: 6px; }
+  .tab-content .lead { color: var(--text-dim); margin-bottom: 18px; }
+  .op-tag {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin: 18px 0 8px;
+  }
+  .op-create { background: rgba(45,212,191,0.15); color: var(--teal); }
+  .op-read   { background: rgba(245,185,66,0.15); color: var(--amber); }
+  .op-update { background: rgba(255,138,76,0.15); color: var(--orange); }
+  .op-delete { background: rgba(255,107,107,0.15); color: var(--red); }
+  .op-setup     { background: rgba(159,176,192,0.15); color: var(--text-dim); }
+  .op-load      { background: rgba(45,212,191,0.15); color: var(--teal); }
+  .op-size      { background: rgba(96,165,250,0.15); color: #60a5fa; }
+  .op-structure { background: rgba(245,185,66,0.15); color: var(--amber); }
+  .op-missing   { background: rgba(255,107,107,0.15); color: var(--red); }
+  .op-stats     { background: rgba(192,132,252,0.15); color: #c084fc; }
+
+  /* Pyodide code cells */
+  .pyodide-cell {
+    background: #0d1319;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--teal);
+    border-radius: 10px;
+    margin: 10px 0 20px;
+    overflow: hidden;
+  }
+  .code-input {
+    width: 100%;
+    background: transparent;
+    color: #d4e8e2;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.92rem;
+    border: none;
+    resize: vertical;
+    padding: 14px 16px;
+    line-height: 1.5;
+    min-height: 40px;
+  }
+  .code-input:focus { outline: none; background: rgba(45,212,191,0.04); }
+  .cell-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 14px;
+    background: var(--panel-2);
+    border-top: 1px solid var(--border);
+  }
+  .run-btn {
+    background: var(--teal);
+    color: #062824;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 16px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .run-btn:hover { background: #24b6a4; }
+  .run-btn:disabled { opacity: 0.5; cursor: wait; }
+  .cell-label { color: var(--text-dim); font-size: 0.8rem; }
+  .output {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88rem;
+    color: #c3e8ff;
+    padding: 12px 16px;
+    white-space: pre;
+    overflow-x: auto;
+    border-top: 1px dashed var(--border);
+    min-height: 20px;
+    display: none;
+  }
+  .output.show { display: block; }
+  .output.error { color: var(--red); }
+
+  .nav-hint { text-align:center; margin-top: 22px; color: var(--text-dim); font-size: 0.92rem; }
+  .nav-hint b { color: var(--amber); }
+
+  /* Quiz */
+  .quiz-progress { width: 100%; height: 8px; background: var(--panel-2); border-radius: 4px; overflow: hidden; margin-bottom: 22px; }
+  .quiz-progress-fill { height: 100%; background: var(--teal); width: 0%; transition: width .4s ease; }
+  .q-number { display: inline-block; background: var(--panel-2); border: 1px solid var(--border); color: var(--amber); padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; margin-bottom: 16px; }
+  .q-text { font-size: 1.2rem; margin-bottom: 18px; line-height: 1.4; }
+  .q-code { background: #0d1319; border-left: 4px solid var(--teal); border-radius: 10px; padding: 14px 18px; font-family: 'JetBrains Mono', monospace; font-size: 1.02rem; margin-bottom: 18px; white-space: pre; overflow-x: auto; }
+  .answers { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 12px; }
+  .answer-btn { background: var(--panel-2); border: 1px solid var(--border); color: var(--text); padding: 14px 16px; border-radius: 12px; font-size: 0.98rem; font-weight: 700; cursor: pointer; text-align: left; font-family: 'JetBrains Mono', monospace; }
+  .answer-btn:hover { border-color: var(--teal); transform: translateY(-2px); }
+  .answer-btn.correct { background: rgba(74,222,128,0.18); border-color: var(--green); color: var(--green); }
+  .answer-btn.incorrect { background: rgba(255,107,107,0.18); border-color: var(--red); color: var(--red); }
+  .answer-btn[disabled] { cursor: default; transform: none; }
+  .feedback { margin-top: 18px; padding: 14px 16px; border-radius: 12px; font-size: 0.95rem; display: none; line-height: 1.5; }
+  .feedback.correct { display:block; background: rgba(74,222,128,0.12); border: 1px solid var(--green); color: #cdf7dc; }
+  .feedback.incorrect { display:block; background: rgba(255,107,107,0.12); border: 1px solid var(--red); color: #ffd9d9; }
+  .next-btn, .start-btn, .restart-btn { margin-top: 20px; background: var(--teal); color: #062824; border: none; padding: 13px 28px; border-radius: 24px; font-weight: 800; font-size: 1rem; cursor: pointer; display: none; }
+  .start-btn, .restart-btn { display: inline-block; }
+  .next-btn:hover, .start-btn:hover, .restart-btn:hover { background: #24b6a4; }
+  .quiz-screen { display:none; }
+  .quiz-screen.active { display:block; }
+  .quiz-start { text-align:center; }
+  .badges { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin: 16px 0 20px; }
+  .badge { background: var(--panel-2); border: 1px solid var(--border); padding: 8px 14px; border-radius: 18px; font-size: 0.86rem; color: var(--text-dim); }
+  .result-screen { text-align: center; }
+  .score-display { font-family: 'Fredoka One', cursive; font-size: 2.8rem; color: var(--teal); margin: 14px 0; }
+  .score-msg { color: var(--text-dim); font-size: 1.05rem; margin-bottom: 18px; }
+  .submit-box { background: rgba(245,185,66,0.1); border: 1px solid var(--amber); border-radius: 12px; padding: 16px 18px; margin-top: 20px; color: #ffe4b0; font-size: 0.95rem; text-align: left; }
+  .submit-box b { color: var(--amber); }
+
+  @media (max-width: 620px) {
+    header h1 { font-size: 1.4rem; }
+    .panel { padding: 20px 14px 26px; }
+    .tab-btn { font-size: 0.8rem; padding: 12px 4px; }
+  }
+
+  .tab-btn { min-width: 100px; }
+</style>
+</head>
+<body><div class="wrap"><div class="brand-badge"><span class="dot"></span> Learn and Help · Python for Data Science</div><header><h1>🐼 Pandas — Summarization &amp; Aggregation</h1><p>Interactive playbook · Runnable examples · 20-question quiz</p><p><a style="color:var(--teal)" href="https://colab.research.google.com/github/sjasthi/Python-DS-Data-Science/blob/main/pandas/5_pandas_summarization_aggregataion.ipynb" target="_blank" rel="noopener">Open notebook in Colab</a></p></header><div id="pyodideStatus">Starting Python engine… first load may take a while. Lessons and quiz are available while it loads.</div><div class="tabs"><button class="tab-btn active" data-tab="setup">🚢 Setup</button><button class="tab-btn " data-tab="categorical">📋 Categories</button><button class="tab-btn " data-tab="numeric">📊 Statistics</button><button class="tab-btn " data-tab="aggregate">🧮 Aggregations</button><button class="tab-btn " data-tab="rows">↔️ Rows</button><button class="tab-btn " data-tab="frame">🗂️ DataFrame</button><button class="tab-btn" data-tab="quiz">📝 Quiz</button></div><div class="panel"><div class="tab-content active" id="tab-setup"><h2>Summarize the Titanic dataset</h2><p class="lead">Summaries compress many observations into useful counts and statistics. Predict the output, run the code, and change it. All cells share variables. Internet is required for the Python engine; if Titanic cannot be fetched, a labeled 12-row sample is used and results differ.</p><div class="op-tag op-load">Load or reset the data</div><div class="pyodide-cell"><textarea aria-label="Load or reset the data code" class="code-input" spellcheck="false" rows="6">import pandas as pd
+url = &quot;https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv&quot;
+df = load_csv(url)  # In Colab use pd.read_csv(url)
+print(df.head())
+print(&quot;Shape:&quot;, df.shape)</textarea><div class="cell-toolbar"><span class="cell-label">The original notebook uses the full Titanic CSV. This helper also supports a sample fallback.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">A small example with missing values</div><div class="pyodide-cell"><textarea aria-label="A small example with missing values code" class="code-input" spellcheck="false" rows="5">s = pd.Series([10, 20, 20, None, 50])
+print(&quot;Rows:&quot;, len(s))
+print(&quot;Present:&quot;, s.count())
+print(&quot;Missing:&quot;, s.isna().sum())</textarea><div class="cell-toolbar"><span class="cell-label">len counts all entries; count excludes missing entries.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-categorical"><h2>Categorical summaries</h2><p class="lead">Use counts and proportions for labels such as Embarked. Missing values are excluded by default from nunique and value_counts, but unique includes them.</p><div class="op-tag op-load">Unique values and distinct counts</div><div class="pyodide-cell"><textarea aria-label="Unique values and distinct counts code" class="code-input" spellcheck="false" rows="4">print(df[&quot;Embarked&quot;].unique())
+print(df[&quot;Embarked&quot;].nunique())
+print(df[&quot;Embarked&quot;].nunique(dropna=False))</textarea><div class="cell-toolbar"><span class="cell-label">unique returns values; nunique returns their count. dropna=False counts missing as a distinct value.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Frequency and percentage</div><div class="pyodide-cell"><textarea aria-label="Frequency and percentage code" class="code-input" spellcheck="false" rows="4">print(df[&quot;Embarked&quot;].value_counts())
+print(df[&quot;Embarked&quot;].value_counts(normalize=True) * 100)
+print(df[&quot;Embarked&quot;].value_counts(dropna=False, normalize=True) * 100)</textarea><div class="cell-toolbar"><span class="cell-label">Default percentages use non-missing observations as the denominator. Include missing to use all rows.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Modes and missing values</div><div class="pyodide-cell"><textarea aria-label="Modes and missing values code" class="code-input" spellcheck="false" rows="4">print(&quot;All modes:&quot;, df[&quot;Embarked&quot;].mode())
+print(&quot;First mode:&quot;, df[&quot;Embarked&quot;].mode().iloc[0])
+print(df[[&quot;Age&quot;, &quot;Embarked&quot;, &quot;Cabin&quot;]].isna().sum())</textarea><div class="cell-toolbar"><span class="cell-label">mode can return multiple tied values. Selecting the first hides ties; an all-missing Series has no default mode.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-numeric"><h2>Numeric summaries: center, spread, and shape</h2><p class="lead">A mean alone cannot describe variability. Choose statistics that answer your question; numeric identifiers are not always meaningful measurements.</p><div class="op-tag op-load">Center and counts</div><div class="pyodide-cell"><textarea aria-label="Center and counts code" class="code-input" spellcheck="false" rows="5">fare = df[&quot;Fare&quot;]
+print(fare.agg([&quot;mean&quot;, &quot;median&quot;, &quot;count&quot;]))
+print(&quot;Modes:&quot;, fare.mode().tolist())
+print(&quot;Total rows:&quot;, len(fare))</textarea><div class="cell-toolbar"><span class="cell-label">mean and median skip missing values by default. Median is less sensitive to extreme values.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Spread</div><div class="pyodide-cell"><textarea aria-label="Spread code" class="code-input" spellcheck="false" rows="4">print(fare.agg([&quot;min&quot;, &quot;max&quot;, &quot;std&quot;, &quot;var&quot;]))
+print(&quot;Range:&quot;, fare.max() - fare.min())
+print(&quot;Population SD:&quot;, fare.std(ddof=0))</textarea><div class="cell-toolbar"><span class="cell-label">std and var default to sample statistics (ddof=1). Range uses only the extremes.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Percentiles and IQR</div><div class="pyodide-cell"><textarea aria-label="Percentiles and IQR code" class="code-input" spellcheck="false" rows="5">q = fare.quantile([0.25, 0.5, 0.75])
+print(q)
+print(&quot;IQR:&quot;, q.loc[0.75] - q.loc[0.25])
+print(fare.describe())</textarea><div class="cell-toolbar"><span class="cell-label">IQR = Q3 − Q1. describe gives count, mean, std, min, quartiles, and max for numeric data.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Skewness and kurtosis</div><div class="pyodide-cell"><textarea aria-label="Skewness and kurtosis code" class="code-input" spellcheck="false" rows="3">print(&quot;Skewness:&quot;, fare.skew())
+print(&quot;Excess kurtosis:&quot;, fare.kurt())</textarea><div class="cell-toolbar"><span class="cell-label">Positive skew indicates a longer right tail. pandas reports excess kurtosis: the normal reference is 0, not 3. Zero skew does not prove symmetry.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Zero, non-zero, and missing</div><div class="pyodide-cell"><textarea aria-label="Zero, non-zero, and missing code" class="code-input" spellcheck="false" rows="4">print(&quot;Missing:&quot;, fare.isna().sum())
+print(&quot;Zero:&quot;, fare.eq(0).sum())
+print(&quot;Non-zero, non-missing:&quot;, (fare.notna() &amp; fare.ne(0)).sum())</textarea><div class="cell-toolbar"><span class="cell-label">For ordinary float NaN, NaN != 0 is True. Add notna() when counting observed non-zero values.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-aggregate"><h2>Totals, cumulative values, ranks, and custom summaries</h2><p class="lead">A reduction returns a summary. Cumulative operations and rank preserve one position per input observation.</p><div class="op-tag op-load">Sum and product</div><div class="pyodide-cell"><textarea aria-label="Sum and product code" class="code-input" spellcheck="false" rows="4">print(&quot;Total fare:&quot;, fare.sum())
+print(&quot;Product:&quot;, fare.prod())
+print(&quot;All-missing sum:&quot;, pd.Series([float(&quot;nan&quot;)]).sum(min_count=1))</textarea><div class="cell-toolbar"><span class="cell-label">Products can overflow or become zero; fare product is rarely useful. min_count=1 prevents an all-missing sum becoming 0.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Cumulative operations</div><div class="pyodide-cell"><textarea aria-label="Cumulative operations code" class="code-input" spellcheck="false" rows="4">demo = pd.Series([2, 3, 4])
+print(&quot;Cumulative sum:&quot;, demo.cumsum().tolist())
+print(&quot;Cumulative product:&quot;, demo.cumprod().tolist())</textarea><div class="cell-toolbar"><span class="cell-label">Cumulative values depend on row order: [2,5,9] and [2,6,24].</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Ranking</div><div class="pyodide-cell"><textarea aria-label="Ranking code" class="code-input" spellcheck="false" rows="4">demo = pd.Series([10, 20, 20, 40])
+print(demo.rank().tolist())
+print(demo.rank(ascending=False).tolist())</textarea><div class="cell-toolbar"><span class="cell-label">Default rank assigns the average rank to ties; smaller values receive lower ranks.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Named custom aggregations</div><div class="pyodide-cell"><textarea aria-label="Named custom aggregations code" class="code-input" spellcheck="false" rows="9">summary = fare.agg({
+    &quot;Mean&quot;: &quot;mean&quot;,
+    &quot;Median&quot;: &quot;median&quot;,
+    &quot;Range&quot;: lambda x: x.max() - x.min(),
+    &quot;IQR&quot;: lambda x: x.quantile(.75) - x.quantile(.25),
+    &quot;Skewness&quot;: &quot;skew&quot;
+})
+print(summary)</textarea><div class="cell-toolbar"><span class="cell-label">A Series agg dictionary gives readable result labels.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Flag possible outliers</div><div class="pyodide-cell"><textarea aria-label="Flag possible outliers code" class="code-input" spellcheck="false" rows="5">q1, q3 = fare.quantile(.25), fare.quantile(.75)
+iqr = q3 - q1
+outliers = (fare &lt; q1 - 1.5 * iqr) | (fare &gt; q3 + 1.5 * iqr)
+print(&quot;Possible outliers:&quot;, outliers.sum())</textarea><div class="cell-toolbar"><span class="cell-label">The 1.5×IQR rule flags observations for investigation; it does not prove they are errors.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-rows"><h2>Row-wise summaries and axis</h2><p class="lead">axis=0 reduces down rows, producing a result per column. axis=1 reduces across columns, producing a result per row.</p><div class="op-tag op-load">Average related measurements</div><div class="pyodide-cell"><textarea aria-label="Average related measurements code" class="code-input" spellcheck="false" rows="8">scores = pd.DataFrame({
+    &quot;Math&quot;: [80, 90, 70],
+    &quot;Science&quot;: [85, 95, 75],
+    &quot;English&quot;: [78, 88, 68]
+})
+scores[&quot;Row_Mean&quot;] = scores[[&quot;Math&quot;, &quot;Science&quot;, &quot;English&quot;]].mean(axis=1)
+print(scores)</textarea><div class="cell-toolbar"><span class="cell-label">Select the original subjects explicitly so repeated runs do not average a previously created summary.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Column versus row means</div><div class="pyodide-cell"><textarea aria-label="Column versus row means code" class="code-input" spellcheck="false" rows="4">print(scores[[&quot;Math&quot;, &quot;Science&quot;, &quot;English&quot;]].mean(axis=0))
+print(scores[[&quot;Math&quot;, &quot;Science&quot;, &quot;English&quot;]].mean(axis=1))
+print(df.mean(axis=1, numeric_only=True).head())</textarea><div class="cell-toolbar"><span class="cell-label">Titanic row means mix age, fare, identifiers, and codes. They are executable but lack a meaningful shared unit.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></div><div class="tab-content " id="tab-frame"><h2>Summaries of the whole DataFrame</h2><p class="lead">Check dimensions and missingness first. Select meaningful numeric columns before interpreting statistics or correlations.</p><div class="op-tag op-load">Dimensions and completeness</div><div class="pyodide-cell"><textarea aria-label="Dimensions and completeness code" class="code-input" spellcheck="false" rows="6">print(&quot;Rows and columns:&quot;, df.shape)
+print(&quot;Cells:&quot;, df.size)
+print(&quot;Non-missing per column:\n&quot;, df.count())
+print(&quot;Missing counts:\n&quot;, df.isna().sum())
+print(&quot;Missing percentages:\n&quot;, df.isna().mean() * 100)</textarea><div class="cell-toolbar"><span class="cell-label">size counts all cells, including missing ones. Missing percentage is the mean of a boolean indicator ×100.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Numeric summaries</div><div class="pyodide-cell"><textarea aria-label="Numeric summaries code" class="code-input" spellcheck="false" rows="10">print(df.describe())
+print(df.mean(numeric_only=True))
+print(df.median(numeric_only=True))
+print(df.min(numeric_only=True))
+print(df.max(numeric_only=True))
+print(df.sum(numeric_only=True))
+print(df.std(numeric_only=True))
+print(df.var(numeric_only=True))
+print(df.max(numeric_only=True) - df.min(numeric_only=True))</textarea><div class="cell-toolbar"><span class="cell-label">numeric_only avoids trying arithmetic on text columns; numeric codes still require judgment.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Categories, correlation, cumulative values</div><div class="pyodide-cell"><textarea aria-label="Categories, correlation, cumulative values code" class="code-input" spellcheck="false" rows="6">print(df.nunique())
+print(df.mode().iloc[0])
+print(df[[&quot;Age&quot;, &quot;Fare&quot;]].corr())
+print(df[[&quot;Fare&quot;, &quot;SibSp&quot;]].cumsum().head())
+print(df[[&quot;Fare&quot;, &quot;SibSp&quot;]].cumprod().head())</textarea><div class="cell-toolbar"><span class="cell-label">Correlation uses paired non-missing observations and does not imply causation. Mode may have ties.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><div class="op-tag op-load">Challenge</div><div class="pyodide-cell"><textarea aria-label="Challenge code" class="code-input" spellcheck="false" rows="4"># For Age, report count, mean, median, range, and IQR.
+# Then report the percentage of passengers whose Age is missing.
+# Write your solution here.</textarea><div class="cell-toolbar"><span class="cell-label">Try without looking at the solution.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div><details><summary>Show challenge solution</summary><div class="op-tag op-load">Challenge solution</div><div class="pyodide-cell"><textarea aria-label="Challenge solution code" class="code-input" spellcheck="false" rows="8">age_summary = df[&quot;Age&quot;].agg({
+    &quot;Count&quot;: &quot;count&quot;, &quot;Mean&quot;: &quot;mean&quot;, &quot;Median&quot;: &quot;median&quot;,
+    &quot;Range&quot;: lambda x: x.max() - x.min(),
+    &quot;IQR&quot;: lambda x: x.quantile(.75) - x.quantile(.25)
+})
+print(age_summary)
+print(&quot;Missing Age %:&quot;, df[&quot;Age&quot;].isna().mean() * 100)</textarea><div class="cell-toolbar"><span class="cell-label">Counts describe observed ages; missing percentage uses all passenger rows.</span><button class="run-btn" onclick="runCell(this)">▶ Run</button></div><pre class="output" aria-live="polite"></pre></div></details></div><div class="tab-content" id="tab-quiz">
+
+      <div class="quiz-screen active" id="quizStart">
+        <div class="quiz-start">
+          <h2>📝 Summarization &amp; Aggregation Quiz</h2>
+          <p class="lead">20 questions on categories, missing values, descriptive statistics, cumulative operations, ranks, axes, and DataFrame summaries.</p>
+          <div class="badges">
+            <span class="badge">📝 20 questions</span>
+            <span class="badge">🎯 No time limit</span>
+            <span class="badge">📸 Screenshot your score</span>
+          </div>
+          <button class="start-btn" onclick="startQuiz()">🚀 Start Quiz</button>
+        </div>
+      </div>
+
+      <div class="quiz-screen" id="quizQuestion">
+        <div class="quiz-progress"><div class="quiz-progress-fill" id="progressFill"></div></div>
+        <div class="q-number" id="qNumber">Question 1 of 20</div>
+        <div class="q-text" id="qText"></div>
+        <div class="q-code" id="qCode" style="display:none;"></div>
+        <div class="answers" id="answers"></div>
+        <div class="feedback" id="feedback" aria-live="polite"></div>
+        <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
+      </div>
+
+      <div class="quiz-screen" id="quizResult">
+        <div class="result-screen">
+          <h2>🎉 Quiz Complete!</h2>
+          <div class="score-display" id="scoreDisplay">0/20</div>
+          <div class="score-msg" id="scoreMsg"></div>
+          <button class="restart-btn" onclick="restartQuiz()">🔄 Try Again</button>
+          <div class="submit-box">
+            📸 <b>Submission:</b> Take a screenshot of this results screen showing your score, and submit it through your instructor’s designated course platform.
+          </div>
+        </div>
+      </div>
+
+    </div>
+</div></div>
+<script>
+  // ---------- Tab switching ----------
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ---------- Pyodide setup ----------
+  let pyodideReady = false;
+  let pyodide = null;
+  let outputBuffer = [];
+
+  async function initPyodide() {
+    const statusEl = document.getElementById('pyodideStatus');
+    try {
+      pyodide = await loadPyodide();
+      statusEl.textContent = '📦 Loading pandas + numpy...';
+      await pyodide.loadPackage(['pandas', 'numpy']);
+
+      statusEl.textContent = '🚢 Preparing the Titanic dataset helper...';
+      await pyodide.runPythonAsync(`
+import io
+import pandas as pd
+pd.set_option("display.width", 200)
+pd.set_option("display.max_columns", 20)
+_TITANIC_SAMPLE = """PassengerId,Survived,Pclass,Name,Sex,Age,SibSp,Parch,Ticket,Fare,Cabin,Embarked
+1,0,3,"Braund, Mr. Owen Harris",male,22,1,0,A/5 21171,7.25,,S
+2,1,1,"Cumings, Mrs. John Bradley (Florence Briggs Thayer)",female,38,1,0,PC 17599,71.2833,C85,C
+3,1,3,"Heikkinen, Miss. Laina",female,26,0,0,STON/O2. 3101282,7.925,,S
+4,1,1,"Futrelle, Mrs. Jacques Heath (Lily May Peel)",female,35,1,0,113803,53.1,C123,S
+5,0,3,"Allen, Mr. William Henry",male,35,0,0,373450,8.05,,S
+6,0,3,"Moran, Mr. James",male,,0,0,330877,8.4583,,Q
+7,0,1,"McCarthy, Mr. Timothy J",male,54,0,0,17463,51.8625,E46,S
+8,0,3,"Palsson, Master. Gosta Leonard",male,2,3,1,349909,21.075,,S
+9,1,3,"Johnson, Mrs. Oscar W (Elisabeth Vilhelmina Berg)",female,27,0,2,347742,11.1333,,S
+10,1,2,"Nasser, Mrs. Nicholas (Adele Achem)",female,14,1,0,237736,30.0708,,C
+11,1,3,"Sandstrom, Miss. Marguerite Rut",female,4,1,1,PP 9549,16.7,G6,S
+12,1,1,"Bonnell, Miss. Elizabeth",female,58,0,0,113783,26.55,C103,S"""
+_cache = {}
+def load_csv(url):
+    """Browser-friendly stand-in for pd.read_csv(url). Falls back to a small sample when offline."""
+    if url not in _cache:
+        try:
+            from pyodide.http import open_url
+            _cache[url] = open_url(url).read()
+        except Exception:
+            print("(Could not reach GitHub - using a built-in 12-row sample of the Titanic data.)")
+            return pd.read_csv(io.StringIO(_TITANIC_SAMPLE))
+    return pd.read_csv(io.StringIO(_cache[url]))
+`);
+      pyodide.setStdout({ batched: (msg) => { outputBuffer.push(msg + "\n"); } });
+      await pyodide.runPythonAsync('df = load_csv("https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv"); fare = df["Fare"]');
+      pyodideReady = true;
+      statusEl.textContent = '✅ Python engine ready — click ▶ Run on any code cell!';
+      statusEl.classList.add('ready');
+      setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
+    } catch (err) {
+      statusEl.textContent = '⚠️ Could not load the Python engine. Check your internet connection and reload the page.';
+    }
+  }
+  initPyodide();
+
+  let running = false;
+  async function runCell(button) {
+    if (running) return;
+    const cell = button.closest('.pyodide-cell');
+    const code = cell.querySelector('.code-input').value;
+    const output = cell.querySelector('.output');
+
+    if (!pyodideReady) {
+      output.textContent = 'Python engine is still loading — please wait a few seconds and try again.';
+      output.className = 'output show error';
+      return;
+    }
+
+    running = true;
+    document.querySelectorAll(".run-btn").forEach(b => b.disabled = true);
+    button.textContent = 'Running...';
+    outputBuffer = [];
+
+    try {
+      await pyodide.runPythonAsync(code);
+      output.textContent = outputBuffer.join('') || '(no output — code ran successfully)';
+      output.className = 'output show';
+    } catch (err) {
+      output.textContent = 'Error:\n' + err.message.split('\n').slice(-4).join('\n');
+      output.className = 'output show error';
+    }
+    running = false;
+    document.querySelectorAll(".run-btn").forEach(b => b.disabled = false);
+    button.textContent = '▶ Run';
+  }
+
+  // ---------- Quiz ----------
+  const questions = [
+  {
+    "q": "What does unique() return?",
+    "options": [
+      "Distinct values",
+      "Number of distinct values",
+      "Frequency of every value",
+      "Only the most frequent value"
+    ],
+    "correct": 0,
+    "explain": "unique returns the distinct values themselves, including a missing value when present."
+  },
+  {
+    "q": "For pd.Series(['S', 'C', None, 'S']), what does nunique() return?",
+    "options": [
+      "4",
+      "3",
+      "2",
+      "1"
+    ],
+    "correct": 2,
+    "explain": "nunique excludes missing by default; S and C are the two distinct observed values."
+  },
+  {
+    "q": "How do you include missing values in frequency counts?",
+    "options": [
+      "value_counts(dropna=False)",
+      "value_counts(numeric_only=True)",
+      "count(dropna=False)",
+      "unique(normalize=True)"
+    ],
+    "correct": 0,
+    "explain": "value_counts(dropna=False) retains a category for missing values."
+  },
+  {
+    "q": "For ['S','S','C',None], what percentage does the default normalized count assign to S (rounded to 2 decimals)?",
+    "options": [
+      "50.00%",
+      "66.67%",
+      "75.00%",
+      "100.00%"
+    ],
+    "correct": 1,
+    "explain": "The default excludes missing: 2 of 3 observed values are S."
+  },
+  {
+    "q": "What can mode() return when two values tie for highest frequency?",
+    "options": [
+      "Only the smallest value",
+      "Always a scalar",
+      "Both values in a Series",
+      "An empty DataFrame"
+    ],
+    "correct": 2,
+    "explain": "mode returns a Series and can contain multiple tied modes."
+  },
+  {
+    "q": "For s = pd.Series([10,20,None]), what are len(s) and s.count()?",
+    "options": [
+      "2 and 2",
+      "3 and 3",
+      "2 and 3",
+      "3 and 2"
+    ],
+    "correct": 3,
+    "explain": "len includes the missing entry, while count excludes it."
+  },
+  {
+    "q": "Which statistic is generally less sensitive to extreme fares?",
+    "options": [
+      "Mean",
+      "Median",
+      "Maximum",
+      "Range"
+    ],
+    "correct": 1,
+    "explain": "The median uses the middle ordered values and is less sensitive to extreme values."
+  },
+  {
+    "q": "What degrees-of-freedom adjustment does Series.std() use by default?",
+    "options": [
+      "ddof=0",
+      "ddof=1",
+      "ddof=2",
+      "ddof=-1"
+    ],
+    "correct": 1,
+    "explain": "The default sample standard deviation uses ddof=1."
+  },
+  {
+    "q": "If Q1=10 and Q3=30, what is the IQR?",
+    "options": [
+      "10",
+      "15",
+      "20",
+      "40"
+    ],
+    "correct": 2,
+    "explain": "IQR is Q3 minus Q1: 30−10=20."
+  },
+  {
+    "q": "Which statistic is NOT part of numeric describe() by default?",
+    "options": [
+      "Mean",
+      "Standard deviation",
+      "75th percentile",
+      "Skewness"
+    ],
+    "correct": 3,
+    "explain": "Skewness requires skew(); numeric describe includes mean, std, and quartiles."
+  },
+  {
+    "q": "What does positive skewness indicate?",
+    "options": [
+      "A longer left tail",
+      "A longer right tail",
+      "No missing values",
+      "Equal values throughout"
+    ],
+    "correct": 1,
+    "explain": "Positive skewness indicates a longer right tail."
+  },
+  {
+    "q": "What is the normal-distribution reference for pandas excess kurtosis?",
+    "options": [
+      "0",
+      "1",
+      "3",
+      "100"
+    ],
+    "correct": 0,
+    "explain": "pandas kurt reports excess kurtosis, subtracting the conventional normal reference of 3."
+  },
+  {
+    "q": "Which counts non-zero, non-missing Fare values robustly?",
+    "options": [
+      "(df['Fare'] != 0).sum()",
+      "df['Fare'].count()",
+      "(df['Fare'].notna() & df['Fare'].ne(0)).sum()",
+      "df['Fare'].isna().sum()"
+    ],
+    "correct": 2,
+    "explain": "notna excludes missing values and ne(0) excludes zeros."
+  },
+  {
+    "q": "What is pd.Series([2,3,4]).cumsum().tolist()?",
+    "options": [
+      "[2,3,4]",
+      "[2,6,24]",
+      "[9,9,9]",
+      "[2,5,9]"
+    ],
+    "correct": 3,
+    "explain": "The running sums are 2, 2+3=5, and 2+3+4=9."
+  },
+  {
+    "q": "What is pd.Series([2,3,4]).cumprod().tolist()?",
+    "options": [
+      "[2,5,9]",
+      "[2,6,24]",
+      "[24,24,24]",
+      "[4,9,16]"
+    ],
+    "correct": 1,
+    "explain": "Running products are 2, 2×3=6, and 2×3×4=24."
+  },
+  {
+    "q": "What ranks does pd.Series([10,20,20,40]).rank() produce?",
+    "options": [
+      "[1,2,3,4]",
+      "[1,2,2,3]",
+      "[1,2.5,2.5,4]",
+      "[4,3,2,1]"
+    ],
+    "correct": 2,
+    "explain": "Default ties receive average rank: positions 2 and 3 average to 2.5."
+  },
+  {
+    "q": "Which summarizes a Series using several named functions?",
+    "options": [
+      "s.agg(['mean','median','max'])",
+      "s.unique(['mean','median','max'])",
+      "s.rank(['mean','median','max'])",
+      "s.count(['mean','median','max'])"
+    ],
+    "correct": 0,
+    "explain": "agg accepts a list of aggregation functions."
+  },
+  {
+    "q": "For three subject columns, which calculates an average for each student row?",
+    "options": [
+      "scores.mean(axis=0)",
+      "scores.mean(axis=1)",
+      "scores.count(axis=0)",
+      "scores.nunique()"
+    ],
+    "correct": 1,
+    "explain": "axis=1 reduces across the subject columns for each row."
+  },
+  {
+    "q": "A DataFrame has 12 rows and 4 columns. What are shape and size?",
+    "options": [
+      "(4,12) and 48",
+      "(12,4) and 16",
+      "(12,4) and 48",
+      "(12,4) and 12"
+    ],
+    "correct": 2,
+    "explain": "shape is (rows,columns); size is rows×columns, including missing cells."
+  },
+  {
+    "q": "Which returns missing-value percentages for every column?",
+    "options": [
+      "df.count() * 100",
+      "df.isna().sum() * 100",
+      "df.isna().mean() * 100",
+      "df.mean(numeric_only=True)"
+    ],
+    "correct": 2,
+    "explain": "The mean of a boolean missing indicator is the missing fraction; multiply by 100."
+  }
+];
+
+  let current = 0;
+  let score = 0;
+  let answered = false;
+
+  function showScreen(id) {
+    document.querySelectorAll('.quiz-screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function startQuiz() {
+    current = 0;
+    score = 0;
+    showScreen('quizQuestion');
+    showQuestion();
+  }
+
+  function showQuestion() {
+    answered = false;
+    const item = questions[current];
+    document.getElementById('progressFill').style.width = (current / questions.length * 100) + '%';
+    document.getElementById('qNumber').textContent = `Question ${current + 1} of ${questions.length}`;
+    document.getElementById('qText').textContent = item.q;
+
+    const codeEl = document.getElementById('qCode');
+    if (item.code) { codeEl.style.display = 'block'; codeEl.textContent = item.code; }
+    else { codeEl.style.display = 'none'; }
+
+    const answersDiv = document.getElementById('answers');
+    answersDiv.innerHTML = '';
+    item.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'answer-btn';
+      btn.textContent = opt;
+      btn.onclick = () => selectAnswer(i);
+      answersDiv.appendChild(btn);
+    });
+
+    document.getElementById('feedback').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'none';
+  }
+
+  function selectAnswer(i) {
+    if (answered) return;
+    answered = true;
+    const item = questions[current];
+    const buttons = document.querySelectorAll('.answer-btn');
+    buttons.forEach(b => b.disabled = true);
+
+    const feedback = document.getElementById('feedback');
+    if (i === item.correct) {
+      score++;
+      buttons[i].classList.add('correct');
+      feedback.className = 'feedback correct';
+      feedback.textContent = 'Correct! ' + item.explain;
+    } else {
+      buttons[i].classList.add('incorrect');
+      buttons[item.correct].classList.add('correct');
+      feedback.className = 'feedback incorrect';
+      feedback.textContent = 'Not quite. Correct answer: ' + item.options[item.correct] + '. ' + item.explain;
+    }
+    feedback.style.display = 'block';
+    document.getElementById('nextBtn').style.display = 'inline-block';
+  }
+
+  function nextQuestion() {
+    if (!answered) return;
+    current++;
+    if (current >= questions.length) { showResults(); }
+    else { showQuestion(); }
+  }
+
+  function showResults() {
+    document.getElementById('progressFill').style.width = '100%';
+    showScreen('quizResult');
+    document.getElementById('scoreDisplay').textContent = `${score}/${questions.length}`;
+    let msg;
+    if (score / questions.length >= 0.9) msg = "Outstanding! You can summarize a DataFrame! 🏆";
+    else if (score / questions.length >= 0.7) msg = "Great job! Solid grasp of the fundamentals. 🎯";
+    else if (score / questions.length >= 0.5) msg = "Good start — revisit the tabs and try again! 📚";
+    else msg = "No worries — go back through the Categories, Statistics, Aggregations, Rows, and DataFrame tabs, then retake it! 💪";
+    document.getElementById('scoreMsg').textContent = msg;
+  }
+
+  function restartQuiz() { showScreen('quizStart'); }
+</script>
+</body>
+</html>
+
