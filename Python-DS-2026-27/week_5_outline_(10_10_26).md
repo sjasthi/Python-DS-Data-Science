@@ -11,7 +11,7 @@ We will review and work through the following notebook:
 **Topic:** Data Encapsulation & Exploring Python Libraries
 
 **Notebook Link:**
-https://github.com/sjasthi/Python-DS-Data-Science/blob/main/python_ds_data_encapsulation_and_exploring_libraries.ipynb
+https://github.com/sjasthi/Python-DS-Data-Science/blob/main/python-ds-libs/python_ds_data_encapsulation_and_exploring_libraries.ipynb
 
 **What we'll cover:**
 - Understanding data encapsulation concepts
@@ -20,6 +20,15 @@ https://github.com/sjasthi/Python-DS-Data-Science/blob/main/python_ds_data_encap
 - Using `help()` to understand functions
 - Using `type()` to check data types
 - Working with common Python libraries
+
+
+**Notebook Link:**
+https://github.com/sjasthi/Python-DS-Data-Science/blob/main/python-ds-libs/python_ds_requests_module.ipynb
+
+**What we'll cover:**
+- Exploring the requests module
+- Fetching the data from the websites
+
 
 ---
 
@@ -38,7 +47,7 @@ During class (and as practice), you should:
 
 ## Assignment Due This Week
 
-### Assignment 4: Exploring the Requests Module
+### Assignment: Exploring the Requests Module
 **Due:** End of Week 5  
 **Points:** 25 points
 
