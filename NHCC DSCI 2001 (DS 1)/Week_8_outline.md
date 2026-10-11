@@ -1,6 +1,6 @@
-# DSCI 2000 – Foundations of Data Science
+# DSCI 2001 – Data Science 1
 
-**Normandale Community College**  
+**North Hennepinc Community College**  
 **Instructor:** Dr. Siva Jasthi  
 **Founder, President, and Chief Instructor – Learn and Help**  
 **Website:** [www.learnandhelp.com](https://www.learnandhelp.com)  
