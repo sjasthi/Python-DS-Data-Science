@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Statistical Data Types | Learn and Help</title>
+<style>
+:root{--ink:#172d3b;--green:#12634f;--blue:#174e78;--light:#edf6f3;--line:#d7e3e5}*{box-sizing:border-box}body{margin:0;background:#f4f7f9;color:var(--ink);font:17px/1.6 system-ui,sans-serif}header{background:linear-gradient(115deg,#123d60,#12634f);color:white;padding:44px max(22px,calc((100vw - 1100px)/2))}header p{max-width:760px;margin:10px 0}.eyebrow{text-transform:uppercase;letter-spacing:.13em;font-size:.8rem;font-weight:750}h1{font-size:clamp(2rem,5vw,3.6rem);line-height:1.1;margin:12px 0}h2{font-size:1.9rem;line-height:1.2}h3{margin-top:0}main{max-width:1144px;margin:auto;padding:24px 22px}nav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}button,select{font:inherit}button{cursor:pointer;border:1px solid var(--line);border-radius:10px;background:white;color:var(--blue);padding:10px 16px;font-weight:650}button:hover{background:#e8f1f4}button[aria-selected=true],.primary{background:var(--green);color:white;border-color:var(--green)}button:disabled{opacity:.65;cursor:default}:focus-visible{outline:3px solid #d18500;outline-offset:3px}[hidden]{display:none!important}.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.card,fieldset{background:white;border:1px solid var(--line);border-radius:16px;padding:24px;margin:0 0 20px;min-width:0}.callout{background:var(--light);padding:18px;border-left:5px solid var(--green);border-radius:8px;margin:20px 0}.badge{display:inline-block;background:#e6edf4;color:var(--blue);font-size:.8rem;padding:3px 10px;border-radius:30px}.lead{font-size:1.15rem}.muted{color:#49616e}select{display:block;max-width:100%;padding:10px;background:white;border:1px solid #8ca5b2;border-radius:8px;margin:10px 0;width:100%}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#152d3b;color:#eaf7f5;padding:18px;border-radius:10px;font-size:.9rem}code{font-family:ui-monospace,monospace}details{margin:14px 0}summary{cursor:pointer;color:var(--blue);font-weight:650}label.option{display:block;border:1px solid var(--line);padding:10px 14px;margin:10px 0;border-radius:9px;cursor:pointer}label.option:hover{background:#f1f6f7}input[type=radio]{margin-right:10px;accent-color:var(--green)}legend{font-weight:750;padding:0 8px;max-width:100%}.feedback{padding:12px;border-radius:8px;margin-top:12px}.good{background:#e1f3e9;color:#14563d}.wrong{background:#fff0e7;color:#783900}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.progress{width:100%;accent-color:var(--green);height:14px}footer{padding:30px 22px;text-align:center;color:#49616e;font-size:.88rem}a{color:var(--blue)}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.93rem}th,td{padding:12px;text-align:left;border-bottom:1px solid var(--line)}th{background:var(--light)}#result{scroll-margin-top:20px}.practice button{display:block;width:100%;text-align:left;margin:10px 0}@media(max-width:700px){.grid{grid-template-columns:1fr}header{padding:30px 22px}.card,fieldset{padding:18px}nav button{flex:1 0 100px;font-size:.9rem}body{font-size:16px}}@media print{nav,button{display:none}section[hidden]{display:block!important}header{background:white;color:black}pre{background:#eee;color:black}section{break-before:page}}
+</style></head><body>
+<header><div class="eyebrow">Learn and Help · Python Data Science</div><h1>Make sense of data types.</h1><p class="lead">Explore seven statistical data types, inspect real examples, and test your reasoning in a 10-question quiz.</p><p>Empowering Minds, Inspiring Generosity.</p></header>
+<main><nav role="tablist" aria-label="Playbook chapters" id="tabs"></nav>
+<section id="panel-overview" role="tabpanel" aria-labelledby="tab-overview"><span class="badge">Start here · About 25–35 minutes</span><h2>One variable, several useful descriptions.</h2><p class="lead">Before choosing a chart or calculating an average, ask what the values mean.</p>
+<div class="grid"><div class="card"><h3>Qualitative → categories</h3><p>Names, groups, or ordered labels: pet species, school name, and satisfaction level.</p><p><strong>Nominal</strong> has no inherent order. <strong>Ordinal</strong> has a meaningful order. <strong>Binary</strong> describes exactly two possible categories.</p></div><div class="card"><h3>Quantitative → amounts</h3><p>Counts or measurements: books donated, height, and elapsed time.</p><p><strong>Discrete / continuous</strong> describes possible values. <strong>Interval / ratio</strong> describes how to interpret differences and zero.</p></div></div>
+<div class="callout"><strong>These labels answer different questions.</strong> A book count is discrete and ratio. Celsius temperature is continuous and interval. A Pass/Fail status has two categories (binary) and can be treated as nominal labels.</div>
+<div class="card"><h3>Build a data dictionary</h3><p>Change the variable to inspect its classifications.</p><label for="dictionary">Variable</label><select id="dictionary"><option value="books">Books donated</option><option value="temp">Temperature in Celsius</option><option value="height">Height in meters</option><option value="rating">Satisfaction rating (1–5)</option><option value="pass">Pass/Fail status</option><option value="id">Student ID</option></select><p id="dictionary-result" aria-live="polite"></p></div>
+<div class="card"><h3>A quick reference</h3><div class="table-wrap"><table><thead><tr><th>Question</th><th>Data type</th><th>Example</th></tr></thead><tbody><tr><td>Labels with no inherent order?</td><td>Nominal</td><td>Pet species</td></tr><tr><td>Ordered labels without known equal gaps?</td><td>Ordinal</td><td>Skill level</td></tr><tr><td>Equal gaps, reference zero?</td><td>Interval</td><td>Temperature in °C</td></tr><tr><td>Equal gaps, true zero?</td><td>Ratio</td><td>Mass in kg</td></tr><tr><td>Separate countable numeric values?</td><td>Discrete</td><td>Student count</td></tr><tr><td>Measurements along a continuum?</td><td>Continuous</td><td>Height</td></tr><tr><td>Exactly two categories?</td><td>Binary</td><td>Registered / Not registered</td></tr></tbody></table></div></div>
+<div class="callout"><strong>Statistical meaning ≠ Python storage type.</strong> An <code>int</code> can store a count, an ID, or an ordinal code. A <code>float</code> column does not automatically mean continuous data. Read the data dictionary and units.</div><button class="primary" id="start">Explore Nominal →</button></section>
+<div id="lessons"></div>
+<section id="panel-quiz" role="tabpanel" aria-labelledby="tab-quiz" hidden><span class="badge">Final challenge · 10 questions · 1 point each</span><h2>Apply what you learned.</h2><p>Choose one answer per question. Submit all 10 to see your score, explanations, and lessons to revisit. This is a practice quiz; answers are not sent to the instructor.</p><p id="answered" aria-live="polite">0 of 10 answered</p><progress class="progress" id="progress" max="10" value="0" aria-label="Questions answered"></progress><form id="quiz-form"><div id="questions"></div><div class="row"><button class="primary" type="submit">Grade quiz</button><button type="button" id="retry">Reset quiz</button></div></form><div id="result" tabindex="-1" aria-live="polite"></div></section>
+<noscript><p>This interactive playbook needs JavaScript enabled. The overview and quick reference remain available.</p></noscript>
+</main><footer><a href="https://www.learnandhelp.com">www.learnandhelp.com</a> · Empowering Minds, Inspiring Generosity.<br>Concept references: <a href="https://archive.cdc.gov/www_cdc_gov/csels/dsepd/ss1978/lesson2/section2.html">CDC: Types of variables</a> · <a href="https://pandas.pydata.org/docs/user_guide/categorical.html">pandas: Categorical data</a><br>Python snippets are examples to run in a notebook with pandas installed; this page does not execute Python. Works offline after download.</footer>
+<script>
+const lessons = [
+  {
+    "id": "nominal",
+    "name": "Nominal",
+    "group": "Measurement scale",
+    "tag": "Names without ranks",
+    "definition": "Categories identify different groups, with no inherent ranking.",
+    "examples": [
+      [
+        "Favorite pet",
+        "Dog, Cat, Bird, Fish",
+        "These are labels. Alphabetical order does not create a statistical rank."
+      ],
+      [
+        "Student ID",
+        "101, 205, 309",
+        "Digits identify students; adding or averaging IDs has no useful meaning."
+      ],
+      [
+        "Travel mode",
+        "Bus, Train, Bicycle",
+        "Count each category to compare how students travel."
+      ]
+    ],
+    "use": "Use counts, percentages, mode, and bar charts. Do not calculate an average of category codes.",
+    "trap": "Encoding Dog = 1 and Cat = 2 does not make Cat twice as much pet.",
+    "code": "import pandas as pd\npets = pd.Series([\"Dog\", \"Cat\", \"Dog\", \"Bird\"], dtype=\"category\")\nprint(pets.value_counts())",
+    "output": "Dog     2\nCat     1\nBird    1\n(counts; display order may vary)",
+    "practice": "A dataset stores school names as numbers: 10, 20, 30. What should you do?",
+    "options": [
+      "Count students in each school",
+      "Average the school codes",
+      "Conclude school 20 is twice school 10"
+    ],
+    "answer": 0,
+    "why": "The numbers are labels. Counts by school are meaningful; arithmetic on the labels is not."
+  },
+  {
+    "id": "ordinal",
+    "name": "Ordinal",
+    "group": "Measurement scale",
+    "tag": "Order without equal gaps",
+    "definition": "Categories have a meaningful order, but distances between adjacent categories are not established as equal.",
+    "examples": [
+      [
+        "Marathon finish place",
+        "1st, 2nd, 3rd",
+        "Ranks tell who finished ahead, not how many seconds apart."
+      ],
+      [
+        "Satisfaction rating",
+        "Very dissatisfied \u2192 Dissatisfied \u2192 Neutral \u2192 Satisfied \u2192 Very satisfied",
+        "A 1\u20135 code preserves order, but equal steps in satisfaction are not guaranteed."
+      ],
+      [
+        "Skill level",
+        "Beginner \u2192 Intermediate \u2192 Advanced",
+        "Sort using the intended order, rather than alphabetically."
+      ]
+    ],
+    "use": "Use ordered counts, mode, and median category. Bar charts should preserve category order.",
+    "trap": "A rating of 4 is not necessarily twice the satisfaction of a rating of 2.",
+    "code": "import pandas as pd\nlevels = pd.Categorical(\n    [\"Advanced\", \"Beginner\", \"Intermediate\"],\n    categories=[\"Beginner\", \"Intermediate\", \"Advanced\"],\n    ordered=True\n)\nprint(list(levels.sort_values()))",
+    "output": "['Beginner', 'Intermediate', 'Advanced']",
+    "practice": "The winner finishes in 60 minutes and the runner-up in 90. What do the ranks alone tell you?",
+    "options": [
+      "The time gap is always one minute",
+      "First place finished before second place",
+      "Second place took twice as long"
+    ],
+    "answer": 1,
+    "why": "Ranks encode order. Actual finish times are needed to measure a time difference or ratio."
+  },
+  {
+    "id": "interval",
+    "name": "Interval",
+    "group": "Measurement scale",
+    "tag": "Equal gaps; a chosen zero",
+    "definition": "Equal differences are meaningful, but zero does not represent an absence of the measured quantity. Ratios of raw readings are not meaningful.",
+    "examples": [
+      [
+        "Celsius temperature",
+        "10\u00b0C, 20\u00b0C, 30\u00b0C",
+        "Each step is 10\u00b0C. Zero Celsius is a reference point, not an absence of thermal energy."
+      ],
+      [
+        "Fahrenheit temperature",
+        "32\u00b0F, 50\u00b0F, 68\u00b0F",
+        "The gaps are equal (18\u00b0F), but 64\u00b0F is not twice as hot as 32\u00b0F."
+      ],
+      [
+        "Calendar year",
+        "2000, 2010, 2020",
+        "Year differences are useful; year 2020 is not twice year 1010."
+      ]
+    ],
+    "use": "Compare differences and calculate means when appropriate. Keep the scale and unit visible.",
+    "trap": "20\u00b0C is 10\u00b0C warmer than 10\u00b0C, but not twice as hot. Kelvin is a ratio scale.",
+    "code": "import pandas as pd\ntemp_c = pd.Series([10.0, 20.0, 30.0])\nprint(temp_c.mean())\nprint(temp_c.iloc[1] - temp_c.iloc[0])",
+    "output": "20.0\n10.0",
+    "practice": "A room warms from 10\u00b0C to 20\u00b0C. Which interpretation is supported?",
+    "options": [
+      "Its temperature rose by 10\u00b0C",
+      "It became twice as hot",
+      "Its thermal energy doubled"
+    ],
+    "answer": 0,
+    "why": "Subtraction is meaningful on the Celsius scale. Multiplying Celsius readings does not establish a physical temperature ratio."
+  },
+  {
+    "id": "ratio",
+    "name": "Ratio",
+    "group": "Measurement scale",
+    "tag": "Equal gaps and a true zero",
+    "definition": "Equal differences and ratios are meaningful because zero represents none of the measured quantity.",
+    "examples": [
+      [
+        "Mass",
+        "0 kg, 2 kg, 4 kg",
+        "4 kg is twice 2 kg; zero represents no mass."
+      ],
+      [
+        "Elapsed time",
+        "0 s, 10 s, 20 s",
+        "20 seconds is twice the duration of 10 seconds."
+      ],
+      [
+        "Books donated",
+        "0, 5, 10 books",
+        "10 books is twice 5 books. This variable is also discrete."
+      ]
+    ],
+    "use": "Compare differences and ratios, and summarize with means or medians as appropriate. Check for zero before dividing.",
+    "trap": "Ratio does not mean continuous: a count of books is both ratio and discrete.",
+    "code": "import pandas as pd\nmass_kg = pd.Series([2.0, 4.0, 6.0])\nprint(mass_kg.mean())\nprint(mass_kg.iloc[1] / mass_kg.iloc[0])",
+    "output": "4.0\n2.0",
+    "practice": "One box has mass 3 kg and another 6 kg. Which claim is meaningful?",
+    "options": [
+      "Mass has an arbitrary zero",
+      "The second box has twice the mass",
+      "Mass must be a category"
+    ],
+    "answer": 1,
+    "why": "Mass has a meaningful zero, so the ratio 6 / 3 = 2 has a physical interpretation."
+  },
+  {
+    "id": "discrete",
+    "name": "Discrete",
+    "group": "Numeric value pattern",
+    "tag": "Separate, countable values",
+    "definition": "A quantitative variable is discrete when its possible values are separate and countable. Counts are a common example.",
+    "examples": [
+      [
+        "Classroom size",
+        "25, 30, 32 students",
+        "You can count 30 students, but not 30.5 students in a classroom."
+      ],
+      [
+        "Cars through a toll booth",
+        "150, 200, 225 per day",
+        "Each car adds one to the count."
+      ],
+      [
+        "Books donated per student",
+        "0, 1, 2, 3, \u2026",
+        "Zero is possible; counts are also measured on a ratio scale."
+      ]
+    ],
+    "use": "Use frequency tables and bar charts for small ranges. Means of counts can be fractional even when individual counts are whole numbers.",
+    "trap": "Discrete does not mean every numeric code: student ID numbers are nominal identifiers.",
+    "code": "import pandas as pd\nbooks = pd.Series([2, 3, 4, 5], dtype=\"int64\")\nprint(books.sum())\nprint(books.mean())",
+    "output": "14\n3.5",
+    "practice": "Four students donate 2, 3, 4, and 5 books. Is their average of 3.5 books valid?",
+    "options": [
+      "No, the data become continuous",
+      "Yes, an average count can be fractional",
+      "No, each student must donate 3.5 books"
+    ],
+    "answer": 1,
+    "why": "The observations remain discrete. Their mean is 14 / 4 = 3.5, which summarizes the group."
+  },
+  {
+    "id": "continuous",
+    "name": "Continuous",
+    "group": "Numeric value pattern",
+    "tag": "Measurements along a continuum",
+    "definition": "A quantitative variable is continuous when it can, in principle, take any value within an interval. Recorded measurements have limited precision.",
+    "examples": [
+      [
+        "Height",
+        "1.50 m, 1.503 m, 1.5037 m",
+        "Greater precision can reveal values between recorded measurements."
+      ],
+      [
+        "Elapsed running time",
+        "12.1 s, 12.15 s, 12.153 s",
+        "Rounding a timer display does not make underlying time discrete."
+      ],
+      [
+        "Celsius temperature",
+        "15\u00b0C, 15.2\u00b0C, 15.24\u00b0C",
+        "Temperature is continuous and Celsius uses an interval scale."
+      ]
+    ],
+    "use": "Use histograms, box plots, and summaries such as means and medians. Record units and precision.",
+    "trap": "A height recorded as 170 cm can still be continuous. A Python integer or float alone does not determine its statistical meaning.",
+    "code": "import pandas as pd\nheight_m = pd.Series([1.50, 1.65, 1.80])\nprint(round(height_m.mean(), 2))\nprint(round(height_m.max() - height_m.min(), 2))",
+    "output": "1.65\n0.3",
+    "practice": "Heights are rounded to the nearest centimeter. How is underlying height classified?",
+    "options": [
+      "Nominal because the values are rounded",
+      "Continuous because values between readings are possible",
+      "Discrete because the display uses integers"
+    ],
+    "answer": 1,
+    "why": "Measurement precision limits the recorded values. The underlying physical quantity remains continuous."
+  },
+  {
+    "id": "binary",
+    "name": "Binary",
+    "group": "Number of categories",
+    "tag": "Exactly two possible categories",
+    "definition": "A binary categorical variable has exactly two possible categories. Pass/Fail is a common example; it can also be described as nominal when used as two labels.",
+    "examples": [
+      [
+        "Exam outcome",
+        "Pass / Fail",
+        "Two labels describe outcome. Here we treat them as a two-category status, rather than as graded achievement levels."
+      ],
+      [
+        "Registration status",
+        "Registered / Not registered",
+        "Both categories must be defined consistently."
+      ],
+      [
+        "Permission granted",
+        "True / False",
+        "Booleans can store binary categories. Missing or unknown is not automatically False."
+      ]
+    ],
+    "use": "Use counts, proportions, and bar charts. With an explicit 1 = Yes, 0 = No encoding and no missing data, the mean is the proportion Yes.",
+    "trap": "Binary describes two possible categories. A 0/1 encoding does not automatically turn a category into a physical ratio measurement.",
+    "code": "import pandas as pd\nregistered = pd.Series([True, False, True, True])\nprint(registered.sum())\nprint(registered.mean())",
+    "output": "3\n0.75",
+    "practice": "With Yes = 1 and No = 0, the mean of [1, 0, 1, 1] is 0.75. What does it mean?",
+    "options": [
+      "The labels are continuous measurements",
+      "75% of responses are Yes",
+      "There are 0.75 categories"
+    ],
+    "answer": 1,
+    "why": "Three of the four responses are Yes, so the proportion is 3 / 4 = 0.75, or 75%."
+  }
+];
+const quiz = [
+  [
+    "Which measurement scale describes pet labels Dog, Cat, Bird, and Fish?",
+    [
+      "Nominal",
+      "Ordinal",
+      "Interval",
+      "Ratio"
+    ],
+    0,
+    "The labels have no inherent ranking.",
+    "Ask whether there is a meaningful order.",
+    "nominal"
+  ],
+  [
+    "Marathon finishing positions (1st, 2nd, 3rd) use which measurement scale?",
+    [
+      "Ratio",
+      "Interval",
+      "Ordinal",
+      "Nominal"
+    ],
+    2,
+    "Finishing position gives a rank without the time gaps.",
+    "Can the ranks reveal how many seconds apart runners finish?",
+    "ordinal"
+  ],
+  [
+    "Which statement about a rise from 15\u00b0C to 25\u00b0C is justified?",
+    [
+      "It is twice as hot",
+      "The increase is 10\u00b0C",
+      "There is no meaningful difference",
+      "25\u00b0C means 25 times the thermal energy of 1\u00b0C"
+    ],
+    1,
+    "Celsius supports differences: 25 \u2212 15 = 10\u00b0C. Its chosen zero prevents that interpretation of ratios.",
+    "Consider subtraction versus division.",
+    "interval"
+  ],
+  [
+    "Which measurement scale describes elapsed time in seconds?",
+    [
+      "Nominal",
+      "Ordinal",
+      "Interval",
+      "Ratio"
+    ],
+    3,
+    "Zero seconds means no elapsed duration, and 20 seconds is twice 10 seconds.",
+    "What would zero elapsed time mean?",
+    "ratio"
+  ],
+  [
+    "Considering the pattern of possible numeric values, classroom student count is:",
+    [
+      "Continuous",
+      "Discrete",
+      "Nominal",
+      "Ordinal"
+    ],
+    1,
+    "A classroom contains a countable whole number of students, not a fractional student. It is also ratio-scaled.",
+    "Think about whether a value of 25.5 students is possible.",
+    "discrete"
+  ],
+  [
+    "Considering the underlying quantity, a person\u2019s height rounded to whole centimeters is:",
+    [
+      "Continuous",
+      "Discrete",
+      "Binary",
+      "Nominal"
+    ],
+    0,
+    "Underlying height can fall between recorded readings; rounding limits precision.",
+    "Separate the physical quantity from the recording precision.",
+    "continuous"
+  ],
+  [
+    "A single satisfaction item is coded 1 = Very dissatisfied through 5 = Very satisfied. Its measurement scale is:",
+    [
+      "Ratio",
+      "Interval",
+      "Nominal",
+      "Ordinal"
+    ],
+    3,
+    "The response categories are ordered, but equal distances in satisfaction are not established.",
+    "Does a numeric code guarantee equal gaps in experience?",
+    "ordinal"
+  ],
+  [
+    "An exam outcome has only Pass and Fail. Which term specifically describes the number of possible categories?",
+    [
+      "Interval",
+      "Ratio",
+      "Binary",
+      "Continuous"
+    ],
+    2,
+    "Binary means two possible categories. The outcome can also be treated as nominal labels.",
+    "Focus on how many categories are possible.",
+    "binary"
+  ],
+  [
+    "Which pair correctly describes the number of donated books?",
+    [
+      "Continuous and interval",
+      "Discrete and ratio",
+      "Nominal and continuous",
+      "Ordinal and interval"
+    ],
+    1,
+    "Books are counted in separate whole units, and zero means no books, so ratios of counts are meaningful.",
+    "Evaluate the value pattern and the measurement scale separately.",
+    "discrete"
+  ],
+  [
+    "School codes 101, 205, and 309 identify schools. Which summary is meaningful?",
+    [
+      "Mean school code",
+      "Ratio of school codes",
+      "Difference in school codes",
+      "Count of students per school"
+    ],
+    3,
+    "The codes are nominal labels. Group counts summarize students; arithmetic on identifiers has no useful interpretation.",
+    "Consider what the digits represent rather than their storage type.",
+    "nominal"
+  ]
+];
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const chapters=[['overview','Overview'],...lessons.map(l=>[l.id,l.name]),['quiz','Quiz · 10']];
+$('tabs').innerHTML=chapters.map(([id,name],i)=>`<button role="tab" id="tab-${id}" aria-controls="panel-${id}" aria-selected="${i===0}" tabindex="${i===0?0:-1}" data-tab="${id}">${name}</button>`).join('');
+function show(id,focus=false){for(const [key] of chapters){$('panel-'+key).hidden=key!==id;const t=$('tab-'+key);t.setAttribute('aria-selected',String(key===id));t.tabIndex=key===id?0:-1;}if(focus)$('tab-'+id).focus();}
+$('tabs').addEventListener('click',e=>{const t=e.target.closest('[data-tab]');if(t)show(t.dataset.tab);});
+$('tabs').addEventListener('keydown',e=>{const i=chapters.findIndex(([id])=>'tab-'+id===document.activeElement.id);if(i<0)return;let n=i;if(e.key==='ArrowRight')n=(i+1)%chapters.length;else if(e.key==='ArrowLeft')n=(i+chapters.length-1)%chapters.length;else if(e.key==='Home')n=0;else if(e.key==='End')n=chapters.length-1;else return;e.preventDefault();show(chapters[n][0],true);});
+$('lessons').innerHTML=lessons.map((l,i)=>`<section role="tabpanel" id="panel-${l.id}" aria-labelledby="tab-${l.id}" hidden><span class="badge">${l.group} · ${i+1} / 7</span><h2>${l.name}: ${l.tag}</h2><p class="lead">${l.definition}</p><div class="grid"><div class="card"><h3>Example explorer</h3><label for="example-${l.id}">Choose a real-world example</label><select id="example-${l.id}">${l.examples.map((x,j)=>`<option value="${j}">${x[0]}</option>`).join('')}</select><div id="example-text-${l.id}" aria-live="polite"></div><h3>How to analyze it</h3><p>${l.use}</p></div><div class="card"><h3>See it in Python / pandas</h3><pre><code>${esc(l.code)}</code></pre><details><summary>Reveal expected output</summary><pre>${esc(l.output)}</pre></details></div></div><div class="callout"><strong>Watch out:</strong> ${l.trap}</div><div class="card practice"><h3>Try a quick check</h3><p>${l.practice}</p>${l.options.map((o,j)=>`<button data-practice="${l.id}" data-choice="${j}" aria-describedby="feedback-${l.id}">${esc(o)}</button>`).join('')}<div id="feedback-${l.id}" aria-live="polite"></div></div><button data-next="${i<6?lessons[i+1].id:'quiz'}">Next: ${i<6?lessons[i+1].name:'Final quiz'} →</button></section>`).join('');
+lessons.forEach(l=>{function update(){const ex=l.examples[Number($('example-'+l.id).value)];$('example-text-'+l.id).innerHTML=`<p><strong>${esc(ex[1])}</strong></p><p>${esc(ex[2])}</p>`;} $('example-'+l.id).addEventListener('change',update);update();});
+$('lessons').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.next){show(b.dataset.next,true);return;}if(b.dataset.practice){const l=lessons.find(x=>x.id===b.dataset.practice),ok=Number(b.dataset.choice)===l.answer;const f=$('feedback-'+l.id);f.className='feedback '+(ok?'good':'wrong');f.textContent=ok?'Correct. '+l.why:'Try again. '+(l.id==='interval'?'Think about whether zero Celsius means no thermal energy.':l.id==='ordinal'?'Ranks provide order, not distances.':l.id==='ratio'?'Ask whether zero means none of the measured quantity.':l.id==='nominal'?'The codes identify groups; they do not measure amounts.':l.id==='continuous'?'Rounding changes the recording precision.':l.id==='discrete'?'A group average does not have to be a possible individual count.':'Count the Yes responses and divide by the total.');}});
+const descriptions={books:'Quantitative · Discrete · Ratio. Whole books are counted, and zero means no books.',temp:'Quantitative · Continuous · Interval. Celsius has meaningful gaps and a reference zero.',height:'Quantitative · Continuous · Ratio. Heights are measurements with a true zero.',rating:'Qualitative · Ordinal. The 1–5 codes give order without guaranteed equal gaps.',pass:'Categorical · Binary. Exactly two possible outcomes; treated here as nominal status labels.',id:'Qualitative · Nominal. Student IDs are labels, even if stored as integers.'};
+function dictionary(){ $('dictionary-result').textContent=descriptions[$('dictionary').value]; }$('dictionary').addEventListener('change',dictionary);dictionary();$('start').addEventListener('click',()=>show('nominal',true));
+$('questions').innerHTML=quiz.map((q,i)=>`<fieldset id="question-${i}"><legend>${i+1}. ${esc(q[0])}</legend>${q[1].map((o,j)=>`<label class="option"><input type="radio" name="q${i}" value="${j}">${String.fromCharCode(65+j)}. ${esc(o)}</label>`).join('')}<details><summary>Need a hint?</summary><p>${esc(q[4])}</p></details><div id="review-${i}" aria-live="polite"></div></fieldset>`).join('');
+function count(){const n=$('quiz-form').querySelectorAll('input:checked').length;$('answered').textContent=`${n} of 10 answered`;$('progress').value=n;return n;}
+$('quiz-form').addEventListener('change',count);
+$('quiz-form').addEventListener('submit',e=>{e.preventDefault();if(count()!==10){$('result').innerHTML='<div class="feedback wrong">Please answer all 10 questions before grading.</div>';$('result').focus();const first=quiz.findIndex((q,i)=>!document.querySelector(`input[name="q${i}"]:checked`));document.querySelector(`input[name="q${first}"]`).focus();return;}let score=0;const missed=new Set();quiz.forEach((q,i)=>{const selected=Number(document.querySelector(`input[name="q${i}"]:checked`).value),ok=selected===q[2];if(ok)score++;else missed.add(q[5]);$('review-'+i).innerHTML=`<div class="feedback ${ok?'good':'wrong'}"><strong>${ok?'Correct':'Review'} · Answer: ${esc(q[1][q[2]])}.</strong> ${esc(q[3])}</div>`;});$('quiz-form').querySelectorAll('input').forEach(el=>el.disabled=true);$('quiz-form').querySelector('button[type=submit]').disabled=true;$('result').innerHTML=`<div class="card"><h3>Your score: ${score} / 10 (${score*10}%)</h3><p>${score===10?'Excellent work! You distinguished the classification dimensions.':'Review the explanations under each question, revisit the suggested lessons, and try again.'}</p>${[...missed].map(id=>`<button type="button" data-review="${id}">Review ${lessons.find(l=>l.id===id).name}</button>`).join('')}<p class="muted">Practice result only. Use Reset quiz to start a new attempt; refreshing the page also clears this attempt.</p></div>`;$('result').focus();});
+$('result').addEventListener('click',e=>{const b=e.target.closest('[data-review]');if(b)show(b.dataset.review,true);});
+$('retry').addEventListener('click',()=>{$('quiz-form').reset();$('quiz-form').querySelectorAll('input').forEach(el=>el.disabled=false);$('quiz-form').querySelector('button[type=submit]').disabled=false;quiz.forEach((q,i)=>{$('review-'+i).textContent='';});$('quiz-form').querySelectorAll('details').forEach(d=>d.open=false);$('result').textContent='';count();document.querySelector('input[name=q0]').focus();});
+</script></body></html>
