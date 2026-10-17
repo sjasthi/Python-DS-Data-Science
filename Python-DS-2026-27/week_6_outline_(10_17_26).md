@@ -45,7 +45,7 @@ Welcome to Week 6! This week we dive into the foundation of Data Science - under
 ### Interactive Data Types Playbook
 **Hands-on practice with data type concepts!**
 
-🎯 [Download: Data Types Interactive Playbook](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/play/python_ds_data_types_playbook.html](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Quizzes/python_ds_statistical_data_types_playbook_and_quiz.html)
+🎯 [Download: Data Types Interactive Playbook](https://github.com/sjasthi/Python-DS-Data-Science/blob/main/Quizzes/python_ds_statistical_data_types_playbook_and_quiz.html)
 
 **Features:**
 - Drag-and-drop activities
@@ -61,8 +61,7 @@ Welcome to Week 6! This week we dive into the foundation of Data Science - under
 
 ### 📝 Quiz: Data Types
 **Due:** Today
-
-🔗 [Take Quiz 4 in Google Classroom](https://docs.google.com/forms/d/1hCmU_U27EjhZ2n5Jl9dKClkHt4AKHMFCjv7BXcog5lA/edit)
+-- See Google Classroom for the link
 
 **Topics Covered:**
 - Qualitative vs Quantitative data
