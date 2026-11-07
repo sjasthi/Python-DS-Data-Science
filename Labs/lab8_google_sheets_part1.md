@@ -1,6 +1,7 @@
 # Lab 8: Google Sheets Part 1 — School Snack Shop
 
 **Week 8:** November 7, 2026  
+**Points:** 20  
 **Estimated time:** 40–50 minutes  
 **Tools:** Browser, Google account, and Google Sheets. Excel is not required.
 
@@ -162,6 +163,18 @@ Check after completing your own formulas:
 - The category record counts should add to 30.
 - Sales!F2 should be **$9.00**, and all 30 revenue cells should contain formulas.
 - Snack_Data should still contain the original five columns.
+
+## Grading — 20 Points
+
+| Component | What is assessed | Points |
+|---|---|---:|
+| Setup and data preparation | Correct import, required tabs, original data preserved, and appropriate formatting (Part A) | 4 |
+| Formulas and calculations | Revenue formulas filled correctly (2 points); correct formula-based answers to Q3–Q12 (6 points) | 8 |
+| Sorting and filtering | Complete rows sorted correctly and Q13 answered (2 points); Fruit filter, Q14, and all rows restored (2 points) | 4 |
+| Explanations and completeness | Q1–Q2 and pause-and-think explanations (2 points); evidence-based Q15 and a complete, clearly labeled submission (2 points) | 4 |
+| **Total** | | **20** |
+
+Partial credit is available for correct steps and formulas even when a final answer contains an error.
 
 ## What to Submit
 
