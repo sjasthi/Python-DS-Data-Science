@@ -1,6 +1,7 @@
 # Lab 9: Google Sheets Part 2 — School Snack Shop
 
 **Week 9:** November 14, 2026  
+**Points:** 20  
 **Estimated time:** 40–50 minutes  
 **Prerequisite:** [Lab 8](lab8_google_sheets_part1.md)
 
@@ -143,6 +144,18 @@ Choose one if time permits:
 
 - **Daily totals:** Create a second PivotTable with Day as Rows and SUM of Revenue as Values. Order the days Monday through Friday rather than alphabetically.
 - **Text practice:** In Practice, add G1 as **Item prefix**, enter `=LEFT(B2,3)` in G2, and fill down. Explain why a short prefix is not guaranteed to be a unique item name.
+
+## Grading — 20 Points
+
+| Component | What is assessed | Points |
+|---|---|---:|
+| Setup and data preparation | Same dataset and workbook reused, Lab 8 work preserved, and required Lab 9 tabs created (Part A) | 2 |
+| Formulas and calculations | Category summary, totals, and revenue check (3 points); Q4–Q6 conditional formulas and percentage calculation (3 points) | 6 |
+| PivotTable and chart | Correct category PivotTable, SUM settings, and cross-check in Q7 (4 points); accurate, labeled revenue chart (4 points) | 8 |
+| Explanations and completeness | Clear Q1–Q3 explanations (2 points); evidence-based Q8–Q10, recommendation, and complete submission (2 points) | 4 |
+| **Total** | | **20** |
+
+Partial credit is available for correct steps and formulas even when a final answer contains an error. Optional extensions are ungraded and are not required for full credit.
 
 ## What to Submit
 
