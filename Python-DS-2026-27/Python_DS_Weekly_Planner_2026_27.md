@@ -21,8 +21,8 @@ This course introduces middle and high school students to Data Science using Pyt
 | 4 | 10/03/26 | 10/09/26 | Chapter 10: Objects and Classes (Part 2) |
 | 5 | 10/10/26 | 10/16/26 | Data Encapsulation & Exploring Python Libraries |
 | 6 | 10/17/26 | 10/23/26 | Data Types, Data Sources & Data Formats |
-| 7 | 10/24/26 | 10/30/26 | Introduction to Excel |
-| 8 | 10/31/26 | 11/06/26 | Excel for Data Analysis |
+| 7 | 10/24/26 | 10/30/26 | VS Code, GitHub, GHCP |
+| 8 | 10/31/26 | 11/06/26 | Excel and Data Analysis |
 | 9 | 11/07/26 | 11/13/26 | Python Libraries for Data Science |
 | 10 | 11/14/26 | 11/20/26 | numpy - Introduction |
 | - | 11/21/26 | 11/27/26 | **No Class - Thanksgiving Break** |
