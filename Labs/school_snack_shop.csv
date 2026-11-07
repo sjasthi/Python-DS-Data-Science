@@ -1,0 +1,31 @@
+Day,Item,Category,Unit_Price,Units_Sold
+Monday,Apple,Fruit,0.75,12
+Monday,Banana,Fruit,0.50,10
+Monday,Popcorn,Snacks,1.00,20
+Monday,Granola Bar,Snacks,1.25,15
+Monday,Water,Drinks,1.00,25
+Monday,Juice Box,Drinks,1.50,18
+Tuesday,Apple,Fruit,0.75,15
+Tuesday,Banana,Fruit,0.50,12
+Tuesday,Popcorn,Snacks,1.00,18
+Tuesday,Granola Bar,Snacks,1.25,14
+Tuesday,Water,Drinks,1.00,22
+Tuesday,Juice Box,Drinks,1.50,20
+Wednesday,Apple,Fruit,0.75,10
+Wednesday,Banana,Fruit,0.50,14
+Wednesday,Popcorn,Snacks,1.00,22
+Wednesday,Granola Bar,Snacks,1.25,16
+Wednesday,Water,Drinks,1.00,28
+Wednesday,Juice Box,Drinks,1.50,19
+Thursday,Apple,Fruit,0.75,14
+Thursday,Banana,Fruit,0.50,11
+Thursday,Popcorn,Snacks,1.00,25
+Thursday,Granola Bar,Snacks,1.25,18
+Thursday,Water,Drinks,1.00,30
+Thursday,Juice Box,Drinks,1.50,22
+Friday,Apple,Fruit,0.75,18
+Friday,Banana,Fruit,0.50,16
+Friday,Popcorn,Snacks,1.00,30
+Friday,Granola Bar,Snacks,1.25,20
+Friday,Water,Drinks,1.00,35
+Friday,Juice Box,Drinks,1.50,25
