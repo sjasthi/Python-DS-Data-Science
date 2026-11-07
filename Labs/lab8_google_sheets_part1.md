@@ -1,156 +1,183 @@
-# Lab 8: Google Sheets for Data Analysis — Part 1
+# Lab 8: Google Sheets Part 1 — School Snack Shop
 
 **Week 8:** November 7, 2026  
-**Estimated time:** 35–45 minutes  
-**Tools:** A browser, a Google account, and Google Sheets. Excel is not required.
+**Estimated time:** 40–50 minutes  
+**Tools:** Browser, Google account, and Google Sheets. Excel is not required.
 
-## Goal
+## Your Mission
 
-Import a small dataset, use basic formulas, and explore records with sorting and filtering. Keep your workbook for [Lab 9](lab9_google_sheets_part2.md).
+Help the school snack shop understand its sales. Import data, calculate revenue, and explore which items sold well. Keep your workbook for [Lab 9](lab9_google_sheets_part2.md).
 
-By the end, you should be able to:
+You will practice:
 
-- Identify numeric and categorical columns.
-- Import data and format a spreadsheet.
-- Use COUNT, COUNTA, COUNTIF, AVERAGE, MIN, and MAX.
-- Distinguish sorting records from filtering records.
-- Record formulas and explain findings.
+- Importing and formatting a spreadsheet.
+- Multiplication and filling formulas down.
+- SUM, COUNT, COUNTA, AVERAGE, MIN, MAX, and COUNTIF.
+- Sorting and filtering complete records.
+- Explaining findings with numbers.
 
-## Shared Dataset: Iris Flowers
+## Shared Dataset: School Snack Shop
 
-We will use the **same 30 records for Lab 8 and Lab 9**. Iris is a standard dataset used to learn data analysis and machine learning. Each row describes one flower.
+Imagine helping run a school snack shop for one week. Your job is to find out what sold well and how much money the shop collected.
 
-This teaching subset contains the **first 10 records of each species** in [Seaborn's Iris CSV](https://github.com/mwaskom/seaborn-data/blob/master/iris.csv). Measurements and species labels are unchanged. The full source has 150 records; this lab uses 30. This is a small, deliberately selected subset, so describe findings as applying to these records.
+This is **fictional practice data created for these labs**. The same **30 records** are used in Lab 8 and Lab 9: six items sold on each of five school days. Each row is **one item's sales for one day**, not one purchase or one student.
 
-| Column | Meaning | Type / unit |
+| Column | Header | Meaning |
 |---|---|---|
-| A: sepal_length | Length of a sepal (outer flower part) | Number, cm |
-| B: sepal_width | Width of a sepal | Number, cm |
-| C: petal_length | Length of a petal | Number, cm |
-| D: petal_width | Width of a petal | Number, cm |
-| E: species | Flower species | Text: setosa, versicolor, virginica |
+| A | Day | Monday through Friday |
+| B | Item | Name of the item sold |
+| C | Category | Fruit, Snacks, or Drinks |
+| D | Unit_Price | Price of one item in US dollars |
+| E | Units_Sold | Number of that item sold that day |
+| F (you create) | Revenue | Unit price multiplied by units sold |
 
-**Included data:** [iris_google_sheets_labs.csv](iris_google_sheets_labs.csv)  
-**Raw CSV:** https://raw.githubusercontent.com/sjasthi/Python-DS-Data-Science/main/Labs/iris_google_sheets_labs.csv
+**Revenue** means money collected from sales. It is not profit: we do not have the shop's costs.
 
-There are 30 data rows plus one header row. The original data occupies **A1:E31**. All four measurement columns are complete.
+- [Downloadable dataset: school_snack_shop.csv](school_snack_shop.csv)
+- [Raw CSV](https://raw.githubusercontent.com/sjasthi/Python-DS-Data-Science/main/Labs/school_snack_shop.csv)
 
-## Part A: Create Your Workbook (10 minutes)
+The supplied CSV contains **A1:E31**: one header row and 30 complete data rows. You will calculate column F yourself.
+
+## Part A: Set Up Your Workbook (10 minutes)
 
 1. Open [Google Sheets](https://sheets.google.com/) and create a blank spreadsheet.
-2. Name it **YourName_Iris_Labs8_9**.
-3. Download the included CSV: open its GitHub page, choose **Raw** or **Download raw file**, and save it as a CSV.
-4. In Sheets, choose **File → Import → Upload**, select the CSV, and import it with comma as the separator. Use the option to insert a new sheet if offered.
-5. Rename the imported tab **Iris_Data**. Remove an unused empty tab if one remains.
-6. Confirm that headers occupy A1:E1 and the last data row is 31. If everything appears in one column, reimport with comma as the separator.
-7. Bold the header, freeze the first row, and resize columns so headers are readable. Format A2:D31 as numbers with two decimal places.
-8. Keep **Iris_Data** unchanged. Duplicate it and name the copy **Practice**.
-9. Create a tab named **Lab8_Answers** with columns **Question**, **Result / formula**, and **Explanation**. Put answer formulas in column B.
+2. Name it **YourName_SnackShop_Labs8_9**.
+3. Download the dataset above. On GitHub, choose **Raw** or **Download raw file**, and save the CSV.
+4. Choose **File → Import → Upload**, select the CSV, and import it with comma as the separator. Insert a new sheet if offered.
+5. Rename the imported tab **Snack_Data**. Confirm headers in A1:E1 and the final record in row 31. If everything is in one column, reimport with comma as the separator.
+6. Bold the headers, freeze the first row, and resize columns to show the headings.
+7. Format **D2:D31** as US dollar currency and **E2:E31** as whole numbers.
+8. Preserve Snack_Data as your original data. Duplicate it and name the copy **Sales**.
+9. Add a tab named **Lab8_Answers**. Use columns **Question**, **Result / formula**, and **Explanation**.
 
 ### Copy-and-Paste Alternative
 
-Instead of downloading, copy the tab-separated block below into cell A1 of an empty **Iris_Data** tab. It contains exactly the same data as the CSV. Do not import it a second time if you already imported the CSV.
+Instead of importing the CSV, paste the tab-separated block below into A1 of an empty **Snack_Data** tab. It is the same data. Do not add it again if you already imported the CSV.
 
 ```tsv
-sepal_length	sepal_width	petal_length	petal_width	species
-5.1	3.5	1.4	0.2	setosa
-4.9	3.0	1.4	0.2	setosa
-4.7	3.2	1.3	0.2	setosa
-4.6	3.1	1.5	0.2	setosa
-5.0	3.6	1.4	0.2	setosa
-5.4	3.9	1.7	0.4	setosa
-4.6	3.4	1.4	0.3	setosa
-5.0	3.4	1.5	0.2	setosa
-4.4	2.9	1.4	0.2	setosa
-4.9	3.1	1.5	0.1	setosa
-7.0	3.2	4.7	1.4	versicolor
-6.4	3.2	4.5	1.5	versicolor
-6.9	3.1	4.9	1.5	versicolor
-5.5	2.3	4.0	1.3	versicolor
-6.5	2.8	4.6	1.5	versicolor
-5.7	2.8	4.5	1.3	versicolor
-6.3	3.3	4.7	1.6	versicolor
-4.9	2.4	3.3	1.0	versicolor
-6.6	2.9	4.6	1.3	versicolor
-5.2	2.7	3.9	1.4	versicolor
-6.3	3.3	6.0	2.5	virginica
-5.8	2.7	5.1	1.9	virginica
-7.1	3.0	5.9	2.1	virginica
-6.3	2.9	5.6	1.8	virginica
-6.5	3.0	5.8	2.2	virginica
-7.6	3.0	6.6	2.1	virginica
-4.9	2.5	4.5	1.7	virginica
-7.3	2.9	6.3	1.8	virginica
-6.7	2.5	5.8	1.8	virginica
-7.2	3.6	6.1	2.5	virginica
+Day	Item	Category	Unit_Price	Units_Sold
+Monday	Apple	Fruit	0.75	12
+Monday	Banana	Fruit	0.50	10
+Monday	Popcorn	Snacks	1.00	20
+Monday	Granola Bar	Snacks	1.25	15
+Monday	Water	Drinks	1.00	25
+Monday	Juice Box	Drinks	1.50	18
+Tuesday	Apple	Fruit	0.75	15
+Tuesday	Banana	Fruit	0.50	12
+Tuesday	Popcorn	Snacks	1.00	18
+Tuesday	Granola Bar	Snacks	1.25	14
+Tuesday	Water	Drinks	1.00	22
+Tuesday	Juice Box	Drinks	1.50	20
+Wednesday	Apple	Fruit	0.75	10
+Wednesday	Banana	Fruit	0.50	14
+Wednesday	Popcorn	Snacks	1.00	22
+Wednesday	Granola Bar	Snacks	1.25	16
+Wednesday	Water	Drinks	1.00	28
+Wednesday	Juice Box	Drinks	1.50	19
+Thursday	Apple	Fruit	0.75	14
+Thursday	Banana	Fruit	0.50	11
+Thursday	Popcorn	Snacks	1.00	25
+Thursday	Granola Bar	Snacks	1.25	18
+Thursday	Water	Drinks	1.00	30
+Thursday	Juice Box	Drinks	1.50	22
+Friday	Apple	Fruit	0.75	18
+Friday	Banana	Fruit	0.50	16
+Friday	Popcorn	Snacks	1.00	30
+Friday	Granola Bar	Snacks	1.25	20
+Friday	Water	Drinks	1.00	35
+Friday	Juice Box	Drinks	1.50	25
 ```
 
-If the pasted block stays in column A, select the pasted cells and use **Data → Split text to columns**, choosing Tab or automatic detection. Confirm A1:E31 before continuing.
+If it stays in one column, use **Data → Split text to columns** with Tab or automatic detection. Confirm A1:E31, then complete the formatting and tab setup above.
 
-## Part B: Describe the Data with Formulas (15 minutes)
+## Part B: Calculate Revenue (10 minutes)
 
-Enter one answer per row on **Lab8_Answers**. Label each answer Q1–Q8. Use formulas that reference **Iris_Data**, so sorting Practice does not affect your work.
+Work on **Sales**, leaving Snack_Data unchanged.
+
+1. Type **Revenue** in F1.
+2. In F2, enter:
+
+```excel
+=D2*E2
+```
+
+3. Press Enter. The first row's revenue should be **$9.00**: 12 apples at $0.75 each.
+4. Select F2 and drag the small fill handle down through **F31**.
+5. Click F3 and confirm the formula is `=D3*E3`. In F31 it should be `=D31*E31`.
+6. Format F2:F31 as US dollar currency.
+
+**Q1:** In Lab8_Answers, explain why the row numbers change when you copy the formula down.
+
+**Q2:** Explain the difference between **units sold** and **revenue**, using the first sales row as your example.
+
+## Part C: Answer the Shop Manager's Questions (15 minutes)
+
+On **Lab8_Answers**, label answers Q3–Q12. Enter formulas in column B, referencing **Sales**.
 
 | Question | Task | Hint |
 |---|---|---|
-| Q1 | How many flowers are recorded? | COUNT on a measurement column |
-| Q2 | How many species labels are present? | COUNTA on column E |
-| Q3 | What is the average sepal length? | AVERAGE on column A |
-| Q4 | What is the shortest petal length? | MIN on column C |
-| Q5 | What is the longest petal length? | MAX on column C |
-| Q6 | How many flowers are setosa? | COUNTIF on column E |
-| Q7 | How many flowers are versicolor? | COUNTIF on column E |
-| Q8 | How many flowers are virginica? | COUNTIF on column E |
+| Q3 | How many daily item-sales records are there? | COUNT on Units_Sold |
+| Q4 | How many item names are filled in? | COUNTA on Item |
+| Q5 | How many individual items were sold during the week? | SUM on Units_Sold |
+| Q6 | How much revenue did the shop collect during the week? | SUM on Revenue |
+| Q7 | What is the average number of units sold per record? | AVERAGE on Units_Sold |
+| Q8 | What is the lowest unit price? | MIN on Unit_Price |
+| Q9 | What is the highest unit price? | MAX on Unit_Price |
+| Q10 | How many records belong to Fruit? | COUNTIF on Category |
+| Q11 | How many records belong to Snacks? | COUNTIF on Category |
+| Q12 | How many records belong to Drinks? | COUNTIF on Category |
 
-**Worked example for Q1:**
+**Worked example for Q3:**
 
 ```excel
-=COUNT(Iris_Data!A2:A31)
+=COUNT(Sales!E2:E31)
 ```
 
-For COUNTIF, the species criterion is text, such as `"setosa"`. Format average and measurement results to two decimal places while retaining the underlying formula.
+For COUNTIF, use text in quotation marks, such as `"Fruit"`. Use the exact category spelling in the data.
 
-**Think about it:** Why might COUNT and COUNTA give different results on the species column? Explain in one sentence.
+**Pause and think:** Q3 counts records. Q5 counts individual items. Why are those different numbers? Also, why would COUNT and COUNTA give different results on the text in column B? Add your explanations below your answers.
 
-## Part C: Sort and Filter (10 minutes)
+## Part D: Sort and Filter (10 minutes)
 
-Work only on **Practice**.
+1. Duplicate the completed **Sales** tab and rename the copy **Practice**.
+2. On Practice, select the entire table **A1:F31** and choose **Data → Create a filter**.
+3. Use the Units_Sold header's filter menu to sort **Z → A** (largest to smallest). Keep all six columns together.
+4. **Q13:** Which item and day had the highest units sold in a single record? Give the units sold and revenue for that record.
+5. Filter Category to **Fruit** only.
+6. **Q14:** How many records are visible? Name the two fruit items.
+7. Restore all categories. Confirm that all 30 records are visible.
 
-1. Select the complete table **A1:E31** and create a filter using **Data → Create a filter**.
-2. Use the sepal length header's filter menu to sort **Z → A** (largest to smallest). Keep all columns together.
-3. **Q9:** Record the largest sepal length and its species.
-4. Filter species to **setosa** only.
-5. **Q10:** How many records remain visible? What do you notice about their petal lengths?
-6. Restore all species in the filter. Confirm that all 30 records are visible again.
+**Note:** Ordinary SUM, COUNT, and AVERAGE formulas include rows hidden by a filter. Use the visible rows for Q14; Lab 9 introduces formulas for category-specific totals.
 
-**Important:** COUNT and AVERAGE on ordinary ranges still include rows hidden by a filter. For this activity, count the visible records directly; in Lab 9, use conditional formulas to summarize specific groups.
+## Part E: Recommend One Next Step (5 minutes)
 
-## Part D: Reflect and Save (5 minutes)
+**Q15:** Write one observation supported by a number and one question to investigate in Lab 9. For example, you might ask whether the category selling the most units also earns the most revenue.
 
-On **Lab8_Answers**, write:
+### Self-Check
 
-- **Q11:** Two observations supported by your calculations. Include a number and unit where relevant.
-- **Q12:** One question about species differences you would like to investigate in Lab 9.
+Check after completing your own formulas:
 
-### Check Your Setup
-
-- Q1 and Q2 should both be **30**.
-- Q6, Q7, and Q8 should add to Q1.
-- There should be no missing measurement cells in A2:D31.
-- The original Iris_Data tab should still have 30 data rows.
+- Q3 and Q4 should both be **30**.
+- Q5 should be **574 units**.
+- The category record counts should add to 30.
+- Sales!F2 should be **$9.00**, and all 30 revenue cells should contain formulas.
+- Snack_Data should still contain the original five columns.
 
 ## What to Submit
 
-Submit your Google Sheets link through the usual course submission channel. Give your instructor viewer access and test the link. Your workbook should contain:
+Submit your workbook link through the usual course submission channel. Give your instructor viewer access and test the link.
 
-- **Iris_Data:** unchanged source records.
-- **Practice:** your sorting/filtering work, with all species visible at the end.
-- **Lab8_Answers:** Q1–Q12, with formulas for Q1–Q8 and written explanations.
+Your workbook should contain:
 
-Keep this same workbook for Lab 9. Follow the instructor's announced submission deadline.
+- **Snack_Data:** original A1:E31 dataset.
+- **Sales:** A1:F31 with calculated revenue.
+- **Practice:** sorting/filtering work, with all records visible at the end.
+- **Lab8_Answers:** Q1–Q15, formula answers for Q3–Q12, and the pause-and-think explanations.
+
+Keep this workbook for Lab 9. Follow the instructor's announced deadline. This mini lab is separate practice from Assignment 6.
 
 ## Help
 
-[Google Sheets Tutorial for Beginners — Kevin Stratvert](https://www.youtube.com/watch?v=TENAbUa-R-w): data entry at 7:46, formulas at 19:54, sorting/filtering at 33:57.
+[Google Sheets Tutorial for Beginners — Kevin Stratvert](https://www.youtube.com/watch?v=TENAbUa-R-w): entering data at 7:46, formulas at 19:54, sorting/filtering at 33:57.
 
-[Continue to Lab 9: Part 2](lab9_google_sheets_part2.md)
+[Continue to Lab 9](lab9_google_sheets_part2.md)
