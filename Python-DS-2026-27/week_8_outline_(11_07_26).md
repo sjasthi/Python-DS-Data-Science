@@ -40,7 +40,7 @@ Use **either Excel or Google Sheets**. Follow the videos for your chosen platfor
 | [Pivot Table Excel — Step-by-Step Tutorial](https://www.youtube.com/watch?v=dvbLrwD2SpA) | Kevin Stratvert | Week 9: summarizing and exploring data |
 | [Full Project in Excel](https://www.youtube.com/watch?v=opJgMj1IUrc) | Alex The Analyst | Week 9: guided application; use relevant sections as needed |
 
-The guided project is a learning resource, not an additional assignment. The Titanic assignment below remains the graded work.
+The guided project is a learning resource, not an additional assignment. The Titanic assignment and the weekly lab below are graded separately.
 
 #### Google Sheets
 No Excel installation is needed. Start at [Google Sheets](https://sheets.google.com/).
@@ -60,6 +60,22 @@ Useful chapters in Kevin's main Google Sheets tutorial:
 - [39:09 — PivotTables](https://www.youtube.com/watch?v=TENAbUa-R-w&t=2349s)
 
 Use the assignment instructions and built-in function help for specific functions beyond the introductory videos.
+
+---
+
+## 🧪 Lab 8: Google Sheets Part 1 — School Snack Shop
+
+- **Instructions:** [Lab 8: Google Sheets Part 1](../Labs/lab8_google_sheets_part1.md)
+- **Worth:** 20 points. The detailed grading rubric is included in the lab.
+- **Estimated time:** 40–50 minutes.
+- **Dataset:** [School snack shop CSV](../Labs/school_snack_shop.csv) — 30 fictional sales records shared by Labs 8 and 9.
+- **Platform:** Google Sheets; no Excel installation is needed.
+
+Import the data, calculate revenue, practice basic formulas, and sort and filter sales records. The lab also includes copy-and-paste data.
+
+Submit your workbook link through the usual course submission channel with instructor viewer access. Keep **YourName_SnackShop_Labs8_9** for Lab 9.
+
+Follow the instructor's announced lab deadline. This **20-point lab is graded separately from the 50-point Titanic Assignment 6**.
 
 ---
 
@@ -89,8 +105,8 @@ The existing assignment questions and submission instructions remain the same. F
 
 | Dates | Focus | Activities |
 |---|---|---|
-| November 7–8 | Foundations | Review the presentation. Excel students: watch the beginner tutorial. Sheets students: begin the main Sheets tutorial through formulas and references. Practice entering data and basic formulas. |
-| November 9–10 | Data exploration | Import the Titanic CSV using your assignment instructions. Practice counts, averages, sorting, and filtering. Excel students: watch the cleaning tutorial. Sheets students: continue through sorting/filtering and use the formulas tutorial as needed. |
+| November 7–8 | Foundations | Review the presentation. Excel students: watch the beginner tutorial. Sheets students: begin the main Sheets tutorial through formulas and references. Practice entering data and basic formulas. Begin Lab 8 using the school snack shop data. |
+| November 9–10 | Data exploration | Complete Lab 8 (20 points) and save its workbook for Lab 9. Import the Titanic CSV using your assignment instructions. Practice counts, averages, sorting, and filtering. Excel students: watch the cleaning tutorial. Sheets students: continue through sorting/filtering and use the formulas tutorial as needed. |
 | November 11–12 | Start Assignment 6 | Work on Part A, Questions 1–10. Check missing values, data types, and unique tickets. Document your formulas. |
 | November 13 | Review and prepare | Finish Part A where possible, begin Part B, and bring unresolved questions to the next class. |
 
@@ -117,6 +133,7 @@ The existing assignment questions and submission instructions remain the same. F
 
 - [ ] Review the course presentation.
 - [ ] Follow the introductory videos for your chosen platform.
+- [ ] Complete Lab 8 (20 points), submit its workbook link, and keep the workbook for Lab 9.
 - [ ] Import the Titanic dataset.
 - [ ] Practice basic functions, sorting, and filtering.
 - [ ] Work through Part A and begin Part B.
@@ -124,6 +141,6 @@ The existing assignment questions and submission instructions remain the same. F
 
 ## 🚀 Looking Ahead: Week 9
 
-On **November 14**, we will continue with conditional calculations, text extraction, PivotTables, and charts. You will complete and submit Assignment 6 by **Friday, November 20, 2026, at 11:59 PM (course time)**.
+On **November 14**, Lab 9 (20 points) will reuse your snack shop workbook. We will continue with conditional calculations, text extraction, PivotTables, and charts. You will complete and submit Assignment 6 by **Friday, November 20, 2026, at 11:59 PM (course time)**.
 
 [Next: Week 9 outline](week_9_outline_%2811_14_26%29.md)
