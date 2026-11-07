@@ -1,155 +1,176 @@
-# Lab 9: Google Sheets for Data Analysis — Part 2
+# Lab 9: Google Sheets Part 2 — School Snack Shop
 
 **Week 9:** November 14, 2026  
 **Estimated time:** 40–50 minutes  
 **Prerequisite:** [Lab 8](lab8_google_sheets_part1.md)
 
-## Goal
+## Your Mission
 
-Reuse your Iris workbook to compare species with conditional formulas, build a PivotTable, and communicate a finding with a chart.
+The snack shop manager wants to know which categories sell the most and collect the most money. Use the **same workbook and data from Lab 8** to create a category summary, a PivotTable, and a chart. Finish with a recommendation.
 
-By the end, you should be able to:
+You will practice COUNTIF, SUMIF, AVERAGEIF, COUNTIFS, absolute references, PivotTables, and charts.
 
-- Use COUNTIF, COUNTIFS, and AVERAGEIF.
-- Copy formulas using absolute and relative references.
-- Cross-check a summary table against a PivotTable.
-- Create a labeled column chart.
-- Explain findings and the limits of a small dataset.
+## Shared Dataset: School Snack Shop
 
-## Shared Dataset: Iris Flowers
+Imagine helping run a school snack shop for one week. Your job is to find out what sold well and how much money the shop collected.
 
-We will use the **same 30 records for Lab 8 and Lab 9**. Iris is a standard dataset used to learn data analysis and machine learning. Each row describes one flower.
+This is **fictional practice data created for these labs**. The same **30 records** are used in Lab 8 and Lab 9: six items sold on each of five school days. Each row is **one item's sales for one day**, not one purchase or one student.
 
-This teaching subset contains the **first 10 records of each species** in [Seaborn's Iris CSV](https://github.com/mwaskom/seaborn-data/blob/master/iris.csv). Measurements and species labels are unchanged. The full source has 150 records; this lab uses 30. This is a small, deliberately selected subset, so describe findings as applying to these records.
-
-| Column | Meaning | Type / unit |
+| Column | Header | Meaning |
 |---|---|---|
-| A: sepal_length | Length of a sepal (outer flower part) | Number, cm |
-| B: sepal_width | Width of a sepal | Number, cm |
-| C: petal_length | Length of a petal | Number, cm |
-| D: petal_width | Width of a petal | Number, cm |
-| E: species | Flower species | Text: setosa, versicolor, virginica |
+| A | Day | Monday through Friday |
+| B | Item | Name of the item sold |
+| C | Category | Fruit, Snacks, or Drinks |
+| D | Unit_Price | Price of one item in US dollars |
+| E | Units_Sold | Number of that item sold that day |
+| F (you create) | Revenue | Unit price multiplied by units sold |
 
-**Included data:** [iris_google_sheets_labs.csv](iris_google_sheets_labs.csv)  
-**Raw CSV:** https://raw.githubusercontent.com/sjasthi/Python-DS-Data-Science/main/Labs/iris_google_sheets_labs.csv
+**Revenue** means money collected from sales. It is not profit: we do not have the shop's costs.
 
-There are 30 data rows plus one header row. The original data occupies **A1:E31**. All four measurement columns are complete.
+- [Downloadable dataset: school_snack_shop.csv](school_snack_shop.csv)
+- [Raw CSV](https://raw.githubusercontent.com/sjasthi/Python-DS-Data-Science/main/Labs/school_snack_shop.csv)
+
+The supplied CSV contains **A1:E31**: one header row and 30 complete data rows. You will calculate column F yourself.
 
 ## Part A: Reopen and Check (5 minutes)
 
-1. Open **YourName_Iris_Labs8_9** from Lab 8. Do not create a different dataset.
-2. Confirm that **Iris_Data** contains the original five columns in A1:E31 and all 30 data rows.
-3. If you missed Lab 8, use its import instructions or copy-and-paste data to create Iris_Data first.
-4. Create a new tab named **Lab9_Analysis**. Preserve your Lab 8 answers.
+1. Open **YourName_SnackShop_Labs8_9**.
+2. Confirm that **Snack_Data** holds the original A1:E31 dataset and **Sales** holds A1:F31 with Revenue calculated in F2:F31.
+3. Check that the first revenue formula is `=D2*E2`, and total Units_Sold is 574.
+4. If you missed Lab 8, import its data and complete its revenue calculation before continuing.
+5. Create a tab named **Lab9_Analysis**. Keep all Lab 8 tabs.
+6. Create a tab named **Lab9_Answers** with columns **Question**, **Result / formula**, and **Explanation**. Record Q1–Q10 here.
 
-## Part B: Build a Species Summary (10 minutes)
+## Part B: Compare Categories (10 minutes)
 
-On **Lab9_Analysis**, enter this structure:
+On **Lab9_Analysis**, enter these headings and category names:
 
-| Cell / range | Enter |
+| Cell | Enter |
 |---|---|
-| A1 | Species |
-| B1 | Flower count |
-| C1 | Average petal length (cm) |
-| D1 | Average sepal length (cm) |
-| A2 | setosa |
-| A3 | versicolor |
-| A4 | virginica |
+| A1 | Category |
+| B1 | Record count |
+| C1 | Total units sold |
+| D1 | Total revenue ($) |
+| E1 | Average units per record |
+| A2 | Fruit |
+| A3 | Snacks |
+| A4 | Drinks |
 
-Enter these formulas in row 2:
-
-```excel
-B2: =COUNTIF(Iris_Data!$E$2:$E$31,A2)
-C2: =AVERAGEIF(Iris_Data!$E$2:$E$31,A2,Iris_Data!$C$2:$C$31)
-D2: =AVERAGEIF(Iris_Data!$E$2:$E$31,A2,Iris_Data!$A$2:$A$31)
-```
-
-The labels `B2:`, `C2:`, and `D2:` identify destination cells; enter only the formula beginning with `=`.
-
-1. Select B2:D2 and drag the fill handle down through row 4.
-2. Format C2:D4 to two decimal places.
-3. In A6, type **Total flowers**. In B6, calculate `=SUM(B2:B4)`.
-4. In A7, type **Check against source**. In B7, enter `=B6=COUNTA(Iris_Data!E2:E31)`. It should return TRUE.
-
-**Q1:** Why are the data ranges locked with dollar signs while A2 is not?
-
-**Q2:** Which species has the greatest average petal length in these records? Give the value in centimeters.
-
-## Part C: Analyze Multiple Conditions (10 minutes)
-
-Below the summary, use **A10:C16** for labels, answer formulas, and explanations.
-
-- **Q3:** How many virginica flowers have petal length **greater than 5 cm**?
-- **Q4:** What percentage of virginica flowers meet that condition?
-
-Use this pattern for Q3:
+Enter these formulas:
 
 ```excel
-=COUNTIFS(Iris_Data!E2:E31,"virginica",Iris_Data!C2:C31,">5")
+B2: =COUNTIF(Sales!$C$2:$C$31,A2)
+C2: =SUMIF(Sales!$C$2:$C$31,A2,Sales!$E$2:$E$31)
+D2: =SUMIF(Sales!$C$2:$C$31,A2,Sales!$F$2:$F$31)
+E2: =AVERAGEIF(Sales!$C$2:$C$31,A2,Sales!$E$2:$E$31)
 ```
 
-For Q4, divide Q3's result by the number of virginica flowers, using a formula or the summary cell. Format the result as a percentage. Do not multiply by 100 and also apply percentage formatting.
+Enter only the formula beginning with `=`; labels such as `B2:` identify destination cells.
 
-**Q5:** Write your own question with two conditions involving species and one measurement. Record the question, a COUNTIFS formula, and the result. Check the result using filters on Practice.
+1. Select B2:E2 and fill down through row 4.
+2. Format D2:D4 as US dollar currency and E2:E4 to one decimal place.
+3. In A6, type **Totals**. In B6, C6, and D6, use SUM to add the corresponding rows 2–4. Leave E6 blank: adding averages is not a useful total.
+4. In A7, type **Revenue check**. In D7, enter `=D6=SUM(Sales!F2:F31)`. It should return TRUE.
 
-**Q6:** Is a rule such as “petal length > 5 cm means virginica” proven for all Iris flowers by this lab? Explain using the size and selection of our dataset.
+Answer on **Lab9_Answers**:
 
-## Part D: Create and Check a PivotTable (10 minutes)
+- **Q1:** Why are source ranges locked with dollar signs while A2 is not?
+- **Q2:** Which category sold the most units? Which collected the most revenue? Include both totals.
+- **Q3:** What does “Record count” mean? Explain why it is different from “Total units sold.”
 
-1. Select **Iris_Data!A1:E31**, including the headers.
-2. Choose **Insert → Pivot table** and place it on a new sheet. Rename that sheet **Lab9_Pivot**.
-3. In the Pivot table editor, add **species** under Rows.
-4. Add **petal_length** under Values and change **Summarize by** to **AVERAGE**.
-5. Add **species** under Values and summarize by **COUNTA** to count flowers.
-6. Format average petal lengths to two decimal places.
-7. Compare all three species averages and counts with **Lab9_Analysis!A1:C4**.
+## Part C: Ask a More Specific Question (10 minutes)
 
-**Q7:** Record whether the PivotTable and formula summary agree. If they do not, check the source range, aggregation setting, and criteria spelling before proceeding.
+**Q4:** On how many item-day records did **Drinks** sell **at least 25 units**?
 
-**Self-check:** Each species should have 10 records. Average petal length for setosa should display as **1.45 cm**. Use this as a check after doing your own work.
+```excel
+=COUNTIFS(Sales!C2:C31,"Drinks",Sales!E2:E31,">=25")
+```
 
-## Part E: Create a Chart and Interpret It (10 minutes)
+**Q5:** What percentage of the Drinks records meet that condition?
 
-1. On Lab9_Analysis, select **A1:A4** and **C1:C4** as nonadjacent ranges. You can use Ctrl (Windows) or Command (Mac) to select both.
-2. Choose **Insert → Chart** and select a **Column chart**.
-3. In the chart's Setup panel, confirm that **species** is the horizontal axis and **average petal length** is the only series. Remove flower count if Sheets includes it.
-4. If selecting nonadjacent ranges is difficult, create an adjacent two-column chart table in F1:G4. Link its entries to the species and average petal length cells using formulas, then chart that table.
-5. Title the chart **Average Petal Length by Species — 30-Flower Subset**.
-6. Label the horizontal axis **Species** and the vertical axis **Average petal length (cm)**. Start the vertical axis at zero.
+Divide Q4's result by the number of Drinks records, using COUNTIF or a link to the summary table. Format the result as a percentage. Do not multiply by 100 and also use percentage formatting.
 
-Below the chart, answer:
+This is a percentage of **records**, not a percentage of all drink units sold.
 
-- **Q8:** Describe two comparisons using numbers and units.
-- **Q9:** Explain why comparing averages tells us more about petal length than comparing counts in this particular dataset.
-- **Q10:** What additional data would help you investigate your findings further?
+**Q6:** Create your own question with two conditions, such as a day and a minimum quantity, or a category and a minimum revenue. Record the question, COUNTIFS formula, and result. Use filters on Practice to check your answer, then restore all rows.
 
-## Optional Extension: Text Functions
+## Part D: Build a PivotTable (10 minutes)
 
-In **Practice**, add a column F named **Species prefix**. Enter `=LEFT(E2,3)` in F2 and fill down through F31. Explain what the formula extracts and whether a three-letter prefix is guaranteed to identify every possible species uniquely. Leave Iris_Data unchanged.
+1. Select **Sales!A1:F31**, including the headers.
+2. Choose **Insert → Pivot table**, place it on a new sheet, and rename the tab **Lab9_Pivot**.
+3. In the Pivot table editor, add **Category** under Rows.
+4. Add **Units_Sold** under Values; summarize by **SUM**.
+5. Add **Revenue** under Values; summarize by **SUM**.
+6. Format the revenue results as US dollar currency.
+7. Compare the totals for each category and the grand totals with Lab9_Analysis.
+
+**Q7:** Do the PivotTable and formula summary agree for all three categories? If not, check the data range and make sure values are summarized by SUM.
+
+**Self-check:** Fruit revenue should be **$83.25**. The grand totals should be **574 units** and **$598.00 revenue**. Check after building your own summary.
+
+## Part E: Make a Chart and a Recommendation (10 minutes)
+
+### Build the Chart
+
+On **Lab9_Analysis**, create an adjacent chart table:
+
+| Cell | Enter |
+|---|---|
+| G1 | Category |
+| H1 | Revenue ($) |
+| G2 | `=A2` |
+| H2 | `=D2` |
+
+1. Fill G2:H2 down through row 4.
+2. Select **G1:H4**, choose **Insert → Chart**, and use a **Column chart**.
+3. Confirm Category is the horizontal axis and Revenue is the only series.
+4. Title it **School Snack Shop: Weekly Revenue by Category**.
+5. Label the horizontal axis **Category** and the vertical axis **Revenue (US dollars)**. Start the vertical axis at zero.
+
+### Explain Your Findings
+
+On Lab9_Answers:
+
+- **Q8:** Compare two categories using revenue amounts. How much more revenue did one collect?
+- **Q9:** Recommend one action for the shop manager, supported by a number. Name one extra piece of information you would want before deciding what to stock next week.
+- **Q10:** Can we tell which category made the most **profit**? Explain what information is missing.
+
+Remember: these are fictional sales for one week. They do not prove what every school or future week will be like.
+
+## Optional Extensions
+
+Choose one if time permits:
+
+- **Daily totals:** Create a second PivotTable with Day as Rows and SUM of Revenue as Values. Order the days Monday through Friday rather than alphabetically.
+- **Text practice:** In Practice, add G1 as **Item prefix**, enter `=LEFT(B2,3)` in G2, and fill down. Explain why a short prefix is not guaranteed to be a unique item name.
 
 ## What to Submit
 
-Submit the **same workbook link** used for Lab 8 through the usual course submission channel, with instructor viewer access. Keep all Lab 8 tabs and include:
+Submit the **same workbook link** used for Lab 8 through the usual course submission channel, with instructor viewer access.
 
-- **Lab9_Analysis:** summary formulas, Q1–Q10 answers, and the labeled chart.
-- **Lab9_Pivot:** species counts and average petal lengths.
+Keep your Lab 8 tabs and include:
 
-Follow the instructor's announced submission deadline. These mini labs are separate practice from Assignment 6.
+- **Lab9_Analysis:** category summary, totals, check formula, and labeled chart.
+- **Lab9_Pivot:** total units and revenue by category.
+- **Lab9_Answers:** Q1–Q10, including formulas for Q4–Q6.
+
+Follow the instructor's announced deadline. These mini labs are separate practice from Assignment 6.
 
 ## Final Checklist
 
-- [ ] Same 30 Iris records used in both labs.
-- [ ] Summary formulas copied correctly and source count check returns TRUE.
-- [ ] Conditional count and percentage use the intended denominator.
-- [ ] PivotTable agrees with the summary for all three species.
-- [ ] Chart shows averages, species labels, and centimeters.
-- [ ] Findings refer to this subset rather than all Iris flowers.
-- [ ] Original data and Lab 8 work are preserved.
+- [ ] Both labs use the same 30 snack shop records.
+- [ ] Original data and Lab 8 answers are preserved.
+- [ ] All Sales revenue values are calculated with formulas.
+- [ ] Summary formulas copy correctly and the revenue check returns TRUE.
+- [ ] Percentage uses the number of Drinks records as its denominator.
+- [ ] PivotTable agrees with the formula summary.
+- [ ] Chart shows dollars rather than units sold.
+- [ ] Recommendation includes evidence, and revenue is distinguished from profit.
 - [ ] Instructor can open the link.
 
 ## Connection to Python
 
-These activities prepare you for pandas: COUNTIFS resembles filtering plus counting, AVERAGEIF resembles grouped averages, and a PivotTable resembles `groupby()` or `pivot_table()`.
+In pandas, multiplying columns calculates revenue, filtering plus counting answers multiple-condition questions, and `groupby()` can summarize units and revenue by category.
 
 ## Help
 
@@ -157,4 +178,4 @@ These activities prepare you for pandas: COUNTIFS resembles filtering plus count
 
 [Google Sheets Formulas Tutorial — Kevin Stratvert](https://www.youtube.com/watch?v=9TVmdFtmbbo)
 
-[Back to Lab 8: Part 1](lab8_google_sheets_part1.md)
+[Back to Lab 8](lab8_google_sheets_part1.md)
