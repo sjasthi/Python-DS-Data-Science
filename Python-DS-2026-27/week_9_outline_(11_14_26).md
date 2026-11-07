@@ -39,7 +39,7 @@ Use **either Excel or Google Sheets**. Follow the videos for your chosen platfor
 | [Pivot Table Excel — Step-by-Step Tutorial](https://www.youtube.com/watch?v=dvbLrwD2SpA) | Kevin Stratvert | Week 9: summarizing and exploring data |
 | [Full Project in Excel](https://www.youtube.com/watch?v=opJgMj1IUrc) | Alex The Analyst | Week 9: guided application; use relevant sections as needed |
 
-The guided project is a learning resource, not an additional assignment. The Titanic assignment below remains the graded work.
+The guided project is a learning resource, not an additional assignment. The Titanic assignment and the weekly lab below are graded separately.
 
 #### Google Sheets
 No Excel installation is needed. Start at [Google Sheets](https://sheets.google.com/).
@@ -59,6 +59,22 @@ Useful chapters in Kevin's main Google Sheets tutorial:
 - [39:09 — PivotTables](https://www.youtube.com/watch?v=TENAbUa-R-w&t=2349s)
 
 Use the assignment instructions and built-in function help for specific functions beyond the introductory videos.
+
+---
+
+## 🧪 Lab 9: Google Sheets Part 2 — School Snack Shop
+
+- **Instructions:** [Lab 9: Google Sheets Part 2](../Labs/lab9_google_sheets_part2.md)
+- **Worth:** 20 points. The detailed grading rubric is included in the lab.
+- **Estimated time:** 40–50 minutes.
+- **Dataset:** [School snack shop CSV](../Labs/school_snack_shop.csv) — 30 fictional sales records shared by Labs 8 and 9.
+- **Platform:** Google Sheets; no Excel installation is needed.
+
+Continue in **YourName_SnackShop_Labs8_9** from Lab 8. Compare categories using conditional formulas, build a PivotTable, create a revenue chart, and make an evidence-based recommendation.
+
+Submit the same workbook link through the usual course submission channel with instructor viewer access. Preserve your Lab 8 tabs and add the required Lab 9 analysis, PivotTable, and answers.
+
+Follow the instructor's announced lab deadline. This **20-point lab is graded separately from the 50-point Titanic Assignment 6**.
 
 ---
 
@@ -117,8 +133,8 @@ These are practice activities; follow the existing assignment instructions for g
 
 | Dates | Focus | Activities |
 |---|---|---|
-| November 14–15 | Conditional and text functions | Resolve Week 8 questions. Practice multi-criteria formulas and text extraction. Continue Parts B and C. |
-| November 16–17 | Summaries and application | Follow the PivotTable/chart resources for your platform. Excel students can use the full project for guided practice. Complete remaining assignment questions. |
+| November 14–15 | Conditional and text functions | Resolve Week 8 questions. Practice multi-criteria formulas and text extraction. Continue Parts B and C. Begin Lab 9 in your Lab 8 snack shop workbook. |
+| November 16–17 | Summaries and application | Follow the PivotTable/chart resources for your platform. Excel students can use the full project for guided practice. Complete Lab 9 (20 points), including its PivotTable, chart, and recommendation. Complete remaining assignment questions. |
 | November 18–19 | Review | Check all 25 answers, formula ranges, missing values, and percentage calculations. Explain complex formulas and organize the Answers sheet. |
 | Friday, November 20 | Submit | Follow your platform's existing submission instructions. Check the file or sharing access and submit by 11:59 PM (course time). |
 
@@ -134,6 +150,9 @@ These are practice activities; follow the existing assignment instructions for g
 - Use assignment hints, built-in function help, and class discussions when you get stuck.
 
 ## 🔍 Submission Checklist
+
+- [ ] Complete Lab 9 (20 points) and submit the shared workbook link with instructor viewer access.
+- [ ] Preserve Lab 8 work and include all required Lab 9 tabs.
 
 - [ ] Answer all 25 questions.
 - [ ] Label answers by question number.
